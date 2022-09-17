@@ -6,6 +6,7 @@ This project generate openapi3 server code for gin restapi
 ```bash
 cd ~
 mkdir golang
+cd golang
 git clone https://github.com/SIMITGROUP/openapigenerator.git
 ```
 2. build this project
@@ -15,7 +16,7 @@ go build .
 ```
 3. prepare openapi v3 spec file into this folder (just let you know there is sample, you can skip this step)
 ```bash
-cp sample/spec.yml ~/openapigenerator
+cp sample/spec.yml .
 ```
 4. Generate ***openapi/openapi.go***, ***openapi/schema.go***, ***openapi/userfunction.go***
 ```bash
@@ -28,7 +29,7 @@ mkdir ~/golang/openapiserver
 cd ~/golang/openapiserver
 cp ../openapigenerator/spec.yml ~/openapiserver
 go mod init openapiserver
-cp -a ../openapigenerator/openapi ~/openapiserver
+cp -a ../openapigenerator/openapi .
 touch main.go
 ```
 
@@ -50,7 +51,7 @@ func main() {
 
 7. run server
 ```bash
-cd ~/openapiserver
+go get .
 go run .
 ```
 
