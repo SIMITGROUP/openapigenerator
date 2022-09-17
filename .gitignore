@@ -1,2 +1,5 @@
 
 spec.yml
+openapi/openapi.go
+openapi/schema.go
+openapi/userfunction.go
