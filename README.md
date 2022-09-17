@@ -25,7 +25,7 @@ cp ~/spec.yml ~/openapigenerator
 
 mkdir ~/openapiserver
 cd ~/openapiserver
-copy ~/spec.yml ~/openapiserver
+cp ~/openapigenerator/spec.yml ~/openapiserver
 go mod init openapiserver
 cp -a ../openapigenerator/openapi ~/openapiserver
 touch main.go
