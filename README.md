@@ -22,6 +22,9 @@ cp sample/spec.yml .
 ```bash
 ./openapigenerator spec.yml 
 ```
+edit *** openapi/userfunction.go *** to perform actual api execution
+
+
 5. initiate new go microservices project
 ```bash
 
@@ -52,7 +55,8 @@ func main() {
 7. run server
 ```bash
 go get .
-go run .
+go build .
+./openapiserver
 ```
 
 8. Try your api according your spec
