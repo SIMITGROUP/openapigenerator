@@ -17,9 +17,14 @@ func main() {
 
 		doc, _ := openapi3.NewLoader().LoadFromFile(docfile)
 		readAPI(doc)
-		_ = os.WriteFile("openapi/schema.go", prepareSchema(), 0644)
-		_ = os.WriteFile("openapi/openapi.go", prepareApi(), 0644)
-		_ = os.WriteFile("openapi/userfunction.go", prepareUserFunction(), 0644)
+		schemafile := "openapi/schema.go"
+		openapifile := "openapi/openapi.go"
+		userfunctionfile := "openapi/userfunction.go"
+		_ = os.WriteFile(schemafile, prepareSchema(), 0644)
+		_ = os.WriteFile(openapifile, prepareApi(), 0644)
+		_ = os.WriteFile(userfunctionfile, prepareUserFunction(), 0644)
+
+		fmt.Println("microservices code generated ", schemafile, openapifile, userfunctionfile)
 
 	}
 }
@@ -39,12 +44,34 @@ func prepareUserFunction() []byte {
 	return []byte(data)
 }
 
+func getResponses(res openapi3.Responses) string {
+	result := ""
+	for statuscode, setting := range res {
+		content := setting.Value.Content["application/json"]
+
+		fmt.Println("get response ", statuscode)
+		if content != nil {
+			values := content.Schema.Value.Properties
+			for fieldname, _ := range values {
+				result = result + "\n        \"" + fieldname + "\": \"" + fieldname + "\","
+			}
+		}
+	}
+	return result
+
+}
+
 func readAPI(doc *openapi3.T) {
 	var route_executors []string
+	executor_result := make(map[string]string)
+	// allschema := doc.Components.Schemas
 
 	for _, pathmethods := range doc.Paths {
 		if pathmethods.Get != nil {
-			route_executors = append(route_executors, pathmethods.Get.OperationID)
+			executor := pathmethods.Get.OperationID
+			route_executors = append(route_executors, executor)
+			executor_result[executor] = getResponses(pathmethods.Get.Responses)
+
 		}
 		if pathmethods.Put != nil {
 			route_executors = append(route_executors, pathmethods.Put.OperationID)
@@ -59,12 +86,12 @@ func readAPI(doc *openapi3.T) {
 	}
 
 	if len(route_executors) > 0 {
-		fmt.Println(route_executors)
+
 		for _, executor := range route_executors {
 			Data_schema = Data_schema + fmt.Sprintf("\n    \"%v\":%v,", executor, executor)
 			Data_userfunction = Data_userfunction + fmt.Sprintf("\nfunc %v(c *gin.Context) {\n"+
-				"    c.JSON(http.StatusOK, gin.H{\"msg\": \"%v\"})"+
-				"\n}", executor, executor)
+				"    c.JSON(http.StatusOK, gin.H{%v})"+
+				"\n}", executor, executor_result[executor])
 		}
 	}
 
