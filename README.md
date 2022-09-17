@@ -3,7 +3,7 @@ The goal of this project is to allow us develop microservices in shortest time, 
 
 We know openapi is cool, usually we use swagger or postman for api testing, documentation and design. However, design, develop, testing and documentation is redundant work and spend us lot of time.
 
-This project help developer design openapi v3 once, and it full microservices code for you. What you need is working openapi v3 spec.yaml file. After code generated, just change the function defined in ***openapi/userfunction.go***.
+In proper API design, we shall design api standard (spec.yaml), before development. The spec.yaml you did can turn into fully function microservices with step-by-step below. After code generated, just change the function defined in ***openapi/userfunction.go***, simple and easy.
 
 
 
