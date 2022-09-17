@@ -27,7 +27,7 @@ cp sample/spec.yml .
 
 mkdir ~/golang/openapiserver
 cd ~/golang/openapiserver
-cp ../openapigenerator/spec.yml ~/openapiserver
+cp ../openapigenerator/spec.yml .
 go mod init openapiserver
 cp -a ../openapigenerator/openapi .
 touch main.go
