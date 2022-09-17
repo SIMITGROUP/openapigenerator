@@ -1,9 +1,9 @@
 # Introduction
 The goal of this project is to allow us develop microservices in shortest time, design with low code concept. 
 
-We know openapi is cool, we use swagger or postman for api documentation and design. However, it is redundant cause design api, develop api, and ensure api compliance will spend lot of time. 
+We know openapi is cool, usually we use swagger or postman for api testing, documentation and design. However, design, develop, testing and documentation is redundant work and spend us lot of time.
 
-In this project, instead of develop restful api, and match with openapi standard, we request developer design openapi, and generate full microservices from the .yaml. No code, no extra documentation, no headache.
+This project help developer design openapi v3 once, and it full microservices code for you. What you need is working openapi v3 spec.yaml file. After code generated, just change the function defined in ***openapi/userfunction.go***.
 
 
 
