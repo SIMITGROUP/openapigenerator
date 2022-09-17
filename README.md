@@ -12,9 +12,9 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 cd ~/openapigenerator
 go build .
 ```
-3. copy openapi v3 spec file into this folder
+3. prepare openapi v3 spec file into this folder
 ```bash
-cp ~/spec.yml ~/openapigenerator
+cp ~/openapigenerator/sample/spec.yml ~/openapigenerator
 ```
 4. Generate openapi/openapi.go, openapi/schema.go, openapi/userfunction.go
 ```bash
