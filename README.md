@@ -23,7 +23,7 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 cd openapigenerator
 go build .
 ```
-3. prepare openapi v3 spec file into this folder (just let you know there is sample, you can skip this step)
+3. Copy openapi v3 spec file into this folder (we use sample from sample/spec.yml, you can use your own)
 ```bash
 cp sample/spec.yml .
 ```
