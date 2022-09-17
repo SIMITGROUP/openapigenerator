@@ -22,7 +22,7 @@ cp sample/spec.yml .
 ```bash
 ./openapigenerator spec.yml 
 ```
-edit *** openapi/userfunction.go *** to perform actual api execution
+edit ***openapi/userfunction.go*** to perform actual api execution
 
 
 5. initiate new go microservices project
