@@ -1,5 +1,14 @@
 # Introduction
-This project generate openapi3 server code for gin restapi
+The goal of this project is to allow us develop microservices in shortest time, design with low code concept. 
+
+We know openapi is cool, we use swagger or postman for api documentation and design. However, it is redundant cause design api, develop api, and ensure api compliance will spend lot of time. 
+
+In this project, instead of develop restful api, and match with openapi standard, we request developer design openapi, and generate full microservices from the .yaml. No code, no extra documentation, no headache.
+
+
+
+# Project Status
+This project still under P.O.C stage. Discussion welcome.
 
 # How to use
 1. clone this project to your home director
