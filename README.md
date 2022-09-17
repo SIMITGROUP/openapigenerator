@@ -14,7 +14,7 @@ go build .
 ```
 3. copy openapi v3 spec file into this folder
 ```bash
-copy ~/spec.yml ~/openapigenerator
+cp ~/spec.yml ~/openapigenerator
 ```
 4. Generate openapi/openapi.go, openapi/schema.go, openapi/userfunction.go
 ```bash
