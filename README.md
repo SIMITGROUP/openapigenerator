@@ -1,9 +1,9 @@
 # Introduction
 The goal of this project is to allow us develop microservices in shortest time, design with low code concept. 
 
-We know openapi is cool, we use swagger or postman for api documentation and design. However, it is redundant cause design api, develop api, and ensure api compliance will spend lot of time. 
+We know openapi is cool, usually we use swagger or postman for api testing, documentation and design. However, design, develop, testing and documentation is redundant work and spend us lot of time.
 
-In this project, instead of develop restful api, and match with openapi standard, we request developer design openapi, and generate full microservices from the .yaml. No code, no extra documentation, no headache.
+In proper API design, we shall design api standard (spec.yaml), before development. The spec.yaml you did can turn into fully function microservices with step-by-step below. After code generated, just change the function defined in ***openapi/userfunction.go***, simple and easy.
 
 
 
@@ -23,7 +23,7 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 cd openapigenerator
 go build .
 ```
-3. prepare openapi v3 spec file into this folder (just let you know there is sample, you can skip this step)
+3. Copy openapi v3 spec file into this folder (we use sample from sample/spec.yml, you can use your own)
 ```bash
 cp sample/spec.yml .
 ```
