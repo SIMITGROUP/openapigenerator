@@ -145,7 +145,7 @@ func readAPI(doc *openapi3.T) {
 			Data_userfunction = Data_userfunction +
 				fmt.Sprintf("\nfunc %v(c *gin.Context) {\n"+
 					"    data := %v{}\n"+
-					"    c.JSON(http.StatusOK, gin.H{data})"+
+					"    c.JSON(http.StatusOK, data)"+
 					"\n}", executor, executor_result[executor])
 		}
 	}

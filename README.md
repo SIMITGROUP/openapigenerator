@@ -53,7 +53,7 @@ import (
 
 func main() {
 
-	openapi.Serve("spec.yml", ":8080")
+	openapi.Serve("spec.yaml", ":8080")
 
 }
 
