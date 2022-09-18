@@ -1,14 +1,12 @@
 # Introduction
+### This project still under P.O.C stage, not yet production ready.
+
 The goal of this project is to allow us develop microservices in shortest time, design with low code concept. 
 
 We know openapi is cool, usually we use swagger or postman for api testing, documentation and design. However, design, develop, testing and documentation is redundant work and spend us lot of time.
 
 In proper API design, we shall design api standard (spec.yaml), before development. The spec.yaml you did can turn into fully function microservices with step-by-step below. After code generated, just change the function defined in ***openapi/userfunction.go***, simple and easy.
 
-
-
-# Project Status
-This project still under P.O.C stage. Discussion welcome.
 
 # How to use
 1. clone this project to your home director
