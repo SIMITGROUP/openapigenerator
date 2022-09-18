@@ -25,11 +25,11 @@ go build .
 ```
 3. Copy openapi v3 spec file into this folder (we use sample from sample/spec.yml, you can use your own)
 ```bash
-cp sample/spec.yml .
+cp sample/spec.yaml .
 ```
 4. Generate ***openapi/openapi.go***, ***openapi/schema.go***, ***openapi/userfunction.go***
 ```bash
-./openapigenerator spec.yml 
+./openapigenerator spec.yaml 
 ```
 edit ***openapi/userfunction.go*** to perform actual api execution
 

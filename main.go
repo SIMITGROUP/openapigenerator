@@ -17,20 +17,26 @@ func main() {
 
 		doc, _ := openapi3.NewLoader().LoadFromFile(docfile)
 		readAPI(doc)
+
+		schema := doc.Components.Schemas
+		schemastring := prepareSchema(schema)
 		schemafile := "openapi/schema.go"
+		interfacefile := "openapi/interface.go"
 		openapifile := "openapi/openapi.go"
 		userfunctionfile := "openapi/userfunction.go"
-		_ = os.WriteFile(schemafile, prepareSchema(), 0644)
+
+		_ = os.WriteFile(interfacefile, prepareInterface(), 0644)
 		_ = os.WriteFile(openapifile, prepareApi(), 0644)
 		_ = os.WriteFile(userfunctionfile, prepareUserFunction(), 0644)
+		_ = os.WriteFile(schemafile, schemastring, 0644)
 
-		fmt.Println("microservices code generated ", schemafile, openapifile, userfunctionfile)
+		fmt.Println("microservices code generated ", interfacefile, openapifile, userfunctionfile)
 
 	}
 }
 
-func prepareSchema() []byte {
-	data := strings.Replace(Temp_schema, "##data##", Data_schema, -1)
+func prepareInterface() []byte {
+	data := strings.Replace(Temp_interface, "##data##", Data_interface, -1)
 	return []byte(data)
 }
 
@@ -43,24 +49,63 @@ func prepareUserFunction() []byte {
 	data := strings.Replace(Temp_userfunction, "##data##", Data_userfunction, -1)
 	return []byte(data)
 }
+func getFieldSettingStr(name string, s openapi3.Schema) string {
+	fieldtype := s.Type
+	prefix := "    "
+	if s.Type == "integer" {
+		if s.Format != "" {
+			fieldtype = s.Format
+		} else {
+			fieldtype = "int32"
+		}
+
+	} else if s.Type == "object" {
+		// fieldtype = " string //original is object"
+		tmp := ""
+		for subfieldname, subfieldsetting := range s.Properties {
+			tmp = tmp + prefix + getFieldSettingStr(subfieldname, *subfieldsetting.Value) + "\n"
+		}
+		return prefix + name + " struct{\n" + tmp + prefix + "}"
+	}
+	return prefix + name + " " + fieldtype
+}
+func prepareSchema(schemas openapi3.Schemas) []byte {
+
+	schemastr := ""
+	for schemaname, setting := range schemas {
+		// fmt.Println("schema:", schemaname, setting.Value.Title)
+		props := setting.Value.Properties
+		tmp := ""
+		for field, fieldsetting := range props {
+			tmp = tmp + getFieldSettingStr(field, *fieldsetting.Value) + "\n"
+		}
+		schemastr = schemastr + "\ntype " + schemaname + " struct {\n" + tmp + "}\n"
+	}
+	Data_schema = schemastr
+	data := strings.Replace(Temp_schema, "##data##", Data_schema, -1)
+	return []byte(data)
+}
 
 func getResponses(res openapi3.Responses) string {
 	result := ""
-	for statuscode, setting := range res {
+	for _, setting := range res {
 		content := setting.Value.Content["application/json"]
 
-		fmt.Println("get response ", statuscode)
+		// only return first 1, usually http status 200
 		if content != nil {
-			values := content.Schema.Value.Properties
-			for fieldname, _ := range values {
-				result = result + "\n        \"" + fieldname + "\": \"" + fieldname + "\","
-			}
+			values := strings.Split(content.Schema.Ref, "/")
+			result = values[len(values)-1]
+			break
 		}
 	}
 	return result
 
 }
-
+func getFieldTypeSettings(setting *openapi3.Schema) (string, string) {
+	fieldtype := setting.Type
+	fieldformat := setting.Format
+	return fieldtype, fieldformat
+}
 func readAPI(doc *openapi3.T) {
 	var route_executors []string
 	executor_result := make(map[string]string)
@@ -74,13 +119,19 @@ func readAPI(doc *openapi3.T) {
 
 		}
 		if pathmethods.Put != nil {
-			route_executors = append(route_executors, pathmethods.Put.OperationID)
+			executor := pathmethods.Put.OperationID
+			route_executors = append(route_executors, executor)
+			executor_result[executor] = getResponses(pathmethods.Put.Responses)
 		}
 		if pathmethods.Post != nil {
-			route_executors = append(route_executors, pathmethods.Post.OperationID)
+			executor := pathmethods.Post.OperationID
+			route_executors = append(route_executors, executor)
+			executor_result[executor] = getResponses(pathmethods.Post.Responses)
 		}
 		if pathmethods.Delete != nil {
-			route_executors = append(route_executors, pathmethods.Delete.OperationID)
+			executor := pathmethods.Delete.OperationID
+			route_executors = append(route_executors, executor)
+			executor_result[executor] = getResponses(pathmethods.Delete.Responses)
 		}
 		route_executors = removeDuplicate(route_executors)
 	}
@@ -88,10 +139,13 @@ func readAPI(doc *openapi3.T) {
 	if len(route_executors) > 0 {
 
 		for _, executor := range route_executors {
-			Data_schema = Data_schema + fmt.Sprintf("\n    \"%v\":%v,", executor, executor)
-			Data_userfunction = Data_userfunction + fmt.Sprintf("\nfunc %v(c *gin.Context) {\n"+
-				"    c.JSON(http.StatusOK, gin.H{%v})"+
-				"\n}", executor, executor_result[executor])
+			Data_interface = Data_interface + fmt.Sprintf("\n    \"%v\":%v,", executor, executor)
+
+			Data_userfunction = Data_userfunction +
+				fmt.Sprintf("\nfunc %v(c *gin.Context) {\n"+
+					"    data := %v{}\n"+
+					"    c.JSON(http.StatusOK, gin.H{data})"+
+					"\n}", executor, executor_result[executor])
 		}
 	}
 
