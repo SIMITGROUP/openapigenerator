@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func main() {
@@ -67,8 +69,12 @@ func getFieldSettingStr(name string, s openapi3.Schema) string {
 			tmp = tmp + prefix + getFieldSettingStr(subfieldname, *subfieldsetting.Value) + "\n"
 		}
 		return prefix + name + " struct{\n" + tmp + prefix + "}"
+	} else if s.Type == "array" {
+		fieldtype = "[]" + s.Items.Value.Type
 	}
-	return prefix + name + " " + fieldtype
+	// fmt.Println(cases.Title(language.Und).String("goSAMples.dev is the best Go bLog in the world!"))
+	newname := cases.Title(language.Und).String(name)
+	return prefix + newname + " " + fieldtype + " `json:\"" + name + "\"`"
 }
 func prepareSchema(schemas openapi3.Schemas) []byte {
 
@@ -99,7 +105,12 @@ func getResponses(res openapi3.Responses) string {
 			break
 		}
 	}
-	return result
+
+	if result == "" {
+		return `gin.H{"msg": "undefined type"}`
+	} else {
+		return result + "{}"
+	}
 
 }
 func getFieldTypeSettings(setting *openapi3.Schema) (string, string) {
@@ -144,7 +155,7 @@ func readAPI(doc *openapi3.T) {
 
 			Data_userfunction = Data_userfunction +
 				fmt.Sprintf("\nfunc %v(c *gin.Context) {\n"+
-					"    data := %v{}\n"+
+					"    data := %v\n"+
 					"    c.JSON(http.StatusOK, data)"+
 					"\n}", executor, executor_result[executor])
 		}

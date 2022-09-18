@@ -2,7 +2,10 @@ module openapigenerator
 
 go 1.19
 
-require github.com/getkin/kin-openapi v0.102.0
+require (
+	github.com/getkin/kin-openapi v0.102.0
+	golang.org/x/text v0.3.7
+)
 
 require (
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
