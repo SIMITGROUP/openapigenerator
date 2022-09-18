@@ -30,7 +30,8 @@ func main() {
 		_ = os.WriteFile(userfunctionfile, prepareUserFunction(), 0644)
 		_ = os.WriteFile(schemafile, schemastring, 0644)
 
-		fmt.Println("microservices code generated ", interfacefile, openapifile, userfunctionfile)
+		fmt.Println("microservices code generated ", interfacefile, openapifile, userfunctionfile, schemafile)
+		fmt.Printf("Edit dummy functions in %v to produce real api result", userfunctionfile)
 
 	}
 }
