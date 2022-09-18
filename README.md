@@ -67,3 +67,12 @@ go build .
 ```
 
 8. Try your api according your spec
+
+
+# Features
+1. Auto prepare data type according schema
+2. Auto prepare methods according operationID, response with schema's data type
+3. Auto route http traffic to coresponding methods
+4. Supported http traffic (GET/POST/PUT/DELETE)
+5. Sample work with gin http server
+6. Work with application/json response
