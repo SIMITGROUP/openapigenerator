@@ -1,7 +1,7 @@
 package main
 
-var Data_interface = ""
-var Temp_interface = `package openapi
+var Data_funcMap = ""
+var Temp_funcMap = `package openapi
 
 import "github.com/gin-gonic/gin"
 

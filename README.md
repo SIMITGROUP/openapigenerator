@@ -25,7 +25,7 @@ go build .
 ```bash
 cp sample/spec.yaml .
 ```
-4. Generate ***openapi/openapi.go***, ***openapi/schema.go***, ***openapi/userfunction.go***
+4. Generate ***openapi/openapi.go***, ***openapi/schema.go***, ***openapi/funcmap.go***, ***openapi/userfunction.go***
 ```bash
 ./openapigenerator spec.yaml 
 ```
@@ -76,3 +76,13 @@ go build .
 4. Supported http traffic (GET/POST/PUT/DELETE)
 5. Sample work with gin http server
 6. Work with application/json response
+
+
+# Todo
+1. try connect database
+2. try basic and bearer jwt authorization
+3. try control path authentication
+4. try connect program connect outside userfunction.go
+5. logs
+6. openapi server environment variables, and flag, arguments
+7. api generator support flat, arguments

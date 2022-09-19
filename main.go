@@ -23,23 +23,23 @@ func main() {
 		schema := doc.Components.Schemas
 		schemastring := prepareSchema(schema)
 		schemafile := "openapi/schema.go"
-		interfacefile := "openapi/interface.go"
+		funcMapfile := "openapi/funcmap.go"
 		openapifile := "openapi/openapi.go"
 		userfunctionfile := "openapi/userfunction.go"
 
-		_ = os.WriteFile(interfacefile, prepareInterface(), 0644)
+		_ = os.WriteFile(funcMapfile, prepareFuncMap(), 0644)
 		_ = os.WriteFile(openapifile, prepareApi(), 0644)
 		_ = os.WriteFile(userfunctionfile, prepareUserFunction(), 0644)
 		_ = os.WriteFile(schemafile, schemastring, 0644)
 
-		fmt.Println("microservices code generated ", interfacefile, openapifile, userfunctionfile, schemafile)
+		fmt.Println("microservices code generated ", funcMapfile, openapifile, userfunctionfile, schemafile)
 		fmt.Printf("Edit dummy functions in %v to produce real api result", userfunctionfile)
 
 	}
 }
 
-func prepareInterface() []byte {
-	data := strings.Replace(Temp_interface, "##data##", Data_interface, -1)
+func prepareFuncMap() []byte {
+	data := strings.Replace(Temp_funcMap, "##data##", Data_funcMap, -1)
 	return []byte(data)
 }
 
@@ -151,7 +151,7 @@ func readAPI(doc *openapi3.T) {
 	if len(route_executors) > 0 {
 
 		for _, executor := range route_executors {
-			Data_interface = Data_interface + fmt.Sprintf("\n    \"%v\":%v,", executor, executor)
+			Data_funcMap = Data_funcMap + fmt.Sprintf("\n    \"%v\":%v,", executor, executor)
 
 			Data_userfunction = Data_userfunction +
 				fmt.Sprintf("\nfunc %v(c *gin.Context) {\n"+
