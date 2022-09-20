@@ -1,6 +1,5 @@
 
-spec.yml
-openapi/openapi.go
-openapi/schema.go
-openapi/userfunction.go
-openapi/funcmap.go
+spec.yaml
+openapi/*
+backups/*
+backups2/*
