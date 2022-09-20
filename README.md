@@ -1,11 +1,17 @@
 # Introduction
-### This project still under P.O.C stage, not yet production ready.
+### This project still under rapid development, it working but not yet production ready.
 
-The goal of this project is to allow us develop microservices in shortest time, design with low code concept. 
+The goal of this project is to allow developer setup microservices in shortest time, design with low code concept. 
 
 We know openapi is cool, usually we use swagger or postman for api testing, documentation and design. However, design, develop, testing and documentation is redundant work and spend us lot of time.
 
-In proper API design, we shall design api standard (spec.yaml), before development. The spec.yaml you did can turn into fully function microservices with step-by-step below. After code generated, just change the function defined in ***openapi/userfunction.go***, simple and easy.
+To create good rest api, here is the step:
+1. Design openapi v3 with swaggerhub, postman or etc openapi GUI design tools, get your spec.yaml (use v3.0 only, v3.1 not yet)
+2. Follow steps written at ***How to use*** to generate your microservices program
+3. If your .yaml design well, the server will function as expected. Then you can edit your ***openapiserver/openapi/handles.go*** to make your microservices use real data.
+
+
+ design api standard (spec.yaml), before development. The spec.yaml you did can turn into fully function microservices with step-by-step below. After code generated, just change the function defined in ***openapi/handle.go***, simple and easy.
 
 
 # How to use
