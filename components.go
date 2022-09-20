@@ -62,14 +62,16 @@ func prepareComponent(doc *openapi3.T) {
 		componentlist["securityschemes"] = prepareSecuritySchemes(doc.Components.SecuritySchemes)
 	}
 	for k, v := range componentlist {
-		filename := fmt.Sprintf("openapi/%v.go", k)
+		filename := k + ".go"
 		_ = os.Remove(filename)
 		fmt.Println(filename)
 
 		if v != "" {
 			fmt.Println(v)
 			content := "package openapi\n" + v
-			_ = os.WriteFile(filename, []byte(content), 0644)
+			// writeFile(filename, content)
+			// _ = os.WriteFile(filename, []byte(content), 0644)
+			writeFile("openapi", filename, content)
 		}
 	}
 

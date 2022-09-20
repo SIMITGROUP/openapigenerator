@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 
@@ -41,14 +40,15 @@ func preparePaths(doc *openapi3.T) {
 		}
 	}
 	fmt.Println(routestr)
-	filename := "openapi/route.go"
+	filename := "route.go"
 	template := "package openapi\n\n" +
 		"import \"github.com/gin-gonic/gin\"\n\n" +
 		"func addRoute(r *gin.Engine) {%v\n}"
 
 	content := fmt.Sprintf(template, routestr)
-	_ = os.Remove(filename)
-	_ = os.WriteFile(filename, []byte(content), 0644)
+	// _ = os.Remove(filename)
+	// _ = os.WriteFile(filename, []byte(content), 0644)
+	writeFile("openapi", filename, content)
 
 }
 

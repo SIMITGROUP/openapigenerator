@@ -1,18 +1,20 @@
 package main
 
 import (
-	"os"
+	"flag"
+	"fmt"
 )
 
+var GenerateFolder = *flag.String("targetfolder", "../openapiserverfolder", "")
+var ProjectName = *flag.String("projectname", "openapiserver", "")
+var Apifile = *flag.String("apifile", "spec.yaml", "")
+var Port = *flag.Int("port", 8000, "listen port")
+
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = ":8000"
-	}
-	// r := gin.Default()
-	file := "spec.yaml"
-	file = "jwt.yaml"
-	_ = NewServer(file)
+
+	fmt.Println("GenerateFolder", GenerateFolder)
+	fmt.Println(ProjectName, GenerateFolder, Apifile)
+	Generate(Apifile)
 
 	// When you use jwt.New(), the function is already automatically called for checking,
 	// which means you don't need to call it again.

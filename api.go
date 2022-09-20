@@ -1,49 +1,51 @@
 package main
 
 import (
-	"log"
+	"fmt"
 
-	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/getkin/kin-openapi/openapi3"
+)
+
+var mainsource = `package main
+
+import "%v/openapi"
+
+func main() {
+	r := openapi.NewServer()
+	r.Run(":%v")	
+}
+
+`
+var gomodulesource = `module %v
+go 1.19`
+
+var apisource = `package openapi
+
+import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewServer(docfile string) *gin.Engine {
-	var authMiddleware *jwt.GinJWTMiddleware
-	var err error
+func NewServer() *gin.Engine {
 	r := gin.Default()
-
-	//read api documents
-	doc, _ := openapi3.NewLoader().LoadFromFile(docfile)
-
-	prepareComponent(doc)
-	preparePaths(doc)
-	prepareHandles(doc)
-	// handleURL(doc, router)
-	// router.Run(listen)
-
-	//prepare all components
-	//schema
-	//security
-
-	//
-
-	//prepare JWT token
-	authMiddleware, err = OpenapiJWT()
-	if err != nil {
-		log.Fatal("JWT Error:" + err.Error())
-	}
-
-	setDefaultRoute(r, authMiddleware)
-
+	addRoute(r)
 	return r
 }
 
-func setDefaultRoute(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
-	r.NoRoute(authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
-		claims := jwt.ExtractClaims(c)
-		log.Printf("NoRoute claims: %#v\n", claims)
-		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
-	})
+`
 
+func Generate(docfile string) {
+	writeFile("", "main.go", fmt.Sprintf(mainsource, ProjectName, Port))
+	writeFile("", "go.mod", fmt.Sprintf(gomodulesource, ProjectName))
+	writeFile("openapi", "openapi.go", apisource)
+	doc, _ := openapi3.NewLoader().LoadFromFile(docfile)
+	prepareComponent(doc)
+	preparePaths(doc)
+	prepareHandles(doc)
+
+	// cli := "/usr/local/go/bin/go mod init " + ProjectName
+	// fmt.Println("change dir:", GenerateFolder, os.Chdir(GenerateFolder))
+
+	// cmd := exec.Command(cli)
+	// err := cmd.Run()
+	// fmt.Println(err, GenerateFolder, cli)
 }

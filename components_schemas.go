@@ -4,8 +4,6 @@ import (
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 func prepareSchemas(schemas openapi3.Schemas) string {
@@ -48,6 +46,7 @@ func getFieldSettingStr(name string, s openapi3.Schema) string {
 		fieldtype = "[]" + s.Items.Value.Type
 	}
 	// fmt.Println(cases.Title(language.Und).String("goSAMples.dev is the best Go bLog in the world!"))
-	newname := cases.Title(language.Und).String(name)
+	// newname := cases.Title(language.Und).String(name)
+	newname := upperCaseFirst(name)
 	return prefix + newname + " " + fieldtype + " `json:\"" + name + "\"`"
 }

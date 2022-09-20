@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -52,19 +51,21 @@ func prepareHandles(doc *openapi3.T) {
 		}
 	}
 
-	filename := "openapi/handles.go"
+	filename := "handles.go"
 	content := "package openapi\n\n" +
 		"import (\n" +
 		"\n   \"github.com/gin-gonic/gin\"\n" +
 		"\n   \"net/http\"\n)\n" +
 		handlestring
 
-	_ = os.Remove(filename)
-	_ = os.WriteFile(filename, []byte(content), 0644)
+	// _ = os.Remove(filename)
+	// _ = os.WriteFile(filename, []byte(content), 0644)
+	writeFile("openapi", filename, content)
 }
 
 func getResponses(res openapi3.Responses) string {
 	result := ""
+	examples := "{}"
 	for statuscode, setting := range res {
 		content := setting.Value.Content["application/json"]
 
@@ -73,6 +74,7 @@ func getResponses(res openapi3.Responses) string {
 			fmt.Println("status:", statuscode)
 			values := strings.Split(content.Schema.Ref, "/")
 			result = values[len(values)-1]
+			examples = getExamples(content.Schema.Value)
 			break
 		}
 	}
@@ -80,9 +82,33 @@ func getResponses(res openapi3.Responses) string {
 	if result == "" {
 		return `gin.H{"msg": "undefined type"}`
 	} else {
-		return result + "{}"
+		return result + examples
 	}
 
+}
+func getExamples(schema *openapi3.Schema) string {
+	examplestr := ""
+	prefix := "        "
+
+	for field, setting := range schema.Properties {
+		fieldname := upperCaseFirst(field)
+		// fmt.Println(prefix, field, setting.Value.Type, setting.Value.Example)
+
+		tmp := ""
+		switch setting.Value.Type {
+		case "string":
+			tmp = fmt.Sprintf("%v: \"%v\",\n", fieldname, setting.Value.Example)
+		case "array":
+			tmp = fmt.Sprintf("%v: %#v,\n", fieldname, setting.Value.Example)
+			tmp = strings.Replace(tmp, "interface {}", setting.Value.Items.Value.Type, -1)
+		default:
+			tmp = fmt.Sprintf("%v: %v,\n", fieldname, setting.Value.Example)
+		}
+
+		examplestr = examplestr + prefix + tmp
+	}
+
+	return "{\n" + examplestr + prefix + "}"
 }
 func getFieldTypeSettings(setting *openapi3.Schema) (string, string) {
 	fieldtype := setting.Type
