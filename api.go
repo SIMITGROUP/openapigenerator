@@ -7,12 +7,15 @@ import (
 )
 
 var mainsource = `package main
-
-import "%v/openapi"
+import (
+	"%v/openapi"
+	"gitlab.com/avarf/getenvs"
+)
 
 func main() {
 	r := openapi.NewServer()
-	r.Run(":%v")	
+	port := getenvs.GetEnvString("API_PORT", "%v")
+	r.Run(":" + port)
 }
 
 `
@@ -34,7 +37,7 @@ func NewServer() *gin.Engine {
 `
 
 func Generate(docfile string) {
-	writeFile("", "main.go", fmt.Sprintf(mainsource, ProjectName, Port))
+	writeFile("", "main.go", fmt.Sprintf(mainsource, ProjectName, Defaultport))
 	writeFile("", "go.mod", fmt.Sprintf(gomodulesource, ProjectName))
 	writeFile("openapi", "openapi.go", apisource)
 	doc, _ := openapi3.NewLoader().LoadFromFile(docfile)

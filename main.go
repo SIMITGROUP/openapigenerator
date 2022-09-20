@@ -8,7 +8,7 @@ import (
 var GenerateFolder = *flag.String("targetfolder", "../openapiserverfolder", "")
 var ProjectName = *flag.String("projectname", "openapiserver", "")
 var Apifile = *flag.String("apifile", "spec.yaml", "")
-var Port = *flag.Int("port", 8000, "listen port")
+var Defaultport = *flag.Int("port", 8000, "listen port")
 
 func main() {
 
