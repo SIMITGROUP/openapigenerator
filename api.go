@@ -14,8 +14,8 @@ import (
 
 func main() {
 	r := openapi.NewServer()
-	port := getenvs.GetEnvString("API_PORT", "%v")
-	r.Run(":" + port)
+	listen := getenvs.GetEnvString("API_LISTEN", "%v")
+	r.Run(listen)
 }
 
 `
@@ -37,7 +37,7 @@ func NewServer() *gin.Engine {
 `
 
 func Generate(docfile string) {
-	writeFile("", "main.go", fmt.Sprintf(mainsource, ProjectName, Defaultport))
+	writeFile("", "main.go", fmt.Sprintf(mainsource, ProjectName, ListenAddress))
 	writeFile("", "go.mod", fmt.Sprintf(gomodulesource, ProjectName))
 	writeFile("openapi", "openapi.go", apisource)
 	doc, _ := openapi3.NewLoader().LoadFromFile(docfile)

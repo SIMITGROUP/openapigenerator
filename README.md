@@ -20,7 +20,7 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 ```bash
 cd openapigenerator
 go build . 
-./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver"
+./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"
 ```
 
 3. use your rest api
@@ -31,9 +31,9 @@ go build .
 ./openapiserver
 ```
 
-4. Try your api according your spec
+4. Try your rest api http://localhost:9000, to access your mock rest api server.
 
-5. 
+5. Modify your code  ***openapiserverfolder/openapi/handles.go*** and repeat step 3 to make your rest api function as expected.
 
 # Features
 1. Auto prepare data type according schema
@@ -45,10 +45,6 @@ go build .
 
 
 # Todo
-1. try connect database
-2. try basic and bearer jwt authorization
-3. try control path authentication
-4. try connect program connect outside userfunction.go
-5. logs
-6. openapi server environment variables, and flag, arguments
-7. api generator support flat, arguments
+1. basic and bearer jwt authorization
+3. use middleware to control access right
+3. keep logs

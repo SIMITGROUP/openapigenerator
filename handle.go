@@ -93,7 +93,10 @@ func getExamples(schema *openapi3.Schema) string {
 	for field, setting := range schema.Properties {
 		fieldname := upperCaseFirst(field)
 		// fmt.Println(prefix, field, setting.Value.Type, setting.Value.Example)
-
+		data := setting.Value.Example
+		if data == nil {
+			continue
+		}
 		tmp := ""
 		switch setting.Value.Type {
 		case "string":

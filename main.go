@@ -2,19 +2,31 @@ package main
 
 import (
 	"flag"
-	"fmt"
 )
 
-var GenerateFolder = *flag.String("targetfolder", "../openapiserverfolder", "")
-var ProjectName = *flag.String("projectname", "openapiserver", "")
-var Apifile = *flag.String("apifile", "spec.yaml", "")
-var Defaultport = *flag.Int("port", 8000, "listen port")
+var GenerateFolder = "" //*flag.String("targetfolder", "../openapiserverfolder", "")
+var ProjectName = ""    //*flag.String("projectname", "openapiserver", "")
+var ApiFile = ""        // *flag.String("apifile", "spec.yaml", "")
+var ListenAddress = ""  // *flag.String("listen", ":8989", "listen address")
 
+func init() {
+
+	// GenerateFolder = *flag.String("targetfolder", "../openapiserverfolder", "")
+	// ProjectName = *flag.String("projectname", "openapiserver", "")
+	// ApiFile = *flag.String("apifile", "samples/spec.yaml", "")
+	// ListenAddress = *flag.String("listen", ":8982", "listen address")
+
+}
 func main() {
 
-	fmt.Println("GenerateFolder", GenerateFolder)
-	fmt.Println(ProjectName, GenerateFolder, Apifile)
-	Generate(Apifile)
+	flag.StringVar(&GenerateFolder, "targetfolder", "../openapiserverfolder", "Generate Folder to which folder")
+	flag.StringVar(&ProjectName, "projectname", "openapiserver", "Rest API GO project name")
+	flag.StringVar(&ApiFile, "apifile", "spec.yaml", "openapi v3 yaml file")
+	flag.StringVar(&ListenAddress, "listen", ":8982", "listen to which address, default :8982")
+
+	flag.Parse()
+
+	Generate(ApiFile)
 
 	// When you use jwt.New(), the function is already automatically called for checking,
 	// which means you don't need to call it again.
