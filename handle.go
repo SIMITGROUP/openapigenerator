@@ -73,7 +73,7 @@ func getResponses(res openapi3.Responses) string {
 		if content != nil && statuscode == "200" {
 			fmt.Println("status:", statuscode)
 			values := strings.Split(content.Schema.Ref, "/")
-			result = values[len(values)-1]
+			result = GetModelName(values[len(values)-1]) // get Model name
 			examples = getExamples(content.Schema.Value)
 			break
 		}

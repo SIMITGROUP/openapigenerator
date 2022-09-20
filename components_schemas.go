@@ -16,7 +16,7 @@ func prepareSchemas(schemas openapi3.Schemas) string {
 		for field, fieldsetting := range props {
 			tmp = tmp + getFieldSettingStr(field, *fieldsetting.Value) + "\n"
 		}
-		schemastr = schemastr + "\ntype " + schemaname + " struct {\n" + tmp + "}\n"
+		schemastr = schemastr + "\ntype " + GetModelName(schemaname) + " struct {\n" + tmp + "}\n"
 	}
 	Temp_schema := ""
 	Data_schema := schemastr

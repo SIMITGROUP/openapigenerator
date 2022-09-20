@@ -54,3 +54,10 @@ go build .
 1. basic and bearer jwt authorization
 3. use middleware to control access right
 3. keep logs
+
+# Tips
+1. Prepare all schemas sample, and connect to your path
+2. Define operationID on every path
+3. Define response for http '200' for every http request, and ref to schema
+4. Define sample request bodies and response
+5. Define your interfaces connect to Model_xxx, and connect ***handles.go*** methods to mdel's method. It can keep your code cleaner.
