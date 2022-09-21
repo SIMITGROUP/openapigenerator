@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
@@ -13,7 +11,7 @@ func prepareSecuritySchemes(schemes openapi3.SecuritySchemes) string {
 
 	for securityname, setting := range schemes {
 		AuthMiddleware["securityname"] = ""
-		fmt.Println("securityname", securityname)
+		// fmt.Println("securityname", securityname)
 		tmp := ""
 
 		switch setting.Value.Type {

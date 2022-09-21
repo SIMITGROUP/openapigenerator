@@ -39,7 +39,7 @@ func preparePaths(doc *openapi3.T) {
 			routestr = routestr + getRouteString("TRACE", path, pathmethods.Trace)
 		}
 	}
-	fmt.Println(routestr)
+	// fmt.Println(routestr)
 	filename := "route.go"
 	template := "package openapi\n\n" +
 		"import \"github.com/gin-gonic/gin\"\n\n" +
@@ -63,7 +63,8 @@ func getRouteString(httpmethod string, path string, op *openapi3.Operation) stri
 		for _, securitysetting := range *securities {
 			for authname, authsetting := range securitysetting {
 				handlestring = handlestring + "data" + authname + ".func" + authname + ", "
-				fmt.Println("auth", authname, authsetting)
+				// fmt.Println("auth", authname, authsetting)
+				_ = authsetting
 			}
 		}
 		handlestring = handlestring + operatingID

@@ -54,6 +54,7 @@ go build .
 1. basic and bearer jwt authorization
 3. use middleware to control access right
 3. keep logs
+4. split schema by file, add interface for it
 
 # Tips
 1. Prepare all schemas sample, and connect to your path
