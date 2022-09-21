@@ -54,12 +54,13 @@ func prepareSecuritySchemes(schemes openapi3.SecuritySchemes) string {
 		*/
 	}
 	if securityschemesstr != "" {
-		securityschemesstr = "import (\n" +
-			"\"fmt\"\n" +
-			"\"github.com/gin-gonic/gin\"\n)\n" +
-			securityschemesstr
+		securityschemesstr = `package openapi
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)` + "\n\n" + securityschemesstr
 	}
-
+	writeFile("openapi", "securityschemes.go", securityschemesstr)
 	return securityschemesstr
 }
 

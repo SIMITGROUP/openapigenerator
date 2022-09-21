@@ -65,21 +65,40 @@ func prepareHandles(doc *openapi3.T) {
 
 func getResponses(res openapi3.Responses) string {
 	result := ""
+	nodata := false
 	examples := "{}"
 	for statuscode, setting := range res {
 		content := setting.Value.Content["application/json"]
-
+		nodata = false
 		// only return first 1, usually http status 200
-		if content != nil && statuscode == "200" {
+		if statuscode == "200" {
 			// fmt.Println("status:", statuscode)
-			values := strings.Split(content.Schema.Ref, "/")
-			result = GetModelName(values[len(values)-1]) // get Model name
-			examples = getExamples(content.Schema.Value)
-			break
+			//if is reference
+			if content != nil {
+
+				if content.Schema.Ref != "" {
+					if content.Schema.Value.Type == "object" {
+						values := strings.Split(content.Schema.Ref, "/")
+						result = GetModelName(values[len(values)-1]) // get Model name
+						examples = getExamples(content.Schema.Value)
+
+					} else if content.Schema.Value.Type == "array" {
+						values := strings.Split(content.Schema.Value.Items.Ref, "/")
+						model := GetModelName(values[len(values)-1])
+						examples = "[]" + model + "{}" //result
+						result = ""
+					} else {
+						// nodata = true
+					}
+				}
+			} else {
+				nodata = true
+			}
+
 		}
 	}
 
-	if result == "" {
+	if nodata == true {
 		return `gin.H{"msg": "undefined type"}`
 	} else {
 		return result + examples

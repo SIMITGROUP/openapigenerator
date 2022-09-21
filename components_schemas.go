@@ -18,7 +18,7 @@ func prepareSchemas(schemas openapi3.Schemas) string {
 		tmp := ""
 		gettersetterstr := ""
 		interfacecontent := "\n    Validate()"
-		fmt.Println("prepare model", modelname)
+		fmt.Println("prepare model", modelname, setting.Value.Type)
 		//no properties, visit reference insteads
 		if setting.Value.Type == "object" {
 			for field, fieldsetting := range props {
@@ -29,9 +29,14 @@ func prepareSchemas(schemas openapi3.Schemas) string {
 				interfacecontent = interfacecontent + intstr
 				gettersetterstr = gettersetterstr + getsetstr
 			}
+		} else if setting.Value.Type == "array" {
+			//try do nothing for array
+			continue
 		} else {
+			//no need create models/interface
+			// return ""
 			if props == nil {
-				// props = setting.Value.Properties
+
 				tmp = "    " + modelname + " []" + getModelNameFromRef(setting.Value.Items.Ref) + " `json:\"" + getTypeNameFromRef(setting.Value.Items.Ref) + "\"`\n"
 			}
 		}
