@@ -22,7 +22,7 @@ func prepareSchemas(schemas openapi3.Schemas) string {
 		//no properties, visit reference insteads
 		if setting.Value.Type == "object" {
 			for field, fieldsetting := range props {
-				tmp = tmp + getFieldSettingStr(field, *fieldsetting.Value) + "\n"
+				tmp = tmp + getFieldSettingStr(field, *fieldsetting.Value) + " // " + fieldsetting.Value.Description + "\n"
 
 				golangfieldtype := convGoLangType(*fieldsetting.Value)
 				intstr, getsetstr := retrieveGetSetStr(modelname, field, golangfieldtype)

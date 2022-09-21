@@ -68,7 +68,12 @@ func getRouteString(httpmethod string, path string, op *openapi3.Operation) stri
 			}
 		}
 		handlestring = handlestring + operatingID
-		routestr = fmt.Sprintf("\n    r.%v(\"%v\", %v)", httpmethod, path, handlestring)
+		descriptions := strings.Replace(op.Description, "\n", "//\n", -1)
+		templatestr := `
+    // %v
+    // %v
+    r.%v("%v", %v)`
+		routestr = fmt.Sprintf(templatestr, op.Summary, descriptions, httpmethod, path, handlestring)
 	}
 
 	return routestr
