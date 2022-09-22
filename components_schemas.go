@@ -22,7 +22,7 @@ func prepareSchemas(schemas openapi3.Schemas) string {
 		//no properties, visit reference insteads
 		if setting.Value.Type == "object" {
 			for field, fieldsetting := range props {
-				tmp = tmp + getFieldSettingStr(field, *fieldsetting.Value) + " // " + fieldsetting.Value.Description + "\n"
+				tmp = tmp + getFieldSettingStr(field, *fieldsetting.Value) + "\n"
 
 				golangfieldtype := convGoLangType(*fieldsetting.Value)
 				intstr, getsetstr := retrieveGetSetStr(modelname, field, golangfieldtype)
@@ -37,7 +37,7 @@ func prepareSchemas(schemas openapi3.Schemas) string {
 			// return ""
 			if props == nil {
 
-				tmp = "    " + modelname + " []" + getModelNameFromRef(setting.Value.Items.Ref) + " `json:\"" + getTypeNameFromRef(setting.Value.Items.Ref) + "\"`\n"
+				tmp = "    " + modelname + " []" + getModelNameFromRef(setting.Value.Items.Ref) + " `json:\"" + getTypeNameFromRef(setting.Value.Items.Ref) + "\"`" + "\n"
 			}
 		}
 
@@ -121,7 +121,7 @@ func getFieldSettingStr(name string, s openapi3.Schema) string {
 	// fmt.Println(cases.Title(language.Und).String("goSAMples.dev is the best Go bLog in the world!"))
 	// newname := cases.Title(language.Und).String(name)
 
-	return prefix + newname + " " + fieldtype + " `json:\"" + name + "\"`"
+	return prefix + newname + " " + fieldtype + " `json:\"" + name + "\"` //" + s.Description
 }
 
 func convertToGoFieldType(fieldtype string, fieldformat string) string {
