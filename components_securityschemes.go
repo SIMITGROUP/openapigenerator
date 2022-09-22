@@ -8,73 +8,112 @@ var AuthMiddleware = map[string]string{}
 
 func prepareSecuritySchemes(schemes openapi3.SecuritySchemes) string {
 	securityschemesstr := ""
-
+	otherschemestr := ""
 	for securityname, setting := range schemes {
 		AuthMiddleware["securityname"] = ""
-		// fmt.Println("securityname", securityname)
-		tmp := ""
+		handlestr, othersstr := getAuthStr(securityname, setting.Value)
 
-		switch setting.Value.Type {
-		case "apiKey":
-			tmp = getAPIKeyAuthStr(securityname, setting.Value)
-		case "http":
-			if setting.Value.Scheme == "basic" {
-				tmp = getBasicHttpAuthStr(securityname, setting.Value)
-			} else if setting.Value.Scheme == "bearer" {
-				if setting.Value.BearerFormat == "JWT" {
-					tmp = getJWTHttpAuthStr(securityname, setting.Value)
-				}
-			}
-
-			//scheme = basic
-			//or
-			//scheme =bearer
-			//bearerformat: JWT
-
-		//not supported yet
-		case "oauth2":
-		case "openIdConnect":
+		if handlestr != "" {
+			securityschemesstr = securityschemesstr + "\n" + handlestr
 		}
-
-		if tmp != "" {
-			securityschemesstr = securityschemesstr + "\n" + tmp
+		if othersstr != "" {
+			otherschemestr = otherschemestr + "\n" + othersstr
 		}
-
-		// authname := setting.Value.Name
-		// authtype := setting.Value.Type
-		// authscheme := setting.Value.Scheme
-		// authformat := setting.Value.BearerFormat
-		// authin := setting.Value.In
-		// authflows := setting.Value.Flows
-		// authopenidconnecturl := setting.Value.OpenIdConnectUrl
-		// authdesc := setting.Value.Description
-
-		/*
-			type: apiKey, http, oauth2, openIdConnect
-		*/
 	}
 	if securityschemesstr != "" {
 		securityschemesstr = `package openapi
 import (
-	"fmt"
+	//"net/http"
 	"github.com/gin-gonic/gin"
-)` + "\n\n" + securityschemesstr
+)` + "\n\n" + securityschemesstr + "\n\n" + otherschemestr
 	}
 	writeFile("openapi", "securityschemes.go", securityschemesstr)
 	return securityschemesstr
 }
 
-func getAPIKeyAuthStr(name string, setting *openapi3.SecurityScheme) string {
-	return ""
+func getAuthStr(name string, setting *openapi3.SecurityScheme) (string, string) {
+	modelname := GetModelName(name)
+	interfacename := GetInterfaceName(name)
+	methodname := GetAuthMethodName(name)
+
+	template := "type " + modelname + " struct {token string}\n" +
+		"type " + interfacename + "i interface {" + methodname + "() gin.HandlerFunc }\n" +
+		"func (obj " + modelname + ") " + methodname + "() gin.HandlerFunc {" +
+		`return ` + getAuthHandles(setting) +
+		"}\n" +
+		"var " + name + " " + interfacename + "i = " + modelname + "{}\n"
+	supportstr := getSupportString(setting)
+	return template, supportstr
+}
+func getSupportString(setting *openapi3.SecurityScheme) string {
+	supportstr := ""
+	switch setting.Type {
+	case "http":
+		schemaname := lowerCaseFirst(setting.Scheme)
+		if schemaname == "basic" {
+			supportstr = `
+//change below for basic authentication users/password
+var BasicAuthAccounts = gin.Accounts{
+	"admin":    "admin",
+	"test": "test",	
+}
+`
+		}
+	}
+	return supportstr
+}
+func getAuthHandles(setting *openapi3.SecurityScheme) string {
+	authstr := "func(c *gin.Context) {}"
+
+	switch setting.Type {
+	case "http":
+		schemaname := lowerCaseFirst(setting.Scheme)
+		if schemaname == "basic" {
+			authstr = "gin.BasicAuth(BasicAuthAccounts)"
+		} else if schemaname == "bearer" {
+			// authstr = "func(c *gin.Context) {}"
+		}
+	//not supported yet
+	case "apiKey":
+	case "mutualTLS":
+	case "oauth2":
+	case "openIdConnect":
+	}
+	return authstr
 }
 
-func getBasicHttpAuthStr(name string, setting *openapi3.SecurityScheme) string {
-	return ""
-}
-func getJWTHttpAuthStr(name string, setting *openapi3.SecurityScheme) string {
-	template := "type " + name + " struct {token string}\n" +
-		"type " + name + "i interface {func" + name + "(c *gin.Context)}\n" +
-		"func (obj " + name + ") func" + name + "(c *gin.Context) {fmt.Print(obj)}\n" +
-		"var data" + name + " " + name + "i = " + name + "{}\n"
-	return template
-}
+// func getAPIKeyAuthStr(name string, setting *openapi3.SecurityScheme) string {
+// 	return ""
+// }
+
+// func getBasicHttpAuthStr(name string, setting *openapi3.SecurityScheme) string {
+// 	modelname := GetModelName(name)
+// 	interfacename := GetInterfaceName(name)
+// 	methodname := GetAuthMethodName(name)
+
+// 	template := "type " + modelname + " struct {token string}\n" +
+// 		"type " + interfacename + "i interface {" + methodname + "() gin.HandlerFunc }\n" +
+// 		"func (obj " + modelname + ") " + methodname + "() gin.HandlerFunc {" +
+// 		`return gin.BasicAuth(gin.Accounts{})` +
+// 		"}\n" +
+// 		"var " + name + " " + interfacename + "i = " + modelname + "{}\n"
+// 	return template
+// }
+// func getJWTHttpAuthStr(name string, setting *openapi3.SecurityScheme) string {
+// 	modelname := GetModelName(name)
+// 	interfacename := GetInterfaceName(name)
+// 	methodname := GetAuthMethodName(name)
+// 	template := "type " + modelname + " struct {token string}\n" +
+// 		"type " + interfacename + "i interface {" + methodname + "() gin.HandlerFunc }\n" +
+// 		"func (obj " + modelname + ") " + methodname + "()  gin.HandlerFunc {" +
+// 		`return func(c *gin.Context) {
+// 			data := gin.H{
+// 				"msg": "no authenticated",
+// 			}
+// 			c.JSON(http.StatusBadRequest, data)
+// 			c.Abort()
+// 		}` +
+// 		"}\n" +
+// 		"var " + name + " " + interfacename + "i = " + modelname + "{}\n"
+// 	return template
+// }

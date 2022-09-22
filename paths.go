@@ -62,7 +62,8 @@ func getRouteString(httpmethod string, path string, op *openapi3.Operation) stri
 		handlestring := ""
 		for _, securitysetting := range *securities {
 			for authname, authsetting := range securitysetting {
-				handlestring = handlestring + "data" + authname + ".func" + authname + ", "
+				methodname := GetAuthMethodName(authname)
+				handlestring = handlestring + " " + authname + "." + methodname + "(), "
 				// fmt.Println("auth", authname, authsetting)
 				_ = authsetting
 			}

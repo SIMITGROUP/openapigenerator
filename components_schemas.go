@@ -18,14 +18,47 @@ func prepareSchemas(schemas openapi3.Schemas) string {
 		tmp := ""
 		gettersetterstr := ""
 		interfacecontent := "\n    Validate()"
-		fmt.Println("prepare model", modelname, setting.Value.Type)
+		// fmt.Println("prepare model", modelname, setting.Value.Type)
 		//no properties, visit reference insteads
 		if setting.Value.Type == "object" {
 			for field, fieldsetting := range props {
-				tmp = tmp + getFieldSettingStr(field, *fieldsetting.Value) + "\n"
-
 				golangfieldtype := convGoLangType(*fieldsetting.Value)
-				intstr, getsetstr := retrieveGetSetStr(modelname, field, golangfieldtype)
+				// fmt.Println("    ", field, "=", fieldsetting.Value.Type)
+				fieldstr := ""
+				if fieldsetting.Value.Type == "array" {
+					// if fieldsetting.Value.Items.Ref == "" {
+					// 	log.Fatal("schema ", schemaname, " consists array '", field, "', which shall use ref")
+					// }
+
+					// fmt.Println("     "+fieldsetting.Value.Type+" ****ref=", fieldsetting.Value.Items)
+					//array
+					// convertToFieldSettingStr(name string, fieldtype string,oriname string,description string) string
+					description := fieldsetting.Value.Description
+					fieldtype := "[]"
+					if fieldsetting.Value.Items.Ref != "" {
+						fieldtype = fieldtype + getModelNameFromRef(fieldsetting.Value.Items.Ref)
+					} else {
+						fieldtype = fieldtype + fieldsetting.Value.Items.Value.Type
+					}
+
+					golangfieldtype = fieldtype
+					newname := upperCaseFirst(field)
+					// modelname := GetModelName(field)
+					fieldstr = convertToFieldSettingStr(newname, fieldtype, field, description)
+					tmp = tmp + fieldstr
+				} else {
+					fieldstr = getFieldSettingStr(field, *fieldsetting.Value) + "\n"
+					tmp = tmp + fieldstr
+				}
+				// if fieldsetting.Value.Type == "object" {
+
+				// } else {
+
+				// 	// tmp = tmp + getFieldSettingStr(field, *fieldsetting.Value) + "\n"
+				// }
+				// fmt.Println(fieldstr)
+
+				intstr, getsetstr := retrieveInterfaceGetSetStr(modelname, field, golangfieldtype)
 				interfacecontent = interfacecontent + intstr
 				gettersetterstr = gettersetterstr + getsetstr
 			}
@@ -72,7 +105,13 @@ func (m %v) Validate() error {
 	return validationstr
 }
 
-func retrieveGetSetStr(modelname string, orifieldname string, fieldtype string) (string, string) {
+//	func replaceUnsupportedFieldType(fieldtype string) string {
+//		if fieldtype == "" || fieldtype == "object" {
+//			fieldtype = "string"
+//		}
+//		return fieldtype
+//	}
+func retrieveInterfaceGetSetStr(modelname string, orifieldname string, fieldtype string) (string, string) {
 	fieldname := upperCaseFirst(orifieldname)
 	gettemplate := `func (m %v) Get%v() %v {
 	return m.%v
@@ -87,13 +126,19 @@ func retrieveGetSetStr(modelname string, orifieldname string, fieldtype string) 
 	return interfacestr, getsetstr
 }
 
+func convertToFieldSettingStr(name string, fieldtype string, oriname string, description string) string {
+	prefix := "    "
+	return prefix + name + " " + fieldtype + " `json:\"" + oriname + "\"` //" + description + "\n"
+
+}
 func getFieldSettingStr(name string, s openapi3.Schema) string {
 	newname := upperCaseFirst(name)
 	fieldtype := convGoLangType(s)
+
 	// ("sdds")
 
-	fmt.Println("  after converttype =", newname, "=", fieldtype)
-	prefix := "    "
+	// fmt.Println("  after converttype =", newname, "=", fieldtype)
+	// prefix := "    "
 	// if s.Type == "integer" {
 	// 	if s.Format != "" {
 	// 		fieldtype = s.Format
@@ -120,8 +165,9 @@ func getFieldSettingStr(name string, s openapi3.Schema) string {
 	// }
 	// fmt.Println(cases.Title(language.Und).String("goSAMples.dev is the best Go bLog in the world!"))
 	// newname := cases.Title(language.Und).String(name)
-
-	return prefix + newname + " " + fieldtype + " `json:\"" + name + "\"` //" + s.Description
+	txt := convertToFieldSettingStr(newname, fieldtype, name, s.Description)
+	return txt
+	// return prefix + newname + " " + fieldtype + " `json:\"" + name + "\"` //" + s.Description
 }
 
 func convertToGoFieldType(fieldtype string, fieldformat string) string {
@@ -160,6 +206,9 @@ func convGoLangType(s openapi3.Schema) string {
 		// refermodel := GetModelName(refer_arr[len(refer_arr)-1]) // get Model name
 		// // fmt.Println("check data:", name, refermodel)
 		// fieldtype = refermodel
+	} else {
+		//all others not supported treat as string
+		fieldtype = "string"
 	}
 	/* else if s.Type == "object" {
 		// fieldtype = " string //original is object"

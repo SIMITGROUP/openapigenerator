@@ -42,19 +42,22 @@ go build .
 5. Modify your code  ***openapiserverfolder/openapi/handles.go*** and repeat step 3 to make your rest api function as expected.
 
 # Features
-1. Auto prepare data type according schema
-2. Auto prepare methods according operationID, response with schema's data type
-3. Auto route http traffic to coresponding methods
-4. Supported http traffic (GET/POST/PUT/DELETE)
-5. Sample work with gin http server
-6. Work with application/json response
+1. Auto prepare model/interface according each component's schema
+2. Auto prepare path and route to handles according operationID (required), response example data according reference schema and examples
+3. Supported http traffic (GET/POST/PUT/DELETE)
+4. Build in gin http server
+5. Work with application/json response (only)
+6. Use middleware control security requirement (support basic and jwt)
 
 
 # Todo
 1. basic and bearer jwt authorization
-3. use middleware to control access right
-3. keep logs
-4. split schema by file, add interface for it
+2. keep logs
+3. unit test
+
+# Not compatible with
+1. oneOf, anyOf, allOf, not
+2. security scheme for apikey, oauth2,openid
 
 # Tips
 1. Prepare all schemas sample, and connect to your path
