@@ -1,0 +1,43 @@
+package openapi
+
+import validation "github.com/go-ozzo/ozzo-validation/v4"
+
+type {{ .ModelName}} struct {
+	{{ with .FieldList}}{{range .}}
+	{{.FieldName}} {{.FieldType}} `json:{{.ApiFieldName}}` //{{.Description}}
+	{{end}}{{end}}
+}
+
+type {{.InterfaceName}} interface{
+	{{ with .FieldList}}{{range .}}
+		Get{{.FieldName}}()
+		Set{{.FieldName}}({{.FieldType}})
+	{{end}}{{end}}
+}
+
+
+{{ with .FieldList}}
+{{range .}}
+func (obj {{.ModelName}}) Get{{.FieldName}}() {{.FieldType}}{
+	return obj.{{.FieldName}}
+}
+func (obj {{.ModelName}}) Set{{.FieldName}}(val {{.FieldType}}){
+	obj.{{.FieldName}}= val
+}
+{{end}}{{end}}
+
+func (obj {{.ModelName}}) Validate() error {
+	return validation.Errors{
+		//"name": validation.Validate(m.Name, validation.Required, validation.Length(5, 20)),
+		//"email": validation.Validate(m.Name, validation.Required, is.Email),
+		//"zip": validation.Validate(m.Address.Zip, validation.Required, validation.Match(regexp.MustCompile("^[0-9]{5}$"))),
+	}.Filter()
+}
+
+func (obj {{.ModelName}}) GetExamples() {{.ModelName}} {
+	example:= {{.ModelName}}{
+		{{ with .FieldList}} {{range .}}
+		{{.FieldName}}: {{.Example}},{{end}}{{end}}
+	}
+	return example
+}

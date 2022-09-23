@@ -2,52 +2,75 @@ package main
 
 import (
 	"flag"
+	"log"
+	"openapigenerator/buildgo"
+	"openapigenerator/buildphp"
+	"openapigenerator/helper"
+
+	"github.com/getkin/kin-openapi/openapi3"
 )
 
-var GenerateFolder = "" //*flag.String("targetfolder", "../openapiserverfolder", "")
-var ProjectName = ""    //*flag.String("projectname", "openapiserver", "")
-var ApiFile = ""        // *flag.String("apifile", "spec.yaml", "")
-var ListenAddress = ""  // *flag.String("listen", ":8989", "listen address")
+var GenerateFolder = ""
+var ProjectName = ""
+var ApiFile = ""
+var ListenAddress = ""
+var BuildLang = ""
 
-func init() {
-
-	// GenerateFolder = *flag.String("targetfolder", "../openapiserverfolder", "")
-	// ProjectName = *flag.String("projectname", "openapiserver", "")
-	// ApiFile = *flag.String("apifile", "samples/spec.yaml", "")
-	// ListenAddress = *flag.String("listen", ":8982", "listen address")
-
-}
 func main() {
-
+	flag.StringVar(&BuildLang, "lang", "go", "Build language (go/php)")
 	flag.StringVar(&GenerateFolder, "targetfolder", "../openapiserverfolder", "Generate Folder to which folder")
 	flag.StringVar(&ProjectName, "projectname", "openapiserver", "Rest API GO project name")
 	flag.StringVar(&ApiFile, "apifile", "spec.yaml", "openapi v3 yaml file")
 	flag.StringVar(&ListenAddress, "listen", ":8982", "listen to which address, default :8982")
-
 	flag.Parse()
+	helper.Proj.ApiFile = ApiFile
+	helper.Proj.ListenAddress = ListenAddress
+	helper.Proj.BuildLang = BuildLang
+	helper.Proj.GenerateFolder = GenerateFolder
+	helper.Proj.ProjectName = ProjectName
 
-	Generate(ApiFile)
+	switch BuildLang {
+	case "go":
+		GenerateCode(ApiFile)
+	default:
+		log.Fatal("Build '" + BuildLang + "' is not supported, use 'go' instead!")
+	}
 
-	// When you use jwt.New(), the function is already automatically called for checking,
-	// which means you don't need to call it again.
-	// errInit := authMiddleware.MiddlewareInit()
-
-	// if errInit != nil {
-	// 	log.Fatal("authMiddleware.MiddlewareInit() Error:" + errInit.Error())
-	// }
-
-	// r.POST("/login", authMiddleware.LoginHandler)
-
-	// auth := r.Group("/auth")
-	// // Refresh time can be longer than token timeout
-	// auth.GET("/refresh_token", authMiddleware.RefreshHandler)
-	// auth.Use(authMiddleware.MiddlewareFunc())
-	// {
-	// 	auth.GET("/hello", helloHandler)
-	// }
-
-	// if err := http.ListenAndServe(":"+port, r); err != nil {
-	// 	log.Fatal(err)
-	// }
-	// r.Run(port)
 }
+
+func GenerateCode(ApiFile string) {
+	doc, _ := openapi3.NewLoader().LoadFromFile(ApiFile)
+	helper.ReadRoutes(doc)
+	helper.ReadComponents(doc)
+	switch BuildLang {
+	case "go":
+		buildgo.Generate(doc)
+	case "php":
+		buildphp.Generate(doc)
+	default:
+		log.Fatal("only 'go' is supported at the moment")
+		// buildphp.Generate("")
+	}
+
+}
+
+// func ReadSchema() {
+
+// }
+
+// func PrepareInfra(doc *openapi3.T) {
+// 	switch BuildLang {
+// 	case "go":
+// 		buildgo.WriteInfra() //Generate(doc)
+// 		buildgo.PrepareRoutes(doc)
+// 		buildgo.PrepareRouteHandles(doc)
+
+// 	case "php":
+// 		// buildphp.PrepareInfra() //Generate(doc)
+// 	// case "typescript":
+// 	// case "java":
+// 	// 	buildphp.Generate(doc)
+// 	default:
+// 		fmt.Println(BuildLang + " build is not supported")
+// 	}
+// }

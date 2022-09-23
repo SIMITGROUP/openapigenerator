@@ -1,0 +1,11 @@
+package openapi
+
+import "github.com/gin-gonic/gin"
+
+func registerRoutes(r *gin.Engine) {
+	{{ with .Methods }}{{range .}}
+	// {{ .Summary }}
+    // {{ .Description }}
+    r.{{.Method}}("{{.Path}}",{{ with .Middlewares }}{{range .}}{{.}},{{end}}{{end}}{{.OperationID}})
+	{{end}}{{ end }}
+}

@@ -1,0 +1,11 @@
+package main
+import (
+	"{{ .ProjectName}}/openapi"
+	"gitlab.com/avarf/getenvs"
+)
+
+func main() {
+	r := openapi.NewServer()
+	listen := getenvs.GetEnvString("API_LISTEN", "{{.ListenAddress}}")
+	r.Run(listen)
+}

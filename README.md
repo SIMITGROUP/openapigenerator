@@ -25,8 +25,8 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 2. build this project
 ```bash
 cd openapigenerator
-go build . 
-./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"
+make
+./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000" --lang="go"
 ```
 
 3. use your rest api
@@ -37,9 +37,12 @@ go build .
 ./openapiserver
 ```
 
-4. Try your rest api http://localhost:9000, to access your mock rest api server.
+4. Try your rest api http://localhost:9000, to access your mock rest api server. It will run return sample data defined in .yaml file.
 
-5. Modify your code  ***openapiserverfolder/openapi/handles.go*** and repeat step 3 to make your rest api function as expected.
+5. Put in your real code at below file and repeat (3.)
+    a.  ***openapiserverfolder/openapi/routerhandle.go***
+    b.  ***openapiserverfolder/openapi/Model_xxx.go***
+
 
 # Features
 1. Auto prepare model/interface according each component's schema
@@ -51,17 +54,16 @@ go build .
 
 
 # Todo
-1. basic and bearer jwt authorization
-2. keep logs
-3. unit test
+1. add in missing basic and bearer jwt authorization
+2. prepare log system
+3. auto generate unit test
 
-# Not compatible with
-1. oneOf, anyOf, allOf, not
+# Rules while using this project
+1. Not support  ***oneOf, anyOf, allOf, not ***
 2. security scheme for apikey, oauth2,openid
-
-# Tips
-1. Prepare all schemas sample, and connect to your path
-2. Define operationID on every path
-3. Define response for http '200' for every http request, and ref to schema
-4. Define sample request bodies and response
-5. Define your interfaces connect to Model_xxx, and connect ***handles.go*** methods to mdel's method. It can keep your code cleaner.
+3. every property in component/schema shall define type, and example
+4. every api request require to define
+    a. with response http status ***200*** and
+            - require content type ***application/json***
+            - $ref link to suitable schema
+    b. ***operationID*** is require to auto generate handle

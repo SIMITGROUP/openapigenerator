@@ -1,0 +1,15 @@
+package openapi
+
+import (
+   "github.com/gin-gonic/gin"
+   "net/http"
+)
+
+
+{{with .Handles}}{{range .}}
+
+func {{ .FuncName}}(c *gin.Context) {
+    data := {{ .DataType}}{ }
+    c.JSON(http.StatusOK, data.GetExamples() )
+}
+{{end}}{{end}}

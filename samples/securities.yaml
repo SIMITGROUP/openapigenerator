@@ -42,19 +42,16 @@ paths:
       description: >
         Authenticate a principal.
       
-
         The authentication process employs a challenge/response mechanism.
         The process depends on the authentication journey, and can be as
         simple as responding to a challenge for a username and password,
         or much more involved for journeys with multi-factor authentication
         and registration processes.
 
-
         Successful authentication results in a `tokenId` AM SSO session cookie.
         Applications can present this cookie for other operations that depend on
         cookie-based authentication. The SSO session cookie name
         is a random string, shown in Tenant Settings > Global Settings > Cookie.
-
 
         When authentication depends on the client IP address,
         and your tenant is behind a proxy layer, configure the proxy
