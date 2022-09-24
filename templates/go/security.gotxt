@@ -1,0 +1,22 @@
+package openapi
+
+import "github.com/gin-gonic/gin"
+
+type {{.ModelName}} struct {
+	token string
+}
+type {{.InterfaceName}} interface {
+	 {{.MethodName}}() gin.HandlerFunc 
+}
+func (obj {{.ModelName}}) {{.MethodName}}() gin.HandlerFunc {
+	return {{.HandleName}}	
+}
+var  {{.Name}}  {{.InterfaceName}}  ={{.ModelName}}{}
+
+
+{{if eq .SecurityScheme "basic"}}
+var BasicAuthAccounts_{{.Name}} = gin.Accounts{
+	"admin":    "admin",
+	"test": "test",	
+}
+{{end}}

@@ -13,6 +13,7 @@ func Generate(doc *openapi3.T) {
 	WriteSchemas()
 	WriteRoutes()
 	WriteHandles()
+	WriteSecuritySchemes()
 	// prepareComponent(doc)
 
 	// prepareHandles(doc)

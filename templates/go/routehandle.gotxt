@@ -10,6 +10,7 @@ import (
 
 func {{ .FuncName}}(c *gin.Context) {
     data := {{ .DataType}}{ }
-    c.JSON(http.StatusOK, data.GetExamples() )
+    
+    c.JSON(http.StatusOK, data{{if ne .SchemaType "array"}}.GetExamples(){{end}} )
 }
 {{end}}{{end}}

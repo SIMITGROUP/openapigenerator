@@ -544,18 +544,23 @@ components:
         id:
           type: integer
           format: int64
+          example: 0
         username:
           type: string
           description: Username
+          example: admin
         text:
           type: string
           description: task description
+          example: Task1
         date:
           type: string
           format: date-time
+          example: 0000-00-00
         status:
           type: string
           description: Order Status
+          example: toDo
           enum:
             - toDo
             - done
@@ -571,15 +576,19 @@ components:
         username:
           type: string
           description: Username
+          example: admin
         text:
           type: string
           description: task description
+          example: task1
         date:
           type: string
           format: date-time
+          example: 0000-00-00
         status:
           type: string
           description: Order Status
+          example: toDo
           enum:
             - toDo
             - done
@@ -591,9 +600,11 @@ components:
         username:
           type: string
           description: Username
+          example: admin
         password:
           type: string
           description: password
+          example: admin
       xml:
         name: User
     UserObject:
@@ -602,12 +613,15 @@ components:
         username:
           type: string
           description: Username
+          example: admin
         password:
           type: string
           description: password
+          example: pass
         id:
           type: integer
           format: int64
+          example: 0
       xml:
         name: UserObject
     UserObjectArray:
@@ -623,12 +637,15 @@ components:
         access_token:
           type: string
           description: Access Token
+          example: sample-access-token
         expires_in:
           type: integer
           format: int64
+          example: 10
         refresh_token:
           type: string
           description: Refresh Token
+          example: sample-refresh-token
       xml:
         name: UserInfo
     TokenInfo:
@@ -637,12 +654,15 @@ components:
         id:
           type: integer
           format: int64
+          example: 0
         username:
           type: string
           description: Username
+          example: admin
         accessToken:
           type: string
           description: access token status
+          example: sample-token-data
       xml:
         name: TokenInfo
     AccessToken:
@@ -651,6 +671,7 @@ components:
         accessToken:
           type: string
           description: access token
+          example: sample-token-data
       xml:
         name: AccessToken
     ApiResponse:
@@ -659,8 +680,10 @@ components:
         status:
           type: integer
           format: int32
+          example: 200
         message:
           type: string
+          example: Success
   requestBodies:
     Task:
       content:

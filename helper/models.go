@@ -29,8 +29,9 @@ type RouteSettings struct {
 }
 
 type Model_Handle struct {
-	FuncName string
-	DataType string
+	FuncName   string
+	DataType   string
+	SchemaType string
 	// Example  string
 }
 type Model_HandleTemplate struct {
@@ -50,4 +51,15 @@ type Model_Schema struct {
 	ModelName     string
 	InterfaceName string
 	FieldList     []Model_Field
+}
+
+type Model_Security struct {
+	Name           string
+	ModelName      string
+	InterfaceName  string
+	MethodName     string
+	HandleName     string
+	HandleData     string
+	SecurityType   string
+	SecurityScheme string
 }

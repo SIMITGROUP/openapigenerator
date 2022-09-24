@@ -124,3 +124,15 @@ func GetResponseDataType(path string, method string, responses openapi3.Response
 	}
 	return datatype
 }
+
+func GetSchemaFromName(schemaname string) *openapi3.Schema {
+
+	for name, setting := range Allschemas {
+		if schemaname == name {
+
+			return setting.Value
+		}
+	}
+	dummy := openapi3.Schema{Type: ""}
+	return &dummy
+}

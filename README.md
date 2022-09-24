@@ -67,3 +67,6 @@ go build .
             - require content type ***application/json***
             - $ref link to suitable schema
     b. ***operationID*** is require to auto generate handle
+
+# Limitation
+1. api refer to Schema type "array" , only able to show blank array
