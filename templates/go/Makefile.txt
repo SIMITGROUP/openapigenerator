@@ -1,0 +1,5 @@
+run:
+	go get .
+	go build .
+	@echo "Build successfully, run './{{ .ProjectName}}' command with your own options"
+	

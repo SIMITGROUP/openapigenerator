@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
-	"log"
+
+	log "github.com/sirupsen/logrus"
+
 	"openapigenerator/buildgo"
 	"openapigenerator/buildphp"
 	"openapigenerator/helper"
@@ -28,7 +30,7 @@ func main() {
 	helper.Proj.BuildLang = BuildLang
 	helper.Proj.GenerateFolder = GenerateFolder
 	helper.Proj.ProjectName = ProjectName
-
+	log.SetLevel(log.DebugLevel)
 	switch BuildLang {
 	case "go":
 		GenerateCode(ApiFile)
@@ -39,7 +41,10 @@ func main() {
 }
 
 func GenerateCode(ApiFile string) {
-	doc, _ := openapi3.NewLoader().LoadFromFile(ApiFile)
+	doc, err := openapi3.NewLoader().LoadFromFile(ApiFile)
+	if err != nil {
+		log.Fatal(err)
+	}
 	helper.ReadRoutes(doc)
 	helper.ReadComponents(doc)
 	switch BuildLang {

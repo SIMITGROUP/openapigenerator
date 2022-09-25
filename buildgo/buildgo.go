@@ -39,6 +39,15 @@ func WriteInfra() {
 	_ = gotemplate.Execute(&gomodbytes, helper.Proj)
 	helper.WriteFile("", "go.mod", gomodbytes.String())
 
+	//prepare Makefile
+	var makebytes bytes.Buffer
+	makefilepath := "./templates/go/Makefile.txt"
+	makesrc := helper.ReadFile(makefilepath)
+	maketemplate := template.New("makefile")
+	maketemplate, _ = maketemplate.Parse(makesrc)
+	_ = maketemplate.Execute(&makebytes, helper.Proj)
+	helper.WriteFile("", "Makefile", makebytes.String())
+
 	//prepare openapi/server.go
 	var serverbytes bytes.Buffer
 	serverfilepath := "./templates/go/server.gotxt"
@@ -47,4 +56,5 @@ func WriteInfra() {
 	servertemplate, _ = servertemplate.Parse(serversrc)
 	_ = servertemplate.Execute(&serverbytes, helper.Proj)
 	helper.WriteFile("openapi", "server.go", serverbytes.String())
+
 }

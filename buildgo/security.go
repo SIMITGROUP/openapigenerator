@@ -2,6 +2,7 @@ package buildgo
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"openapigenerator/helper"
 	"text/template"
@@ -9,62 +10,139 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
+// consolidate multiple security scheme, every scheme name = separate handle
+// different securityscheme type write in different file
+// example: split by basichttp, jwt, oauth2
+type Model_SchemeHandle struct {
+	SchemeType string
+	SchemeName string
+}
+
 func WriteSecuritySchemes() {
 
-	for authname, setting := range helper.Allsecurityschemas {
+	// fmt.Println("WriteSecuritySchemes")
+	schemelist := make(map[string]string)
 
+	for authname, setting := range helper.Allsecurityschemas {
 		securityscheme := helper.LowerCaseFirst(setting.Value.Scheme)
 		securitytype := helper.LowerCaseFirst(setting.Value.Type)
-		handlename := getAuthHandles(authname, setting.Value)
-		handleData := ""
-		if securitytype == "basic" {
+		schemetype, filename, schemehandle := getAuthTemplates(authname, setting.Value)
+		schemelist[schemetype] = filename
+		fmt.Println("filename: ", filename)
+		// schemasrc := helper.ReadFile(filename)
+		// schematemplate := template.New("security")
+		// schematemplate, _ = schematemplate.Parse(schemasrc)
+		_, _, _, _, _, _ = setting, filename, securitytype, schemetype, securityscheme, schemehandle
+	}
 
-		}
+	for schemetype, srcfilename := range schemelist {
 
-		securityobj := helper.Model_Security{
-			Name:           authname,
-			SecurityType:   securitytype,
-			SecurityScheme: securityscheme,
-			ModelName:      helper.GetModelName(authname),
-			InterfaceName:  helper.GetInterfaceName(authname),
-			MethodName:     "Auth_" + authname,
-			HandleName:     handlename,
-			HandleData:     handleData,
-		}
-
-		filename := "Security_" + authname + ".go"
-
+		filename := "Security_" + schemetype + ".go"
 		var writebuffer bytes.Buffer
-		schemapath := "./templates/go/security.gotxt"
-		schemasrc := helper.ReadFile(schemapath)
+		schemasrc := helper.ReadFile(srcfilename)
 		schematemplate := template.New("security")
 		schematemplate, _ = schematemplate.Parse(schemasrc)
-		// fmt.Println("securityobj::::", securityobj)
+		securityobj := Model_SchemeHandle{
+			SchemeType: schemetype,
+			SchemeName: schemetype + "name",
+		}
 		err := schematemplate.Execute(&writebuffer, securityobj)
 		if err != nil {
 			log.Fatal("writing template ", filename, "error, ", err)
 		}
 		helper.WriteFile("openapi", filename, writebuffer.String())
-		_, _, _, _ = setting, filename, securityobj, writebuffer
 	}
 }
 
-func getAuthHandles(authname string, setting *openapi3.SecurityScheme) string {
-	authstr := "func(c *gin.Context) {}"
+func getAuthTemplates(authname string, setting *openapi3.SecurityScheme) (string, string, string) {
+	filename := ""
+	schemaname := helper.LowerCaseFirst(setting.Scheme)
+	schemetype := ""
+	schemehandle := ""
 
-	switch setting.Type {
-	case "http":
-		schemaname := helper.LowerCaseFirst(setting.Scheme)
-		if schemaname == "basic" {
-			authstr = "gin.BasicAuth(BasicAuthAccounts_" + authname + ")"
-		} else if schemaname == "bearer" {
-			// authstr = "func(c *gin.Context) {}"
-		}
-	//not supported yet
-	case "apiKey":
-	case "mutualTLS":
-	case "oauth2":
-	case "openIdConnect":
+	if setting.Type == "http" && schemaname == "basic" {
+		schemetype = "basic"
+		filename = "security_httpbasic"
+		schemehandle = "BasicAuth"
+	} else if setting.Type == "http" && schemaname == "bearer" { //JWT
+		schemetype = "jwt"
+		filename = "security_httpjwt"
+		schemehandle = "xxxxxxx"
+	} else if setting.Type == "apiKey" {
+		schemetype = "apikey"
+		filename = "security_apikey"
+		schemehandle = "xxxxxxx"
+	} else if setting.Type == "mutualTLS" {
+	} else if setting.Type == "oauth2" {
+	} else if setting.Type == "openIdConnect" {
+		schemetype = "openidconnect"
+		filename = "security_openidconnect"
+		schemehandle = "xxxxxxx"
 	}
-	return authstr
+	if schemetype != "" {
+		filename = "templates/go/" + filename + ".gotxt"
+		return schemetype, filename, schemehandle
+	} else {
+		log.Fatal(authname + " using security scheme type " + setting.Type + " is not supported yet")
+		return schemetype, filename, schemehandle
+	}
+
 }
+
+// func WriteSecuritySchemes2() {
+
+// 	for authname, setting := range helper.Allsecurityschemas {
+
+// 		securityscheme := helper.LowerCaseFirst(setting.Value.Scheme)
+// 		securitytype := helper.LowerCaseFirst(setting.Value.Type)
+// 		handlename := getAuthHandles(authname, setting.Value)
+// 		handleData := ""
+
+// 		securityobj := helper.Model_Security{
+// 			Name:           authname,
+// 			SecurityType:   securitytype,
+// 			SecurityScheme: securityscheme,
+// 			ModelName:      helper.GetModelName(authname),
+// 			InterfaceName:  helper.GetInterfaceName(authname),
+// 			MethodName:     "Auth_" + authname,
+// 			HandleName:     handlename,
+// 			HandleData:     handleData,
+// 		}
+// 		fmt.Println("securityobj", securityobj)
+
+// 		filename := "Security_" + authname + ".go"
+
+// 		var writebuffer bytes.Buffer
+// 		schemetype, schemapath := getAuthTemplatesFile(authname, setting.Value)
+
+// 		schemasrc := helper.ReadFile(schemapath)
+// 		schematemplate := template.New("security")
+// 		schematemplate, _ = schematemplate.Parse(schemasrc)
+// 		fmt.Println("securityobj::::", securityobj)
+// 		err := schematemplate.Execute(&writebuffer, securityobj)
+// 		if err != nil {
+// 			log.Fatal("writing template ", filename, "error, ", err)
+// 		}
+// 		helper.WriteFile("openapi", filename, writebuffer.String())
+// 		_, _, _, _, _ = setting, filename, securityobj, writebuffer, schemetype
+// 	}
+// }
+
+// func getAuthHandles(authname string, setting *openapi3.SecurityScheme) string {
+// 	authstr := "func(c *gin.Context) {}"
+
+// 	switch setting.Type {
+
+// 	case "http":
+// 		schemaname := helper.LowerCaseFirst(setting.Scheme)
+// 		if schemaname == "basic" {
+// 			authstr = "gin.BasicAuth(BasicAuthAccounts_" + authname + ")"
+// 		} else if schemaname == "bearer" {
+// 		}
+// 	case "apiKey":
+// 	case "mutualTLS":
+// 	case "oauth2":
+// 	case "openIdConnect":
+// 	}
+// 	return authstr
+// }

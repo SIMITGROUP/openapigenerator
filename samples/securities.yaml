@@ -231,11 +231,15 @@ paths:
             type: string
             enum:
               - resource=1.0
-      security:
-        - iplanetDirectoryProAuth: []
+      # security:
+      #   - iplanetDirectoryProAuth: []
       responses:
         '200':
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/status'
         '403':
           description: Access denied
   /monitoring/health:
@@ -290,9 +294,9 @@ paths:
           name: _sortKeys
           schema:
             type: string
-      security:
-        - ApiKeyAuthKey: []
-          ApiKeyAuthSecret: []
+      # security:
+      #   - ApiKeyAuthKey: []
+      #     ApiKeyAuthSecret: []
       responses:
         '200':
           description: List of log events
@@ -307,12 +311,16 @@ paths:
       tags:
         - Monitoring
       security:
-        - ApiKeyAuthKey: []
-          ApiKeyAuthSecret: []
+        # - ApiKeyAuthKey: []
+        #   ApiKeyAuthSecret: []
         - BasicAuth: []
       responses:
         '200':
           description: Prometheus metrics for AM pods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/logResult'
   /openidm/managed/alpha_user:
     get:
       summary: Use OAuth 2.0
@@ -325,11 +333,15 @@ paths:
           schema:
             type: boolean
             default: true
-      security:
-        - openIdAlpha: [openid,'fr:idm:*']
+      # security:
+      #   - openIdAlpha: [openid,'fr:idm:*']
       responses:
         '200':
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/logResult'
         '403':
           description: Access denied
 servers:
@@ -343,30 +355,30 @@ servers:
         description: The tenant identifier for your deployment
 components:
   securitySchemes:
-    openIdAlpha:
-      type: openIdConnect
-      # FixMe: Remove the following comment when the referenced issue is resolved:
-      # Due to an open issue reported in https://github.com/swagger-api/swagger-ui/issues/7485,
-      # use an absolute URL; for example, https://openam-dx-kl02.forgeblocks.com/am/oauth2/realms/root/realms/alpha/.well-known/openid-configuration
-      openIdConnectUrl: https://openam-dx-kl02.forgeblocks.com/am/oauth2/realms/root/realms/alpha/.well-known/openid-configuration
-    iplanetDirectoryProAuth:
-      type: apiKey
-      # FixMe: The description needs a link to /am/json/authenticate:
-      description: Use `/am/json/authenticate` to obtain the cookie value.
-      in: cookie
-      # FixMe: this is variable and depends on the tenant; openam-docs has:
-      #name: 46b42b4229cd7a3
-      name: iplanetDirectoryPro
-    ApiKeyAuthKey:
-      type: apiKey
-      description: Create an API key/secret pair as admin under Tenant Settings > Global Settings > Log API keys.
-      in: header
-      name: X-API-KEY
-    ApiKeyAuthSecret:
-      type: apiKey
-      description: Create an API key/secret pair as admin under Tenant Settings > Global Settings > Log API keys.
-      in: header
-      name: X-API-SECRET
+    # openIdAlpha:
+    #   type: openIdConnect
+    #   # FixMe: Remove the following comment when the referenced issue is resolved:
+    #   # Due to an open issue reported in https://github.com/swagger-api/swagger-ui/issues/7485,
+    #   # use an absolute URL; for example, https://openam-dx-kl02.forgeblocks.com/am/oauth2/realms/root/realms/alpha/.well-known/openid-configuration
+    #   openIdConnectUrl: https://openam-dx-kl02.forgeblocks.com/am/oauth2/realms/root/realms/alpha/.well-known/openid-configuration
+    # iplanetDirectoryProAuth:
+    #   type: apiKey
+    #   # FixMe: The description needs a link to /am/json/authenticate:
+    #   description: Use `/am/json/authenticate` to obtain the cookie value.
+    #   in: cookie
+    #   # FixMe: this is variable and depends on the tenant; openam-docs has:
+    #   #name: 46b42b4229cd7a3
+    #   name: iplanetDirectoryPro
+    # ApiKeyAuthKey:
+    #   type: apiKey
+    #   description: Create an API key/secret pair as admin under Tenant Settings > Global Settings > Log API keys.
+    #   in: header
+    #   name: X-API-KEY
+    # ApiKeyAuthSecret:
+    #   type: apiKey
+    #   description: Create an API key/secret pair as admin under Tenant Settings > Global Settings > Log API keys.
+    #   in: header
+    #   name: X-API-SECRET
     BasicAuth:
       type: http
       scheme: Basic
@@ -386,6 +398,7 @@ components:
         timestamp:
           type: string
           format: date-time
+          example: examplw2
         type:
           type: string
           example: text/plain
@@ -417,15 +430,19 @@ components:
         tokenId:
           type: string
           description: SSO session cookie, not returned when `noSession` is set to `true`
+          example: examplw2
         message:
           type: string
           description: Result message
+          example: examplw2
         successUrl:
           type: string
           description: Location to redirect the user-agent
+          example: examplw2
         realm:
           type: string
           description: Realm where authentication succeeded
+          example: examplw2
     Challenge:
       type: object
       properties:
@@ -435,95 +452,10 @@ components:
             JSON Web Token (JWT) that uniquely identifies the
             authentication context to AM, and so must also be sent
             back with the requests.
+          example: example
         template:
           type: string
+          example: examplw2
         stage:
           type: string
-        callbacks:
-          type: object
-          items:
-            properties:
-              type:
-                type: string
-                description: |
-                  The following callbacks request information that usually requires user interaction:
-
-                    *   `BooleanAttributeInputCallback` - Used to ask for a boolean-style confirmation, such as yes/no, or true/false, and retrieve the response. Can be used with IDM policy information to validate the input against the managed user schema.
-                    *   `ChoiceCallback` - Used to display a list of choices and retrieve the selected choice by number, counting from 0.
-                    *   `ConfirmationCallback` - Used to ask for a confirmation such as Yes, No, or Cancel and retrieve the selection, counting from 0.
-                    *   `ConsentMappingCallback` - Used to display managed user attributes that require consent, and to collect consent from the user.
-                    *   `DeviceProfileCallback` - Used to request information about the device being used to authenticate. The `identifier` is a unique string to identify the device. The `alias` is friendly name for the device, often derived from the make and model.
-                    *   `IdPCallback` - Used to retrieve information required by a client to authenticate with a social identity provider.
-                    *   `KbaCreateCallback` - Used to collect knowledge-based authentication (KBA) answers to predefined questions, or to let users register both questions and answers.
-                    *   `NameCallback` - Used to retrieve a name string.
-                    *   `NumberAttributeInputCallback` - Used to collect numerical-only attributes, such as size, or age.
-                    *   `PasswordCallback` - Used to retrieve a password value.
-                    *   `SelectIdPCallback` - Used to offer a choice of social identity provider, or local authentication.
-                    *   `StringAttributeInputCallback` - Used to collect string attributes, such as city names, telephone numbers, and postcodes.
-                    *   `TermsAndConditionsCallback` - Used to show the company’s terms and conditions, and to collect the user’s agreement to them.
-                    *   `TextInputCallback` - Used to retrieve text input from the end user.
-
-                  The following read-only callbacks include information to present to (or hide from) a user:
-
-                    *   `HiddenValueCallback` - Used to return form values that are not visually rendered to the end user.
-                    *   `MetadataCallback` - Used to inject key-value meta data into the authentication process.
-                    *   `PollingWaitCallback` - Used to indicate the amount of time to wait before responding to the callback.
-                    *   `RedirectCallback` - Used to redirect the client user-agent.
-                    *   `SuspendedTextOutputCallback` - Used to display a message to the end user after the authentication tree is suspended.
-                    *   `TextOutputCallback` - Used to display a message to the end user.
-
-                  The following backchannel callbacks require information from the request:
-
-                    *   `HttpCallback` - Used for HTTP handshake negotiations.
-                    *   `LanguageCallback` - Used to retrieve the locale for localizing text presented to the end user.
-                    *   `ScriptTextOutputCallback` - Used to insert a script into the page presented to the end user. The script can, for example, collect data about the user's environment.
-                    *   `X509CertificateCallback` - Used to retrieve the content of an x.509 certificate.
-                enum:
-                  - BooleanAttributeInputCallback
-                  - ChoiceCallback
-                  - ConfirmationCallback
-                  - ConsentMappingCallback
-                  - DeviceProfileCallback
-                  - HiddenValueCallback
-                  - HttpCallback
-                  - IdPCallback
-                  - KbaCreateCallback
-                  - LanguageCallback
-                  - MetadataCallback
-                  - NameCallback
-                  - NumberAttributeInputCallback
-                  - PasswordCallback
-                  - PollingWaitCallback
-                  - RedirectCallback
-                  - ScriptTextOutputCallback
-                  - SelectIdPCallback
-                  - StringAttributeInputCallback
-                  - SuspendedTextOutputCallback
-                  - TermsAndConditionsCallback
-                  - TextInputCallback
-                  - TextOutputCallback
-                  - X509CertificateCallback
-              output:
-                description: >-
-                  Name-value pairs to format and display to the user
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      description: A `prompt` label
-                    value:
-                      type: string
-                      description: A `prompt` value
-              input:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      description: Name of field to populate
-                    value:
-                      type: string
-                      description: Populate this with the user's response
+          example: examplw2

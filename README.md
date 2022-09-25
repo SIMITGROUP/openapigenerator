@@ -51,12 +51,26 @@ go build .
 4. Build in gin http server
 5. Work with application/json response (only)
 6. Use middleware control security requirement (support basic and jwt)
+7. Supported Component type
+    schema
+    securityscheme
 
 
 # Todo
 1. add in missing basic and bearer jwt authorization
 2. prepare log system
 3. auto generate unit test
+4. missing support component type
+    Parameters
+    RequestBodies
+        connect still connect to schema, 
+            require: true/false
+            application/json only
+    Responses
+    Examples
+    Callbacks
+    Headers
+    Links
 
 # Rules while using this project
 1. Not support  ***oneOf, anyOf, allOf, not ***

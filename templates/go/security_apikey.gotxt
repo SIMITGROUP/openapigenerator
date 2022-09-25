@@ -1,0 +1,29 @@
+// basic authentication template
+// modify function BasicAuth() to perform real authentication
+// default only authenticate user admin/admin
+package openapi
+
+import (
+  "github.com/gin-gonic/gin"
+  log "github.com/sirupsen/logrus"
+  "net/http"
+  )
+
+func Auth_BasicAuth(c *gin.Context) {
+	user, password, ok := c.Request.BasicAuth()
+	if ok && user == "admin" && password == "admin" {
+		log.WithFields(log.Fields{
+			"user": user,
+		}).Info("User authenticated")
+    c.Next()
+	} else {	
+    log.WithFields(log.Fields{
+			"user": user,
+		}).Info("Fail login user " + user)
+		c.JSON(http.StatusForbidden, gin.H{"message": "basic authentication failed"})
+
+		c.Writer.Header().Set("WWW-Authenticate", "Basic realm=Restricted")    
+    c.Abort()
+		return
+	}
+}

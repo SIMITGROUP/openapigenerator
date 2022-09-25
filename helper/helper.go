@@ -2,6 +2,7 @@ package helper
 
 import (
 	"os"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -25,8 +26,14 @@ func LowerCaseFirst(name string) string {
 	return newname
 }
 
-func GetAuthMethodName(name string) string {
-	return "Auth_" + name
+func GetAuthMethodName(schemename string) string {
+
+	// for name, schemesetting := range Allsecurityschemas {
+	// 	if name == schemename {
+	// 		return "ss"
+	// 	}
+	// }
+	return "Auth_" + schemename
 }
 func GetModelName(name string) string {
 	return "Model_" + name
@@ -91,4 +98,24 @@ func GetTypeNameFromRef(refstring string) string {
 	refer_arr := strings.Split(refstring, "/")
 	typename := refer_arr[len(refer_arr)-1]
 	return typename
+}
+
+func InArray(val interface{}, array interface{}) (exists bool, index int) {
+	exists = false
+	index = -1
+
+	switch reflect.TypeOf(array).Kind() {
+	case reflect.Slice:
+		s := reflect.ValueOf(array)
+
+		for i := 0; i < s.Len(); i++ {
+			if reflect.DeepEqual(val, s.Index(i).Interface()) == true {
+				index = i
+				exists = true
+				return
+			}
+		}
+	}
+
+	return
 }

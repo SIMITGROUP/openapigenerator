@@ -2,10 +2,11 @@ package buildgo
 
 import (
 	"bytes"
-	"fmt"
 	"openapigenerator/helper"
 	"strings"
 	"text/template"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // register routes
@@ -45,10 +46,10 @@ func WriteHandles() {
 		schemobj := helper.GetSchemaFromName(oridatatype)
 
 		if schemobj.Type == "array" {
-
 			handledatatype = "[]" + helper.GetModelNameFromRef(schemobj.Items.Ref)
 		}
-		fmt.Println("handle info", handlename, handledatatype)
+
+		log.Info("handle info", handlename, ", ", handledatatype)
 		h := helper.Model_Handle{
 			FuncName:   handlename,
 			DataType:   handledatatype,

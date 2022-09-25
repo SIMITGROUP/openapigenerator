@@ -3,10 +3,11 @@ package buildgo
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"openapigenerator/helper"
 	"strings"
 	"text/template"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -23,19 +24,28 @@ func WriteSchemas() {
 		schemaobj.InterfaceName = interfacename
 
 		props := setting.Value.Properties
+		log.Info("Prepare Schema: ", modelname, "(", schemaname, ")", ": ", setting.Value.Type)
 		if setting.Value.Type == "object" {
 			allfields := []helper.Model_Field{}
 			for field, fieldsetting := range props {
 				// fmt.Println("Schema:", schemaname, field)
 				examplestr := ""
 				if fieldsetting.Value.Example == nil {
-					if fieldsetting.Value.Type != "" {
+					if fieldsetting.Value.Type == "object" && fieldsetting.Value.Items.Ref == "" {
+						log.Fatal("Schema " + schemaname + "." + field + " type=object, but not ref to another schema")
+					}
+
+					if fieldsetting.Value.Type != "" && fieldsetting.Value.Type != "object" && fieldsetting.Value.Type != "array" {
 						log.Fatal("Undefine sample data in schema '" + schemaname + "' field '" + field + "'")
 					}
 					// fmt.Println("field ", field, fieldsetting.Value.Items)
 					if fieldsetting.Value.Items.Ref != "" {
 						fmt.Println(field, " == ", fieldsetting.Value.Items.Ref)
 						examplestr = helper.GetModelNameFromRef(fieldsetting.Value.Items.Ref) + "{}"
+						if fieldsetting.Value.Type == "array" {
+							examplestr = "[]" + examplestr
+						}
+
 					}
 
 				} else {
@@ -44,6 +54,7 @@ func WriteSchemas() {
 				}
 				fieldname := helper.UpperCaseFirst(field)
 				fieldtype := convGoLangType(*fieldsetting.Value)
+				log.Debug("    ", fieldname, ", ", fieldtype)
 				fieldobj := helper.Model_Field{
 					ModelName:    modelname,
 					FieldName:    fieldname,
@@ -89,7 +100,7 @@ func convGoLangType(s openapi3.Schema) string {
 	} else if s.Type == "string" {
 		//do nothing for string
 	} else if s.Type == "array" {
-		if s.Items.Value.Type != "" {
+		if s.Items.Value.Type != "" && s.Items.Value.Type != "object" {
 			fieldtype = s.Items.Value.Type
 		} else { // use custom type
 			fieldtype = helper.GetModelNameFromRef(s.Items.Ref)

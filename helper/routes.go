@@ -10,9 +10,11 @@ import (
 func ReadRoutes(doc *openapi3.T) {
 
 	for oripath, pathmethods := range doc.Paths {
+
 		path := ConvertGinPath(oripath)
 
 		if pathmethods.Get != nil {
+
 			methodsetting := generateMethodObject("GET", path, pathmethods.Get)
 			Allroutes = append(Allroutes, methodsetting)
 		}
@@ -59,7 +61,7 @@ func generateMethodObject(methodtype string, path string, op *openapi3.Operation
 			for authname, authsetting := range securitysetting {
 				methodname := GetAuthMethodName(authname)
 				_ = authsetting
-				handle := authname + "." + methodname + "()"
+				handle := methodname
 				middlewares = append(middlewares, handle)
 			}
 		}
