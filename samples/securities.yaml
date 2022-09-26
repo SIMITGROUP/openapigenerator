@@ -294,8 +294,8 @@ paths:
           name: _sortKeys
           schema:
             type: string
-      # security:
-      #   - ApiKeyAuthKey: []
+      security:
+        - ApiKeyAuthKey: []
       #     ApiKeyAuthSecret: []
       responses:
         '200':
@@ -311,7 +311,7 @@ paths:
       tags:
         - Monitoring
       security:
-        # - ApiKeyAuthKey: []
+        - ApiKeyAuthKey: []
         #   ApiKeyAuthSecret: []
         - BasicAuth: []
       responses:
@@ -369,11 +369,11 @@ components:
     #   # FixMe: this is variable and depends on the tenant; openam-docs has:
     #   #name: 46b42b4229cd7a3
     #   name: iplanetDirectoryPro
-    # ApiKeyAuthKey:
-    #   type: apiKey
-    #   description: Create an API key/secret pair as admin under Tenant Settings > Global Settings > Log API keys.
-    #   in: header
-    #   name: X-API-KEY
+    ApiKeyAuthKey:
+      type: apiKey
+      description: Create an API key/secret pair as admin under Tenant Settings > Global Settings > Log API keys.
+      in: header
+      name: X-API-KEY
     # ApiKeyAuthSecret:
     #   type: apiKey
     #   description: Create an API key/secret pair as admin under Tenant Settings > Global Settings > Log API keys.

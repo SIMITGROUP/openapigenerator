@@ -8,22 +8,26 @@ import (
   log "github.com/sirupsen/logrus"
   "net/http"
   )
+  var KEYSECRET="MYKEY"
 
-func Auth_BasicAuth(c *gin.Context) {
-	user, password, ok := c.Request.BasicAuth()
-	if ok && user == "admin" && password == "admin" {
-		log.WithFields(log.Fields{
-			"user": user,
-		}).Info("User authenticated")
-    c.Next()
-	} else {	
-    log.WithFields(log.Fields{
-			"user": user,
-		}).Info("Fail login user " + user)
-		c.JSON(http.StatusForbidden, gin.H{"message": "basic authentication failed"})
 
-		c.Writer.Header().Set("WWW-Authenticate", "Basic realm=Restricted")    
-    c.Abort()
+{{ with .Auth_handle}}{{range .}}
+func {{.}}(c *gin.Context){
+	return func(c *gin.Context) {
+		// var user authorizedUser
+		APIKey := c.Request.Header.Get("X-API-Key")
+
+		if APIKey != KEYSECRET {
+			log.Warn("Wrong API Key: %s\n", APIKey)
+
+			c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "API Key authentication failed"})
+			return
+		}
+
 		return
 	}
 }
+{{end}}{{end}}
+
+
+

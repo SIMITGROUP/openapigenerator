@@ -50,7 +50,7 @@ go build .
 3. Supported http traffic (GET/POST/PUT/DELETE)
 4. Build in gin http server
 5. Work with application/json response (only)
-6. Use middleware control security requirement (support basic and jwt)
+6. Use middleware control security requirement (support basic and apikey at this moment)
 7. Supported Component type
     schema
     securityscheme
@@ -84,3 +84,4 @@ go build .
 
 # Limitation
 1. api refer to Schema type "array" , only able to show blank array
+2. jwt is not supported yet
