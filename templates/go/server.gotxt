@@ -3,9 +3,12 @@ package openapi
 import (
 	"github.com/gin-gonic/gin"
 )
-
+var SecuritySchemelist map[string]bool
 func NewServer() *gin.Engine {
 	r := gin.Default()
+	if SecuritySchemelist["jwt"] == true {
+		InitiateJWT()
+	}
 	registerRoutes(r)
 	return r
 }

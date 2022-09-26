@@ -513,8 +513,8 @@ paths:
                                 type: string
                                 description: The name of the token. The user will be able to see a list of their tokens (and revoke tokens) via our web application
                         example:
-                          email: bugsbunny@disney.com
-                          password: ILoveCarrots
+                          email: admin@example.com
+                          password: aaaaaa
                           token_name: "Bugs Bunny's iPhone 12"
         responses: 
             200:

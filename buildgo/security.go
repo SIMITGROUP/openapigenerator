@@ -2,10 +2,10 @@ package buildgo
 
 import (
 	"bytes"
-	"fmt"
-	"log"
 	"openapigenerator/helper"
 	"text/template"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -14,28 +14,33 @@ import (
 // different securityscheme type write in different file
 // example: split by basichttp, jwt, oauth2
 type Model_SchemeHandle struct {
-	SchemeType string
-	SchemeName string
+	SchemeType  string
+	SchemeName  string
+	Auth_handle []string
 }
 
 func WriteSecuritySchemes() {
 
 	// fmt.Println("WriteSecuritySchemes")
-	schemelist := make(map[string]string)
+	schemefilelist := make(map[string]string)
+	schemenamelist := make(map[string][]string)
 
 	for authname, setting := range helper.Allsecurityschemas {
 		securityscheme := helper.LowerCaseFirst(setting.Value.Scheme)
 		securitytype := helper.LowerCaseFirst(setting.Value.Type)
 		schemetype, filename, schemehandle := getAuthTemplates(authname, setting.Value)
-		schemelist[schemetype] = filename
-		fmt.Println("filename: ", filename)
+		schemefilelist[schemetype] = filename
+		authhandlename := helper.GetAuthMethodName(authname)
+		schemenamelist[schemetype] = append(schemenamelist[schemetype], authhandlename)
+		log.Debug("Prepare Scheme: ", authname, ", type: ", schemetype)
+
 		// schemasrc := helper.ReadFile(filename)
 		// schematemplate := template.New("security")
 		// schematemplate, _ = schematemplate.Parse(schemasrc)
 		_, _, _, _, _, _ = setting, filename, securitytype, schemetype, securityscheme, schemehandle
 	}
 
-	for schemetype, srcfilename := range schemelist {
+	for schemetype, srcfilename := range schemefilelist {
 
 		filename := "Security_" + schemetype + ".go"
 		var writebuffer bytes.Buffer
@@ -43,8 +48,9 @@ func WriteSecuritySchemes() {
 		schematemplate := template.New("security")
 		schematemplate, _ = schematemplate.Parse(schemasrc)
 		securityobj := Model_SchemeHandle{
-			SchemeType: schemetype,
-			SchemeName: schemetype + "name",
+			SchemeType:  schemetype,
+			SchemeName:  schemetype + "name",
+			Auth_handle: schemenamelist[schemetype],
 		}
 		err := schematemplate.Execute(&writebuffer, securityobj)
 		if err != nil {

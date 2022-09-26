@@ -20,7 +20,7 @@ func Auth_BasicAuth(c *gin.Context) {
     log.WithFields(log.Fields{
 			"user": user,
 		}).Info("Fail login user " + user)
-		c.JSON(http.StatusForbidden, gin.H{"message": "basic authentication failed"})
+		c.JSON(http.StatusUnauthorized, gin.H{"msg": "HTTP Basic Authentication unauthorise access"})
 
 		c.Writer.Header().Set("WWW-Authenticate", "Basic realm=Restricted")    
     c.Abort()

@@ -49,6 +49,7 @@ func WriteInfra() {
 	helper.WriteFile("", "Makefile", makebytes.String())
 
 	//prepare openapi/server.go
+
 	var serverbytes bytes.Buffer
 	serverfilepath := "./templates/go/server.gotxt"
 	serversrc := helper.ReadFile(serverfilepath)

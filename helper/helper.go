@@ -1,12 +1,15 @@
 package helper
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"regexp"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
+
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -63,7 +66,16 @@ func WriteFile(folder string, filename string, content string) {
 
 	_ = os.MkdirAll(targetfolder, 0777)
 	// fmt.Println("targetfile:", GenerateFolder, targetfile, "===", targetfolder, err)
-	_ = os.WriteFile(targetfile, []byte(content), 0644)
+	err := os.WriteFile(targetfile, []byte(content), 0644)
+	if err == nil {
+		log.Info("Write file ", targetfile)
+
+	} else {
+		errormsg := fmt.Sprintf("Can't write file %v error %v", targetfile, err)
+		log.Fatal(errormsg)
+
+	}
+
 }
 
 func ConvertGinPath(oripath string) string {
