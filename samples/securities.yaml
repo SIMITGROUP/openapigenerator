@@ -296,7 +296,7 @@ paths:
             type: string
       security:
         - ApiKeyAuthKey: []
-      #     ApiKeyAuthSecret: []
+          ApiKeyAuthSecret: []
       responses:
         '200':
           description: List of log events
@@ -312,7 +312,7 @@ paths:
         - Monitoring
       security:
         - ApiKeyAuthKey: []
-        #   ApiKeyAuthSecret: []
+          ApiKeyAuthSecret: []
         - BasicAuth: []
       responses:
         '200':
@@ -373,12 +373,12 @@ components:
       type: apiKey
       description: Create an API key/secret pair as admin under Tenant Settings > Global Settings > Log API keys.
       in: header
-      name: X-API-KEY
-    # ApiKeyAuthSecret:
-    #   type: apiKey
-    #   description: Create an API key/secret pair as admin under Tenant Settings > Global Settings > Log API keys.
-    #   in: header
-    #   name: X-API-SECRET
+      name: X_API_KEY
+    ApiKeyAuthSecret:
+      type: apiKey
+      description: Create an API key/secret pair as admin under Tenant Settings > Global Settings > Log API keys.
+      in: header
+      name: X_API_SECRET
     BasicAuth:
       type: http
       scheme: Basic

@@ -7,27 +7,35 @@ import (
   "github.com/gin-gonic/gin"
   log "github.com/sirupsen/logrus"
   "net/http"
-  )
-  var KEYSECRET="MYKEY"
-
+  "gitlab.com/avarf/getenvs"
+  )  
 
 {{ with .Auth_handle}}{{range .}}
-func {{.}}(c *gin.Context){
-	return func(c *gin.Context) {
-		// var user authorizedUser
-		APIKey := c.Request.Header.Get("X-API-Key")
-
-		if APIKey != KEYSECRET {
-			log.Warn("Wrong API Key: %s\n", APIKey)
-
-			c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "API Key authentication failed"})
-			return
-		}
-
-		return
-	}
+func {{.Handlename}}(c *gin.Context){	
+		// {{.Description}}
+		apikeyname := "{{.Keyname}}"
+		keyvalue := c.Request.Header.Get(apikeyname)
+	
+		if verifyKey(apikeyname, keyvalue) ==false {
+			log.Warn("Wrong API Key:", apikeyname)
+			c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "API Key "+apikeyname+" authentication failed"})
+			c.Abort()
+		}	
 }
 {{end}}{{end}}
 
 
 
+func verifyKey(keyname string, keyvalue string) bool {
+	emptyvalue:="----"
+	envkeyvalue := getenvs.GetEnvString(keyname, emptyvalue)
+
+	if envkeyvalue == emptyvalue {
+		log.Error("Undefine environment variable "+keyname)
+	}
+	if envkeyvalue == keyvalue {
+		return true
+	} else {
+		return false
+	}
+}

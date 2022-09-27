@@ -13,17 +13,22 @@ import (
 // consolidate multiple security scheme, every scheme name = separate handle
 // different securityscheme type write in different file
 // example: split by basichttp, jwt, oauth2
-type Model_SchemeHandle struct {
+type Model_SchemeHandles struct {
 	SchemeType  string
 	SchemeName  string
-	Auth_handle []string
+	Auth_handle []Model_SchemeSetting
+}
+type Model_SchemeSetting struct {
+	Keyname     string
+	Handlename  string
+	Description string
 }
 
 func WriteSecuritySchemes() {
 
 	// fmt.Println("WriteSecuritySchemes")
 	schemefilelist := make(map[string]string)
-	schemenamelist := make(map[string][]string)
+	schemenamelist := make(map[string][]Model_SchemeSetting)
 
 	for authname, setting := range helper.Allsecurityschemas {
 		securityscheme := helper.LowerCaseFirst(setting.Value.Scheme)
@@ -31,7 +36,12 @@ func WriteSecuritySchemes() {
 		schemetype, filename, schemehandle := getAuthTemplates(authname, setting.Value)
 		schemefilelist[schemetype] = filename
 		authhandlename := helper.GetAuthMethodName(authname)
-		schemenamelist[schemetype] = append(schemenamelist[schemetype], authhandlename)
+		schemenamelist[schemetype] = append(schemenamelist[schemetype],
+			Model_SchemeSetting{
+				Handlename:  authhandlename,
+				Keyname:     setting.Value.Name,
+				Description: setting.Value.Description,
+			})
 		log.Debug("Prepare Scheme: ", authname, ", type: ", schemetype)
 
 		// schemasrc := helper.ReadFile(filename)
@@ -47,7 +57,7 @@ func WriteSecuritySchemes() {
 		schemasrc := helper.ReadFile(srcfilename)
 		schematemplate := template.New("security")
 		schematemplate, _ = schematemplate.Parse(schemasrc)
-		securityobj := Model_SchemeHandle{
+		securityobj := Model_SchemeHandles{
 			SchemeType:  schemetype,
 			SchemeName:  schemetype + "name",
 			Auth_handle: schemenamelist[schemetype],
@@ -70,17 +80,32 @@ func getAuthTemplates(authname string, setting *openapi3.SecurityScheme) (string
 		schemetype = "basic"
 		filename = "security_httpbasic"
 		schemehandle = "BasicAuth"
-	} else if setting.Type == "http" && schemaname == "bearer" { //JWT
-		schemetype = "jwt"
-		filename = "security_httpjwt"
-		schemehandle = "xxxxxxx"
 	} else if setting.Type == "apiKey" {
+		// setting
 		schemetype = "apikey"
 		filename = "security_apikey"
 		schemehandle = "xxxxxxx"
+		keyname := setting.Name
+		if verifyKeyname(keyname) == false {
+			log.Fatal("Invalid apikey " + keyname + ", it should only consist character a-z without special character and spacing")
+		}
+		keyin := setting.In
+		if keyin != "header" {
+			log.Fatal("Api key shall define 'In' value as header")
+		}
+		keydesc := setting.Description
+		_ = keydesc
+	} else if setting.Type == "http" && schemaname == "bearer" { //JWT
+		log.Fatal("JWT security scheme is not supported yet")
+		schemetype = "jwt"
+		filename = "security_httpjwt"
+		schemehandle = "xxxxxxx"
 	} else if setting.Type == "mutualTLS" {
+		log.Fatal("mutualTLS security scheme is not supported yet")
 	} else if setting.Type == "oauth2" {
+		log.Fatal("oauth2 security scheme is not supported yet")
 	} else if setting.Type == "openIdConnect" {
+		log.Fatal("openIdConnect security scheme is not supported yet")
 		schemetype = "openidconnect"
 		filename = "security_openidconnect"
 		schemehandle = "xxxxxxx"
@@ -93,6 +118,16 @@ func getAuthTemplates(authname string, setting *openapi3.SecurityScheme) (string
 		return schemetype, filename, schemehandle
 	}
 
+}
+func verifyKeyname(s string) bool {
+	for _, r := range s {
+		if r == '_' {
+			return true
+		} else if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
+			return false
+		}
+	}
+	return true
 }
 
 // func WriteSecuritySchemes2() {

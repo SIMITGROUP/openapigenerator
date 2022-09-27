@@ -6,9 +6,8 @@ import (
 var SecuritySchemelist map[string]bool
 func NewServer() *gin.Engine {
 	r := gin.Default()
-	if SecuritySchemelist["jwt"] == true {
-		InitiateJWT()
-	}
+	//JWT is not supported at this moment
+	//InitiateJWT()
 	registerRoutes(r)
 	return r
 }

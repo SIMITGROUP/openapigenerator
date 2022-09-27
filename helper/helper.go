@@ -19,6 +19,7 @@ var Allschemas = openapi3.Schemas{}
 var Allhandles = []Model_Handle{}
 var Allsecurityschemas = openapi3.SecuritySchemes{}
 var Proj = ProjectSetting{}
+var apikey string
 
 func UpperCaseFirst(name string) string {
 	newname := cases.Title(language.Und).String(name)

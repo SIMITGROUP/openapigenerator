@@ -7,5 +7,6 @@ import (
 func main() {
 	r := openapi.NewServer()
 	listen := getenvs.GetEnvString("API_LISTEN", "{{.ListenAddress}}")
+	
 	r.Run(listen)
 }
