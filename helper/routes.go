@@ -1,8 +1,9 @@
 package helper
 
 import (
-	"log"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -54,6 +55,9 @@ func ReadRoutes(doc *openapi3.T) {
 func generateMethodObject(methodtype string, path string, op *openapi3.Operation) MethodSettings {
 	middlewares := []string{}
 	securities := op.Security
+	if op.OperationID == "" {
+		log.Fatal(methodtype, " ", path, " undefine operationId")
+	}
 	if securities == nil {
 		//no midleware
 	} else {

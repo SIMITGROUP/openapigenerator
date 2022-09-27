@@ -1,0 +1,69 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'simbiz.cloud/userapi'
+  description: User services
+paths:
+  /:
+    get:
+      summary: welcome
+      description: show msg undefine resource
+      operationId: "welcome"
+      responses:
+        200:
+          description: successfully show welcome msg
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Welcomemsg'
+  /memory:
+    get:
+      summary: memory info
+      description: Display server memory usage in json
+      operationId: getMemoryInfo
+      security:
+        - ApiKey: []
+      responses:
+        200:
+          description: successfully get memory info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoriesInfo'
+components:
+  schemas:
+    Welcomemsg:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: Undefine resource
+    MemoriesInfo:
+      type: object
+      properties:
+        total:
+          type: string
+          example: 10GB
+        used:
+          type: string
+          example: 3.5GB
+        percent:
+          type: string
+          example: 35%
+    User:
+      type: object
+      properties:
+        uid:
+          type: string
+          example: admin
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X_API_KEY
+    AdminApiKey:
+      type: apiKey
+      in: header
+      name: X_ADMIN_API_KEY
+security:
+  - ApiKey: []
