@@ -72,14 +72,15 @@ func generateMethodObject(methodtype string, path string, op *openapi3.Operation
 
 	}
 	m := MethodSettings{
-		Path:        path,
-		Method:      methodtype,
-		OperationID: op.OperationID,
-		Middlewares: middlewares,
-		Summary:     op.Summary,
-		Description: strings.Replace(op.Description, "\n", "\n    //", -1),
-		DataType:    GetResponseDataType(path, methodtype, op.Responses),
-		Responses:   op.Responses,
+		Path:              path,
+		Method:            methodtype,
+		OperationID:       op.OperationID,
+		Middlewares:       middlewares,
+		Summary:           op.Summary,
+		Description:       strings.Replace(op.Description, "\n", "\n    //", -1),
+		DataType:          GetResponseDataType(path, methodtype, op.Responses),
+		Responses:         op.Responses,
+		RequestBodiesName: GetTypeNameFromRef(op.RequestBody.Ref),
 	}
 	return m
 }

@@ -23,10 +23,10 @@ func ReadComponents(doc *openapi3.T) {
 	// 	componentlist["parameters"] = prepareParameters(doc.Components.Parameters)
 	// }
 
-	// //RequestBodies
-	// if doc.Components.RequestBodies != nil {
-	// 	componentlist["requestbodies"] = prepareRequestBodies(doc.Components.RequestBodies)
-	// }
+	//RequestBodies
+	if doc.Components.RequestBodies != nil {
+		Allrequestbodies = doc.Components.RequestBodies
+	}
 
 	// //Responses
 	// if doc.Components.Responses != nil {

@@ -16,6 +16,7 @@ import (
 
 var Allroutes = []MethodSettings{}
 var Allschemas = openapi3.Schemas{}
+var Allrequestbodies = openapi3.RequestBodies{}
 var Allhandles = []Model_Handle{}
 var Allsecurityschemas = openapi3.SecuritySchemes{}
 var Proj = ProjectSetting{}

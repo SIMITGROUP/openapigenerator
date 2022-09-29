@@ -34,6 +34,8 @@ func WriteHandles() {
 		} else {
 			alloperations[route.OperationID] = "gin.H"
 		}
+
+		// route
 	}
 
 	//prepare object for draw template
@@ -42,8 +44,8 @@ func WriteHandles() {
 
 	for handlename, handledatatype := range alloperations {
 		// fmt.Println("handlename", handlename, "Datatype", handledatatype)
-		oridatatype := strings.Replace(handledatatype, "Model_", "", -1)
-		schemobj := helper.GetSchemaFromName(oridatatype)
+		schemaname := strings.Replace(handledatatype, "Model_", "", -1)
+		schemobj := helper.GetSchemaFromName(schemaname)
 
 		if schemobj.Type == "array" {
 			handledatatype = "[]" + helper.GetModelNameFromRef(schemobj.Items.Ref)

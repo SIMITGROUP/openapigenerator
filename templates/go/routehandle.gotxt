@@ -9,8 +9,18 @@ import (
 {{with .Handles}}{{range .}}
 
 func {{ .FuncName}}(c *gin.Context) {
-    data := {{ .DataType}}{ }
+
+    {{ if eq .RequestBodyModel ""}}
+    var requestBody {{.RequestBodyModel}}
+    if err := c.BindJSON(&requestBody); err != nil {
+        // DO SOMETHING WITH THE ERROR
+    }
+    // log.Debug("RequestBody value",requestBody.XXX)
+    {{end}}
+
+
+    responsedata := {{ .DataType}}{ }
     
-    c.JSON(http.StatusOK, data{{if ne .SchemaType "array"}}.GetExamples(){{end}} )
+    c.JSON(http.StatusOK, responsedata{{if ne .SchemaType "array"}}.GetExamples(){{end}} )
 }
 {{end}}{{end}}

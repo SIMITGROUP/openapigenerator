@@ -15,14 +15,15 @@ type ProjectPara struct {
 	Listen  string
 }
 type MethodSettings struct {
-	Path        string
-	Method      string
-	OperationID string
-	Middlewares []string
-	Summary     string
-	Description string
-	Responses   openapi3.Responses
-	DataType    string
+	Path              string
+	Method            string
+	OperationID       string
+	Middlewares       []string
+	Summary           string
+	Description       string
+	Responses         openapi3.Responses
+	DataType          string
+	RequestBodiesName string
 }
 type RouteSettings struct {
 	Methods []MethodSettings
