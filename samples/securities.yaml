@@ -393,7 +393,7 @@ components:
       type: object
       properties:
         payload:
-          type: object
+          type: string
           example: "10.40.7.28 - - [09/Apr/2020:22:17:40 +0000] GET \"/am/isAlive.jsp HTTP/1.0\" 200 112 0ms"
         timestamp:
           type: string

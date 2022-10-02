@@ -11,12 +11,16 @@ import (
 func WriteRoutes() {
 	routesettings := helper.AllRoutes
 	for path, pathsetting := range routesettings {
+		newpath := helper.ConvertPathParasCurlyToColon(path)
 		for method, route := range pathsetting.RequestSettings {
 			desc := strings.Replace(route.Description, "\n", "\n    // ", -1)
 			route.Description = desc
+			route.Path = newpath
 			pathsetting.RequestSettings[method] = route
 		}
-		routesettings[path] = pathsetting
+
+		delete(routesettings, path)
+		routesettings[newpath] = pathsetting
 	}
 	// routesettings["sss"].Path
 	// routesettings["sss"].RequestSettings
