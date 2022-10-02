@@ -1,10 +1,8 @@
 package buildgo
 
-import log "github.com/sirupsen/logrus"
-
 func ConvertDataType(datatype string, dataformat string) string {
 	dtype := ""
-	log.Debug("convGoLangType:", datatype, ",", dataformat)
+
 	if datatype == "integer" {
 		if dataformat == "int64" {
 			dtype = "int64"

@@ -100,19 +100,25 @@ func GetResponseSchema(methodtype string, path string, op *openapi3.Operation) M
 	return schema
 }
 func GetRequestBodySetting(methodtype string, path string, op *openapi3.Operation) Model_RequestBody {
-	log.Info("        request body: ")
+	log.Info("        request body: ", op.RequestBody)
 	requestBody := Model_RequestBody{}
 
 	//op.RequestBody.Ref
 	if op.RequestBody != nil {
-		if op.RequestBody.Ref != "" {
-			log.Info("        request body schema name: ", op.RequestBody.Ref)
+		log.Info("            not null: ", op.RequestBody.Value.Content.Get("application/json").Schema.Ref)
+		content := op.RequestBody.Value.Content
+		if content != nil && content.Get("application/json").Schema.Ref != "" {
+			ref := content.Get("application/json").Schema.Ref
+			log.Info("        request body schema name: ", ref)
 
 			requestBody.Description = op.RequestBody.Value.Description
 			requestBody.Required = op.RequestBody.Value.Required
+			schemaname := GetTypeNameFromRef(ref)
 
-			schemaname := GetTypeNameFromRef(op.RequestBody.Ref)
 			requestBody.RequestSchema = AllSchemas[schemaname]
+
+		} else {
+			log.Fatal("        request body undefine $ref")
 		}
 
 	} // else {
@@ -144,11 +150,17 @@ func GetParameters(methodtype string, path string, op *openapi3.Operation) map[s
 	log.Info("        parameters: ")
 	paras := map[string]Model_Parameter{}
 	for _, psetting := range op.Parameters {
-		// if psetting.Ref == "" {
 		pname := psetting.Value.Name
 		ptype := psetting.Value.Schema.Value.Type
 		prequired := psetting.Value.Required
-		pstorein := psetting.Value.In
+		pstorein := LowerCaseFirst(psetting.Value.In)
+		if pstorein == "cookie" {
+			log.Fatal("parameter ", pname, " store in cookie which is not supported")
+		}
+
+		if VerifyKeyname(pname) == false {
+			log.Fatal("Invalid parameter ", pname, ", it should only consist character a-z without special character and spacing")
+		}
 		log.Info("            ", pname, ": ", ptype,
 			", IN: ", pstorein,
 			", Required: ", prequired)

@@ -26,19 +26,8 @@ func WriteHandles() {
 			RequestBodies:  hsetting.RequestBodies,
 		}
 		allhandles[handlename] = h
-		// for _, route := range routesettings.Methods {
-
-		// }
-		// x := helper.MethodSettings{}
-		// x.Description
-		// x.Middlewares
-		// x.Method
-		// x.OperationID
-		// x.Summary
-		// x.Path
-		// fmt.Println("templateobj", templateobj)
-
 	}
+
 	var routebytes bytes.Buffer
 	routepath := "./templates/go/routehandle.gotxt"
 	routesrc := helper.ReadFile(routepath)

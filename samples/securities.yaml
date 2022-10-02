@@ -113,7 +113,7 @@ paths:
             Set this to a previously issued SSO session cookie value to request session upgrade.
           schema:
             type: string
-        - name: X-OpenAM-Username
+        - name: X_OpenAM_Username
           in: header
           description: |
             User identifier.
@@ -121,7 +121,7 @@ paths:
             To use UTF-8 user names, base64-encode the string, and then wrap the string as described in RFC 2047.
           schema:
             type: string
-        - name: X-OpenAM-Password
+        - name: X_OpenAM_Password
           in: header
           description: |
             User password.
@@ -225,7 +225,7 @@ paths:
         - AM Requests
       parameters:
         - in: header
-          name: Accept-API-Version
+          name: Accept_API_Version
           required: true
           schema:
             type: string

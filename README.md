@@ -85,7 +85,7 @@ go build .
 # Limitation
 1. api refer to Schema type "array" , only able to show blank array
 2. jwt is not supported yet
-
+3. parameters and apikey's name only support alphanumeric or "_".
 
 
 

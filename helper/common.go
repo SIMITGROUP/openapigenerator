@@ -107,3 +107,14 @@ func ConvertPathParasCurlyToColon(oripath string) string {
 	}
 	return newpath
 }
+
+func VerifyKeyname(s string) bool {
+	for _, r := range s {
+		if r == '_' {
+			return true
+		} else if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
+			return false
+		}
+	}
+	return true
+}

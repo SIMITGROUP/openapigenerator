@@ -17,6 +17,7 @@ func WriteSecuritySchemes() {
 		log.Info("    ", authname)
 		data := map[string]string{}
 		data["SchemeName"] = authname
+		data["Keyname"] = authsetting.Name
 
 		var writebytes bytes.Buffer
 		path := getTemplateFile(authsetting)
@@ -42,7 +43,7 @@ func getTemplateFile(setting openapi3.SecurityScheme) string {
 		// setting
 		filename = "security_apikey"
 		keyname := setting.Name
-		if verifyKeyname(keyname) == false {
+		if helper.VerifyKeyname(keyname) == false {
 			log.Fatal("Invalid apikey " + keyname + ", it should only consist character a-z without special character and spacing")
 		}
 		keyin := setting.In
@@ -66,14 +67,4 @@ func getTemplateFile(setting openapi3.SecurityScheme) string {
 	filename = "templates/go/" + filename + ".gotxt"
 	return filename
 
-}
-func verifyKeyname(s string) bool {
-	for _, r := range s {
-		if r == '_' {
-			return true
-		} else if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
-			return false
-		}
-	}
-	return true
 }
