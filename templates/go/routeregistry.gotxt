@@ -3,9 +3,11 @@ package openapi
 import "github.com/gin-gonic/gin"
 
 func registerRoutes(r *gin.Engine) {
-	{{ with .Methods }}{{range .}}
+	{{ with . }}{{range .}}
+	{{range .RequestSettings}}	
 	// {{ .Summary }}
-    // {{ .Description }}
-    r.{{.Method}}("{{.Path}}",{{ with .Middlewares }}{{range .}}{{.}},{{end}}{{end}}{{.OperationID}})
+    // {{ .Description }}	
+  	r.{{.Method}}("{{.Path}}",{{range $key,$security:= .Securities }} Auth_{{$key }},{{end}}{{.RequestHandle.HandleName}})
+	{{ end }}
 	{{end}}{{ end }}
 }

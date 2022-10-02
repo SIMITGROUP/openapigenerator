@@ -6,21 +6,11 @@ import (
 )
 
 
-{{with .Handles}}{{range .}}
+{{range .}}
 
-func {{ .FuncName}}(c *gin.Context) {
+func {{ .HandleName}}(c *gin.Context) {
 
-    {{ if eq .RequestBodyModel ""}}
-    var requestBody {{.RequestBodyModel}}
-    if err := c.BindJSON(&requestBody); err != nil {
-        // DO SOMETHING WITH THE ERROR
-    }
-    // log.Debug("RequestBody value",requestBody.XXX)
-    {{end}}
-
-
-    responsedata := {{ .DataType}}{ }
     
-    c.JSON(http.StatusOK, responsedata{{if ne .SchemaType "array"}}.GetExamples(){{end}} )
+    c.JSON(http.StatusOK, gin.H{} )
 }
-{{end}}{{end}}
+{{end}}

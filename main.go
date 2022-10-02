@@ -45,9 +45,17 @@ func GenerateCode(ApiFile string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// helper.Prepare(doc)
-	helper.ReadRoutes(doc)
-	helper.ReadComponents(doc)
+	helper.PrepareObjects(doc)
+	/*
+
+
+
+
+
+
+	 */
+	// helper.ReadRoutes(doc)
+	// helper.ReadComponents(doc)
 	switch BuildLang {
 	case "go":
 		buildgo.Generate(doc)

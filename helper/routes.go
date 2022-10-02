@@ -1,145 +1,218 @@
 package helper
 
 import (
-	"strings"
-
-	log "github.com/sirupsen/logrus"
-
 	"github.com/getkin/kin-openapi/openapi3"
+	log "github.com/sirupsen/logrus"
 )
 
-func ReadRoutes(doc *openapi3.T) {
+// consolidate all routes and route's handles
+func PrepareRoutes() {
 
-	for oripath, pathmethods := range doc.Paths {
+	for path, pathmethods := range Doc.Paths {
 
-		path := ConvertGinPath(oripath)
-
+		req := make(map[string]Model_RequestSetting)
 		if pathmethods.Get != nil {
-
-			methodsetting := generateMethodObject("GET", path, pathmethods.Get)
-			Allroutes = append(Allroutes, methodsetting)
+			req["GET"] = getPathSetting("GET", path, pathmethods.Get)
 		}
 		if pathmethods.Post != nil {
-			methodsetting := generateMethodObject("POST", path, pathmethods.Post)
-			Allroutes = append(Allroutes, methodsetting)
+			req["POST"] = getPathSetting("POST", path, pathmethods.Post)
 		}
 		if pathmethods.Put != nil {
-			methodsetting := generateMethodObject("PUT", path, pathmethods.Put)
-			Allroutes = append(Allroutes, methodsetting)
+			req["PUT"] = getPathSetting("PUT", path, pathmethods.Put)
 		}
 		if pathmethods.Delete != nil {
-			methodsetting := generateMethodObject("DELETE", path, pathmethods.Delete)
-			Allroutes = append(Allroutes, methodsetting)
+			req["DELETE"] = getPathSetting("DELETE", path, pathmethods.Delete)
 		}
 		if pathmethods.Head != nil {
-			methodsetting := generateMethodObject("HEAD", path, pathmethods.Head)
-			Allroutes = append(Allroutes, methodsetting)
+			req["HEAD"] = getPathSetting("HEAD", path, pathmethods.Head)
 		}
 		if pathmethods.Patch != nil {
-			methodsetting := generateMethodObject("PATCH", path, pathmethods.Patch)
-			Allroutes = append(Allroutes, methodsetting)
+			req["PATCH"] = getPathSetting("PATCH", path, pathmethods.Patch)
 		}
 		if pathmethods.Options != nil {
-			methodsetting := generateMethodObject("OPTIONS", path, pathmethods.Options)
-			Allroutes = append(Allroutes, methodsetting)
+			req["OPTIONS"] = getPathSetting("OPTIONS", path, pathmethods.Options)
 		}
 		if pathmethods.Trace != nil {
-			methodsetting := generateMethodObject("TRACE", path, pathmethods.Trace)
-			Allroutes = append(Allroutes, methodsetting)
+			req["TRACE"] = getPathSetting("TRACE", path, pathmethods.Trace)
+		}
+		AllRoutes[path] = Model_Routes{
+			Path:            path,
+			RequestSettings: req,
 		}
 	}
-
 }
 
-// prepare properties of each route
-func generateMethodObject(methodtype string, path string, op *openapi3.Operation) MethodSettings {
-	middlewares := []string{}
-	securities := op.Security
+func getPathSetting(methodtype string, path string, op *openapi3.Operation) Model_RequestSetting {
+	log.Info(methodtype, " ", path)
+	rsetting := Model_RequestSetting{
+		Summary:       op.Summary,
+		Path:          path,
+		Method:        methodtype,
+		Description:   op.Description,
+		Securities:    GetSecurityMiddleware(methodtype, path, op),
+		RequestHandle: GetRequestHandle(methodtype, path, op),
+	}
+	return rsetting
+}
+
+func GetRequestHandle(methodtype string, path string, op *openapi3.Operation) Model_RequestHandle {
+
 	if op.OperationID == "" {
-		log.Fatal(methodtype, " ", path, " undefine operationId")
+		log.Fatal(methodtype, path, " undefine operationId schema RequestBodies")
 	}
-	if securities == nil {
-		//no midleware
+	log.Info("    Handle: ", op.OperationID)
+
+	requestobj, ok := AllRequestHandles[op.OperationID]
+	if ok {
+		//do nothing
+		return requestobj
 	} else {
-		for _, securitysetting := range *securities {
+
+		//get this handle return data (object)
+		responseschema := GetResponseSchema(methodtype, path, op)
+		//get this handle request body (object)
+		requestbody := GetRequestBodySetting(methodtype, path, op)
+		//get this handle parameters (array)
+		paras := GetParameters(methodtype, path, op)
+		handle := Model_RequestHandle{
+			HandleName:     op.OperationID,
+			ResponseSchema: responseschema,
+			Parameters:     paras,
+			RequestBodies:  requestbody,
+		}
+		AllRequestHandles[op.OperationID] = handle
+		return handle
+	}
+}
+func GetResponseSchema(methodtype string, path string, op *openapi3.Operation) Model_SchemaSetting {
+	selectedstatus := 200
+	schema := Model_SchemaSetting{}
+	selectedmime := "application/json"
+	contentSchema := op.Responses.Get(selectedstatus).Value.Content.Get(selectedmime).Schema
+	if contentSchema.Ref != "" {
+		log.Info("        response schema name: ", contentSchema.Ref)
+		schemaname := GetTypeNameFromRef(contentSchema.Ref)
+		schema = AllSchemas[schemaname]
+	} else {
+		log.Fatal("        undefined response schema $ref")
+	}
+
+	return schema
+}
+func GetRequestBodySetting(methodtype string, path string, op *openapi3.Operation) Model_RequestBody {
+	log.Info("        request body: ")
+	requestBody := Model_RequestBody{}
+
+	//op.RequestBody.Ref
+	if op.RequestBody != nil {
+		if op.RequestBody.Ref != "" {
+			log.Info("        request body schema name: ", op.RequestBody.Ref)
+
+			requestBody.Description = op.RequestBody.Value.Description
+			requestBody.Required = op.RequestBody.Value.Required
+
+			schemaname := GetTypeNameFromRef(op.RequestBody.Ref)
+			requestBody.RequestSchema = AllSchemas[schemaname]
+		}
+
+	} // else {
+	// 	log.Fatal("        undefined response schema $ref")
+	// }
+
+	return requestBody
+
+}
+
+func GetSecurityMiddleware(methodtype string, path string, op *openapi3.Operation) map[string]Model_SecuritySchemaSetting {
+
+	securityrules := map[string]Model_SecuritySchemaSetting{}
+	if op.Security != nil {
+		log.Info("    Security middleware: ")
+		for _, securitysetting := range *op.Security {
 			for authname, authsetting := range securitysetting {
-				methodname := GetAuthMethodName(authname)
+				/*limitation authsetting in path temporary ignore*/
+				securityrules[authname] = AllSecuritySchemes[authname]
+
+				log.Info("        ", authname)
 				_ = authsetting
-				handle := methodname
-				middlewares = append(middlewares, handle)
 			}
 		}
-
 	}
-	m := MethodSettings{
-		Path:              path,
-		Method:            methodtype,
-		OperationID:       op.OperationID,
-		Middlewares:       middlewares,
-		Summary:           op.Summary,
-		Description:       strings.Replace(op.Description, "\n", "\n    //", -1),
-		DataType:          GetResponseDataType(path, methodtype, op.Responses),
-		Responses:         op.Responses,
-		RequestBodiesName: GetTypeNameFromRef(op.RequestBody.Ref),
-	}
-	return m
+	return securityrules
 }
+func GetParameters(methodtype string, path string, op *openapi3.Operation) map[string]Model_Parameter {
+	log.Info("        parameters: ")
+	paras := map[string]Model_Parameter{}
+	for _, psetting := range op.Parameters {
+		// if psetting.Ref == "" {
+		pname := psetting.Value.Name
+		ptype := psetting.Value.Schema.Value.Type
+		prequired := psetting.Value.Required
+		pstorein := psetting.Value.In
+		log.Info("            ", pname, ": ", ptype,
+			", IN: ", pstorein,
+			", Required: ", prequired)
 
-func GetRoutes() RouteSettings {
-	routesettings := RouteSettings{Allroutes}
-	return routesettings
-}
-
-// prepare sample response for route handle
-// only capture http status 200, and content for application/json
-// generate sample data according api document too
-func GetResponseDataType(path string, method string, responses openapi3.Responses) string {
-	datatype := ""
-	for statuscode, res := range responses {
-		if statuscode == "200" {
-			if res.Value.Content == nil {
-				log.Fatal(method, " ", path, " status '200' undefine content")
-			}
-			if res.Value.Content["application/json"] == nil {
-				log.Fatal(method, " ", path, " status '200' undefine application/json")
-			}
-			content := res.Value.Content["application/json"]
-			if content.Schema.Ref == "" {
-				log.Fatal(method, " ", path, " status '200' undefine application/json schema.$ref")
-			}
-			datatype := GetModelNameFromRef(content.Schema.Ref)
-
-			return datatype
-			// properties := content.Schema.Value.Properties
-			// for field, fsetting := range properties {
-			// 	if fsetting.Value.Type == "object" {
-			// 		values := strings.Split(content.Schema.Ref, "/")
-			// 		datatype = helper.GetModelName(values[len(values)-1]) // get Model name
-			// 		examples = getExamples(content.Schema.Value)
-			// 	} else if fsetting.Value.Type == "array" {
-			// 		values := strings.Split(content.Schema.Value.Items.Ref, "/")
-			// 		datatype := helper.GetModelName(values[len(values)-1])
-			// 		examples = "[]" + model + "{}" //result
-			// 	} else {
-			// 	}
-
-			// }
-			// fmt.Println("properties", properties)
-
+		paras[psetting.Value.Name] = Model_Parameter{
+			StoreIn:         psetting.Value.In,
+			Required:        psetting.Value.Required,
+			Deprecated:      psetting.Value.Deprecated,
+			AllowEmptyValue: psetting.Value.AllowEmptyValue,
 		}
+		// } else {
+		// psetting.Value
+		// }
 
 	}
-	return datatype
+	return paras
 }
 
-func GetSchemaFromName(schemaname string) *openapi3.Schema {
+// prepare handles of each request type
+// also consolidate all route's request handle (function) into single registry (Allhandles)
 
-	for name, setting := range Allschemas {
-		if schemaname == name {
+// func getRouteSetting(methodtype string, path string, op *openapi3.Operation) Model_RouteSetting {
+// 	securityrules := map[string]Model_SecuritySchemaSetting{}
+// 	if op.OperationID == "" {
+// 		log.Fatal(methodtype, " ", path, " undefine operationId")
+// 	}
+// 	if op.Security == nil {
+// 		//no midleware
+// 	} else {
 
-			return setting.Value
-		}
-	}
-	dummy := openapi3.Schema{Type: ""}
-	return &dummy
-}
+// 		for _, securitysetting := range *op.Security {
+// 			for authname, _ := range securitysetting {
+
+// 				/*limitation not yet support securities setting in path setting yet*/
+// 				securityrules[authname] = Model_SecuritySchemaSetting{}
+// 			}
+// 		}
+
+// 	}
+
+// 	schemaobj := GetSchemaFromRef(op.RequestBody.Ref)
+
+// 	rsetting := Model_RouteSetting{
+// 		Summary:     op.Summary,
+// 		Description: op.Description,
+// 		RouteHandle: Model_RouteHandleSetting{
+// 			HandleName:     op.OperationID,
+// 			ResponseSchema: schemaobj,
+// 		},
+// 		Securities: securityrules,
+// 	}
+// 	paras := map[string]Model_Parameter{}
+// 	for _, psetting := range op.Parameters {
+// 		if psetting.Ref == "" {
+// 			paras[psetting.Value.Name] = Model_Parameter{
+// 				StoreIn:         psetting.Value.In,
+// 				Required:        psetting.Value.Required,
+// 				Deprecated:      psetting.Value.Deprecated,
+// 				AllowEmptyValue: psetting.Value.AllowEmptyValue,
+// 			}
+// 		}
+
+// 	}
+
+// 	rsetting.RouteHandle.Parameters = paras
+// 	return rsetting
+// }

@@ -4,29 +4,29 @@
 package openapi
 
 import (
-  "github.com/gin-gonic/gin"
-  log "github.com/sirupsen/logrus"
-  "net/http"
-  "gitlab.com/avarf/getenvs"
+	"github.com/gin-gonic/gin"
+    log "github.com/sirupsen/logrus"
+    "net/http"
+    "gitlab.com/avarf/getenvs"
   )  
 
-{{ with .Auth_handle}}{{range .}}
-func {{.Handlename}}(c *gin.Context){	
+
+func Auth_{{.SchemeName}}(c *gin.Context){	
 		// {{.Description}}
 		apikeyname := "{{.Keyname}}"
 		keyvalue := c.Request.Header.Get(apikeyname)
 	
-		if verifyKey(apikeyname, keyvalue) ==false {
+		if verifyKey_{{.SchemeName}}(apikeyname, keyvalue) ==false {
 			log.Warn("Wrong API Key:", apikeyname)
 			c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "API Key "+apikeyname+" authentication failed"})
 			c.Abort()
 		}	
 }
-{{end}}{{end}}
 
 
 
-func verifyKey(keyname string, keyvalue string) bool {
+
+func verifyKey_{{.SchemeName}}(keyname string, keyvalue string) bool {
 	emptyvalue:="----"
 	envkeyvalue := getenvs.GetEnvString(keyname, emptyvalue)
 

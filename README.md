@@ -85,3 +85,21 @@ go build .
 # Limitation
 1. api refer to Schema type "array" , only able to show blank array
 2. jwt is not supported yet
+
+
+
+
+# Technical Info
+1. spec.yaml used to generate below objects
+    - Allroutes
+    - Allschemas
+    - Allsecurityschemes
+    - Allhandles
+    - Allparameters
+3. Allroutes generate
+    - tell web server each http request (post/get/... ) go to which handle function
+    - prepare all handle function, each function sample dataisted in .yaml
+    - implement security middleware if define in .yaml 
+2. Allschemas use for generate
+    - Model (Data type) of each response
+    - Example data

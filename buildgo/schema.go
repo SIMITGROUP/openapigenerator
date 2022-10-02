@@ -2,9 +2,7 @@ package buildgo
 
 import (
 	"bytes"
-	"fmt"
 	"openapigenerator/helper"
-	"strings"
 	"text/template"
 
 	log "github.com/sirupsen/logrus"
@@ -15,71 +13,80 @@ import (
 func WriteSchemas() {
 	// Model_Field Model_Schema
 
-	for schemaname, setting := range helper.Allschemas {
-		schemaobj := helper.Model_Schema{}
-		modelname := helper.GetModelName(schemaname)
-		interfacename := helper.GetInterfaceName(schemaname)
+	for schemaname, schemaobj := range helper.AllSchemas {
+		log.Debug("Write Model ", schemaobj.ModelName, ": ", schemaobj.ModelType, " (", schemaname, ")")
+		for f, fsetting := range schemaobj.FieldList {
 
-		schemaobj.ModelName = modelname
-		schemaobj.InterfaceName = interfacename
+			ftype := fsetting.FieldType
+			format := fsetting.FieldFormat
+			newtype := ConvertDataType(ftype, format)
+			log.Debug("    Prepare field ", f, ": ", newtype, " //", fsetting.ChildItemType)
+			fsetting.FieldType = newtype
+			schemaobj.FieldList[f] = fsetting
+			// x := &schemaobj.FieldList
 
-		props := setting.Value.Properties
-		log.Info("Prepare Schema: ", modelname, "(", schemaname, ")", ": ", setting.Value.Type)
-		if setting.Value.Type == "object" {
-			allfields := []helper.Model_Field{}
-			for field, fieldsetting := range props {
-				// fmt.Println("Schema:", schemaname, field)
-				examplestr := ""
-				if fieldsetting.Value.Example == nil {
-					if fieldsetting.Value.Type == "object" && fieldsetting.Value.Items.Ref == "" {
-						log.Fatal("Schema " + schemaname + "." + field + " type=object, but not ref to another schema")
-					}
-
-					if fieldsetting.Value.Type != "" && fieldsetting.Value.Type != "object" && fieldsetting.Value.Type != "array" {
-						log.Fatal("Undefine sample data in schema '" + schemaname + "' field '" + field + "'")
-					}
-					// fmt.Println("field ", field, fieldsetting.Value.Items)
-					if fieldsetting.Value.Items.Ref != "" {
-						fmt.Println(field, " == ", fieldsetting.Value.Items.Ref)
-						examplestr = helper.GetModelNameFromRef(fieldsetting.Value.Items.Ref) + "{}"
-						if fieldsetting.Value.Type == "array" {
-							examplestr = "[]" + examplestr
-						}
-
-					}
-
-				} else {
-					examplestr = fmt.Sprintf("%#v", fieldsetting.Value.Example)
-					examplestr = strings.Replace(examplestr, "interface {}", "string", -1)
-				}
-				fieldname := helper.UpperCaseFirst(field)
-				fieldtype := convGoLangType(*fieldsetting.Value)
-				log.Debug("    ", fieldname, ", ", fieldtype)
-				fieldobj := helper.Model_Field{
-					ModelName:    modelname,
-					FieldName:    fieldname,
-					FieldType:    fieldtype,
-					ApiFieldName: field,
-					Description:  fieldsetting.Value.Description,
-					Example:      examplestr,
-				}
-				allfields = append(allfields, fieldobj)
-				// _, _ = field, fieldtype
-			}
-			schemaobj.FieldList = allfields
-		} else if setting.Value.Type == "array" { //array no need new model
-			continue
-		} else {
-
+			// = schemaobj.FieldList[f].FieldType
+			// schemaobj.FieldList[f].FieldType = newtype
+			// fieldobj.FieldType = newtype
 		}
-		_, _, _, _ = schemaname, modelname, interfacename, props
+		// props := setting.Value.Properties
+		// log.Info("Prepare Schema: ", modelname, "(", schemaname, ")", ": ", setting.Value.Type)
+		// if setting.Value.Type == "object" {
+		// 	allfields := []helper.Model_Field{}
+		// 	for field, fieldsetting := range props {
+		// 		// fmt.Println("Schema:", schemaname, field)
+		// 		examplestr := ""
+		// 		if fieldsetting.Value.Example == nil {
+		// 			if fieldsetting.Value.Type == "object" && fieldsetting.Value.Items.Ref == "" {
+		// 				log.Fatal("Schema " + schemaname + "." + field + " type=object, but not ref to another schema")
+		// 			}
+
+		// 			if fieldsetting.Value.Type != "" && fieldsetting.Value.Type != "object" && fieldsetting.Value.Type != "array" {
+		// 				log.Fatal("Undefine sample data in schema '" + schemaname + "' field '" + field + "'")
+		// 			}
+		// 			// fmt.Println("field ", field, fieldsetting.Value.Items)
+		// 			if fieldsetting.Value.Items.Ref != "" {
+		// 				fmt.Println(field, " == ", fieldsetting.Value.Items.Ref)
+		// 				examplestr = helper.GetModelNameFromRef(fieldsetting.Value.Items.Ref) + "{}"
+		// 				if fieldsetting.Value.Type == "array" {
+		// 					examplestr = "[]" + examplestr
+		// 				}
+
+		// 			}
+
+		// 		} else {
+		// 			examplestr = fmt.Sprintf("%#v", fieldsetting.Value.Example)
+		// 			examplestr = strings.Replace(examplestr, "interface {}", "string", -1)
+		// 		}
+		// 		fieldname := helper.UpperCaseFirst(field)
+		// 		fieldtype := convGoLangType(*fieldsetting.Value)
+		// 		log.Debug("    ", fieldname, ", ", fieldtype)
+		// 		fieldobj := helper.Model_Field{
+		// 			ModelName:    modelname,
+		// 			FieldName:    fieldname,
+		// 			FieldType:    fieldtype,
+		// 			ApiFieldName: field,
+		// 			Description:  fieldsetting.Value.Description,
+		// 			Example:      examplestr,
+		// 		}
+		// 		allfields = append(allfields, fieldobj)
+		// 		// _, _ = field, fieldtype
+		// 	}
+		// 	schemaobj.FieldList = allfields
+		// } else if setting.Value.Type == "array" { //array no need new model
+		// 	continue
+		// } else {
+
+		// }
+		// _, _, _, _ = schemaname, modelname, interfacename, props
 
 		var writebuffer bytes.Buffer
-		filename := modelname + ".go"
+		filename := schemaobj.ModelName + ".go"
 		schemapath := "./templates/go/schema.gotxt"
 		schemasrc := helper.ReadFile(schemapath)
 		schematemplate := template.New("schema")
 		schematemplate, _ = schematemplate.Parse(schemasrc)
+
 		err := schematemplate.Execute(&writebuffer, schemaobj)
 		if err != nil {
 			log.Fatal("writing template ", filename, "error, ", err)
@@ -90,6 +97,7 @@ func WriteSchemas() {
 
 func convGoLangType(s openapi3.Schema) string {
 	fieldtype := s.Type
+
 	if s.Type == "integer" {
 		if s.Format != "" {
 			fieldtype = s.Format
@@ -106,6 +114,7 @@ func convGoLangType(s openapi3.Schema) string {
 			fieldtype = helper.GetModelNameFromRef(s.Items.Ref)
 		}
 		fieldtype = "[]" + fieldtype
+		log.Debug("It is array")
 	} else if s.Type == "" { //custom types, refer to another type
 		fieldtype = helper.GetModelNameFromRef(s.Items.Ref)
 		// refer_arr := strings.Split(s.Items.Ref, "/")

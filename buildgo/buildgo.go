@@ -2,21 +2,21 @@ package buildgo
 
 import (
 	"bytes"
+	"html/template"
 	"openapigenerator/helper"
-	"text/template"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	log "github.com/sirupsen/logrus"
 )
 
 func Generate(doc *openapi3.T) {
+	log.Info("Generate Golang API:")
 	WriteInfra()
 	WriteSchemas()
 	WriteRoutes()
-	WriteHandles()
 	WriteSecuritySchemes()
-	// prepareComponent(doc)
+	WriteHandles()
 
-	// prepareHandles(doc)
 }
 
 func WriteInfra() {
