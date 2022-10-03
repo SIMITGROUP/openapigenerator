@@ -10,30 +10,22 @@ import (
 
 func Test{{.TestName}}(t *testing.T){
 	requestURL := fmt.Sprintf("%v%v", "{{.RequestServer}}","{{.RequestPath}}")
-	// fmt.Println(requestURL)
 	req, err := http.NewRequest("{{.RequestMethod}}", requestURL, nil)
-
 	req.Header.Set("Accept", "application/json")
-
 	client := &http.Client{}
 	resp, err := client.Do(req)
-
-	
 
 	if err != nil {
 		log.Error(err)
 	} else {
 		b, err := io.ReadAll(resp.Body)
-		// b, err := ioutil.ReadAll(resp.Body)  Go.1.15 and earlier
 		if err != nil {
 			log.Fatalln("ERR2", err)
 		}
-
 		result := string(b)		
 		_ = result
+		//status code 200 consider ok
 		assert.Equal(t, resp.StatusCode, 200)
-		
-
 	}
 	defer resp.Body.Close()
 }
