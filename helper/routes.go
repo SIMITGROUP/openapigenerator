@@ -105,7 +105,7 @@ func GetRequestBodySetting(methodtype string, path string, op *openapi3.Operatio
 
 	//op.RequestBody.Ref
 	if op.RequestBody != nil {
-		log.Info("            not null: ", op.RequestBody.Value.Content.Get("application/json").Schema.Ref)
+
 		content := op.RequestBody.Value.Content
 		if content != nil && content.Get("application/json").Schema.Ref != "" {
 			ref := content.Get("application/json").Schema.Ref

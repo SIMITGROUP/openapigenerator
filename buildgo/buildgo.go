@@ -16,6 +16,7 @@ func Generate(doc *openapi3.T) {
 	WriteRoutes()
 	WriteSecuritySchemes()
 	WriteHandles()
+	WriteTest()
 
 }
 

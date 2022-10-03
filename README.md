@@ -86,7 +86,7 @@ go build .
 1. api refer to Schema type "array" , only able to show blank array
 2. jwt is not supported yet
 3. parameters and apikey's name only support alphanumeric or "_".
-
+4. Response and request body only support application/json
 
 
 # Technical Info
@@ -103,3 +103,9 @@ go build .
 2. Allschemas use for generate
     - Model (Data type) of each response
     - Example data
+
+
+
+Todo:
+1. unit test auto run http request using all sample provided in .yaml
+2. add configuration for use sample data/use external module
