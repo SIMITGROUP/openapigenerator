@@ -31,12 +31,7 @@ func main() {
 	helper.Proj.GenerateFolder = GenerateFolder
 	helper.Proj.ProjectName = ProjectName
 	log.SetLevel(log.DebugLevel)
-	switch BuildLang {
-	case "go":
-		GenerateCode(ApiFile)
-	default:
-		log.Fatal("Build '" + BuildLang + "' is not supported, use 'go' instead!")
-	}
+	GenerateCode(ApiFile)
 
 }
 

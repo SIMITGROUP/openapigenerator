@@ -2,8 +2,8 @@ package buildgo
 
 import (
 	"bytes"
-	"html/template"
 	"openapigenerator/helper"
+	"text/template"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	log "github.com/sirupsen/logrus"

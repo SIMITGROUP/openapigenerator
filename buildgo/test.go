@@ -2,9 +2,9 @@ package buildgo
 
 import (
 	"bytes"
-	"html/template"
 	"openapigenerator/helper"
 	"strings"
+	"text/template"
 )
 
 // write unit test of each route

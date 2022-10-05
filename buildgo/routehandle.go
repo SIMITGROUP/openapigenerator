@@ -2,8 +2,8 @@ package buildgo
 
 import (
 	"bytes"
-	"html/template"
 	"openapigenerator/helper"
+	"text/template"
 
 	log "github.com/sirupsen/logrus"
 )
