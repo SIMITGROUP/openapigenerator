@@ -27,7 +27,7 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 cd openapigenerator
 make
 
-./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"  --apifile="samples/simpleapi.yaml" --lang="go"
+./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"  --lang="go"
 ```
 
 3. use your rest api
