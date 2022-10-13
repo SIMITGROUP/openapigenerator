@@ -1,0 +1,129 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'SIMIT User API'
+  description: It is microservices connect to core system, provide authentication service at SSO, access database profiles, and provide others useful user information
+paths:
+  # sso api
+  /sso-verifytoken:
+    get:
+      summary: check sso token is still valid
+      description: verify token is still valid, if yes return ok, else return fail. actually status shall follow sso server response status
+      operationId: verifyToken
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /sso-callback:
+    get:
+      summary: api to sso server
+      description: connect to keycloak server for request or refresh tokens
+      operationId: ssoHandle
+      responses:
+        '307':
+          description: success
+          headers:
+            Content-Type:
+              $ref:  '#/components/headers/ContentType'
+            Location: 
+              $ref: '#/components/headers/RedirectLink'
+            Set-Cookie:
+              $ref: '#/components/headers/SetTokenCookie'
+          content:            
+            text/plain:
+              schema:
+                # type: string
+                $ref: '#/components/schemas/PlainText'    
+components:
+  parameters:
+    Authorization:
+      name: Authorization
+      in: header
+      required: true
+      schema: 
+        type: string
+        example: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    uid:
+      name: uid
+      description: user id in uuid format
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: xxxxx-xx-xxxx-xx
+  schemas:
+    PlainText:
+      type: string
+      example: plaintext
+    User:
+      type: object
+      properties:
+        uid:
+          type: string
+          example: xxxx-yyy-zzz
+        name:
+          type: string
+          example: user 1
+        email:
+          type: string
+          format: email
+          example: user1@test.com        
+    Message:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "OK"
+        msg:
+          type: string
+          example: Welcome User API
+        version:
+          type: string
+          example: 1.0.0
+    Oauth2Token:    
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        token_type:
+          type: string
+          example: bearer
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        expiry:
+          type: string
+          example: 2022-10-11T23:15:37.093318+08:00
+        user:
+          $ref: '#/components/schemas/User'
+  headers:
+    ContentType:
+      description: define content type
+      schema:
+        type: string
+        format: mime/type
+        example: application/json
+    RedirectLink:
+      description: define redirect link
+      schema:
+        type: string
+        format: url
+        example: http://www.example.com
+    SetTokenCookie:
+      description: Define JWT token via set-cookie
+      schema:
+        type: string
+        example: token=xxxxx.xxxx.xxx
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+security:
+  - ApiKey: []
+
