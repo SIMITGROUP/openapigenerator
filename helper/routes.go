@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"strconv"
+
 	"github.com/getkin/kin-openapi/openapi3"
 	log "github.com/sirupsen/logrus"
 )
@@ -65,11 +67,12 @@ func GetRequestHandle(methodtype string, path string, op *openapi3.Operation) Mo
 	requestobj, ok := AllRequestHandles[op.OperationID]
 	if ok {
 		//do nothing
+		log.Fatal("operationId ", op.OperationID, " has been declared.")
 		return requestobj
 	} else {
 
 		//get this handle return data (object)
-		responseschema := GetResponseSchema(methodtype, path, op)
+		httpstatus, contenttype, responseschema, headers := GetResponseSchema(methodtype, path, op)
 		//get this handle request body (object)
 		requestbody := GetRequestBodySetting(methodtype, path, op)
 		//get this handle parameters (array)
@@ -79,16 +82,52 @@ func GetRequestHandle(methodtype string, path string, op *openapi3.Operation) Mo
 			ResponseSchema: responseschema,
 			Parameters:     paras,
 			RequestBodies:  requestbody,
+			Headers:        headers,
+			HttpStatusCode: httpstatus,
+			ContentType:    contenttype,
 		}
 		AllRequestHandles[op.OperationID] = handle
 		return handle
 	}
 }
-func GetResponseSchema(methodtype string, path string, op *openapi3.Operation) Model_SchemaSetting {
-	selectedstatus := 200
+func GetResponseSchema(methodtype string, path string, op *openapi3.Operation) (int, string, Model_SchemaSetting, []Model_Header) {
+	//default
+	selectedstatus := 0
+	selectedcontenttype := ""
+	headers := []Model_Header{}
 	schema := Model_SchemaSetting{}
-	selectedmime := "application/json"
-	contentSchema := op.Responses.Get(selectedstatus).Value.Content.Get(selectedmime).Schema
+	log.Info("    Process Response: ", methodtype, " ", path)
+
+	//only get 1st http status and first content type
+	for httpstatuscode, statusconfig := range op.Responses {
+		log.Info("        status : ", httpstatuscode)
+		selectedstatus, _ = strconv.Atoi(httpstatuscode)
+
+		for headername, headersetting := range statusconfig.Value.Headers {
+			header := Model_Header{
+				Name:        headername,
+				Description: headersetting.Value.Description,
+				Type:        headersetting.Value.Schema.Value.Type,
+				Example:     headersetting.Value.Schema.Value.Example,
+			}
+			headers = append(headers, header)
+
+			_, _ = headername, headersetting
+		}
+		for contenttype, contentobj := range statusconfig.Value.Content {
+			log.Info("            content type : ", contenttype)
+			selectedcontenttype = contenttype
+			_ = contentobj
+			break
+		}
+	}
+	if selectedstatus == 0 {
+		log.Fatal("        undefine http responses, example: '2xx','3xx','4xx','5xx'")
+	}
+	if selectedcontenttype == "" {
+		log.Fatal("        undefine resonse content type, example application/json, text/html,text/plain\nrefer https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types")
+	}
+	contentSchema := op.Responses.Get(selectedstatus).Value.Content.Get(selectedcontenttype).Schema
 	if contentSchema.Ref != "" {
 		log.Info("        response schema name: ", contentSchema.Ref)
 		schemaname := GetTypeNameFromRef(contentSchema.Ref)
@@ -97,7 +136,7 @@ func GetResponseSchema(methodtype string, path string, op *openapi3.Operation) M
 		log.Fatal("        undefined response schema $ref")
 	}
 
-	return schema
+	return selectedstatus, selectedcontenttype, schema, headers
 }
 func GetRequestBodySetting(methodtype string, path string, op *openapi3.Operation) Model_RequestBody {
 	log.Info("        request body: ", op.RequestBody)

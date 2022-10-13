@@ -1,6 +1,8 @@
 package buildgo
 
-func ConvertDataType(datatype string, dataformat string) string {
+import "openapigenerator/helper"
+
+func ConvertDataType(datatype string, dataformat string, fieldname string) string {
 	dtype := ""
 
 	if datatype == "integer" {
@@ -24,7 +26,10 @@ func ConvertDataType(datatype string, dataformat string) string {
 		dtype = "string"
 	} else if datatype == "array" {
 		dtype = "array"
+	} else if datatype == "object" {
+		dtype = helper.GetModelName(fieldname)
 	} else {
+
 		/*limitation others typeall put as string at the moment*/
 	}
 

@@ -1,16 +1,25 @@
 package openapi
 
-import validation "github.com/go-ozzo/ozzo-validation/v4"
+import (
+	{{if ne .ModelType "object"}}"fmt"{{end}}
+	
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+)
 
-type {{ .ModelName}} struct {
+
+{{if eq .ModelType "object"}}type {{ .ModelName}} struct {
 	{{ range .FieldList}}{{.FieldName}} {{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}} `json:"{{.ApiFieldName}}"` //{{.Description}}
 	{{end}}
-}
+}{{else}}type {{ .ModelName}} {{.ModelType}}{{end}}
 
 type {{.InterfaceName}} interface{
 	{{ range .FieldList}}
 	Get{{.FieldName}}()
 	Set{{.FieldName}}({{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}}){{end}}
+	Validate() error
+	GetExamples() {{.ModelName}}
+	{{if ne .ModelType "object"}}ToString() {{.ModelType}}{{end}}
+	
 }
 {{ range .FieldList}}
 func (obj {{.ModelName}}) Get{{.FieldName}}() {{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}}{
@@ -29,9 +38,19 @@ func (obj {{.ModelName}}) Validate() error {
 }
 
 func (obj {{.ModelName}}) GetExamples() {{.ModelName}} {
-	example:= {{.ModelName}}{
+	{{if eq .ModelType "object"}}    example:= {{.ModelName}}{
 		{{ with .FieldList}} {{range .}}
-		{{.FieldName}}: {{.Example}},{{end}}{{end}}
+		{{.FieldName}}: {{if eq .FieldIsModel true}} {{.FieldType}}{}.GetExamples(){{else}}{{.Example}}{{end}} ,{{end}}{{end}}
 	}
+	{{else}}    var  example {{.ModelName}} {{end}}
 	return example
 }
+
+
+{{if ne .ModelType "object"}}
+func (obj {{.ModelName}}) ToString() string{
+	var value {{.ModelType}} = fmt.Sprintf("%v", obj)
+	
+	return value
+}
+{{end}}

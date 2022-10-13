@@ -9,7 +9,15 @@ import (
 )
 
 // use every registered route's operationID to create handle function
-func WriteHandles() {
+func WriteHandles() bool {
+	overridefile := helper.Proj.OverrideHandle
+
+	//if file exists, but no override flag
+	if helper.CheckFileExists("openapi", "routerhandle.go") && overridefile == false {
+		log.Warn("routerhandle.go exists, skip")
+		return false
+	}
+
 	allhandles := map[string]helper.Model_RequestHandle{}
 	for handlename, hsetting := range helper.AllRequestHandles {
 		// fmt.Println("handlename", handlename, "Datatype", handledatatype)
@@ -18,21 +26,25 @@ func WriteHandles() {
 			// handledatatype = "[]" + helper.GetModelNameFromRef(schemobj.Items.Ref)
 		}
 
-		log.Info("handle info", handlename, ", ", hsetting.ResponseSchema.ModelType)
-		h := helper.Model_RequestHandle{
-			HandleName:     handlename,
-			ResponseSchema: hsetting.ResponseSchema,
-			Parameters:     hsetting.Parameters,
-			RequestBodies:  hsetting.RequestBodies,
-		}
-		allhandles[handlename] = h
+		log.Info("handle: ", handlename, ", ", hsetting.HttpStatusCode, " ", hsetting.ContentType)
+
+		// h := helper.Model_RequestHandle{
+		// 	HandleName:     handlename,
+		// ResponseSchema: hsetting.ResponseSchema,
+		// 	Parameters:     hsetting.Parameters,
+		// 	RequestBodies:  hsetting.RequestBodies,
+		// 	HttpStatusCode
+		// }
+		allhandles[handlename] = hsetting
 	}
 
 	var routebytes bytes.Buffer
+
 	routepath := "./templates/go/routehandle.gotxt"
 	routesrc := helper.ReadFile(routepath)
 	routetemplate := template.New("route")
 	routetemplate, _ = routetemplate.Parse(routesrc)
 	_ = routetemplate.Execute(&routebytes, allhandles)
 	helper.WriteFile("openapi", "routerhandle.go", routebytes.String())
+	return true
 }

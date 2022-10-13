@@ -17,7 +17,7 @@ func PrepareSchemas() {
 		//initiate new schema
 		var schemaobj = Model_SchemaSetting{
 			ModelName:     modelname,
-			ModelType:     schemasetting.Value.Type,
+			ModelType:     LowerCaseFirst(schemasetting.Value.Type),
 			InterfaceName: GetInterfaceName(schemaname),
 			Description:   schemasetting.Value.Description,
 			FieldList:     map[string]Model_Field{},
@@ -25,6 +25,7 @@ func PrepareSchemas() {
 		//prepare properties of this schema
 		for fieldname, fieldsettings := range schemasetting.Value.Properties {
 			var fieldobj = Model_Field{}
+			fieldobj.FieldIsModel = false
 			fieldobj.ApiFieldName = fieldname
 
 			fieldobj.FieldName = UpperCaseFirst(fieldname)
@@ -37,8 +38,11 @@ func PrepareSchemas() {
 			// openapi field format break into 2 properties,
 			// we need both to define proper variable type, in diff programming language
 			fieldobj.FieldType = fieldsettings.Value.Type
-			if fieldobj.FieldType == "object" && fieldsettings.Value.Properties == nil {
-				log.Fatal("Schema ", schemaname, " has field ", fieldname, ":object but undefine properties")
+			if fieldobj.FieldType == "object" {
+				fieldobj.FieldIsModel = true
+				if fieldsettings.Value.Properties == nil {
+					log.Fatal("Schema ", schemaname, " has field ", fieldname, ":object but undefine properties")
+				}
 			} else if fieldobj.FieldType == "array" {
 				if fieldsettings.Value.Items.Ref != "" {
 					fieldobj.ChildItemType = GetModelNameFromRef(fieldsettings.Value.Items.Ref)
@@ -50,8 +54,8 @@ func PrepareSchemas() {
 
 			}
 
-			fieldobj.ApiFieldType = fieldsettings.Value.Type
-			fieldobj.FieldFormat = fieldsettings.Value.Format
+			fieldobj.ApiFieldType = LowerCaseFirst(fieldsettings.Value.Type)
+			fieldobj.FieldFormat = LowerCaseFirst(fieldsettings.Value.Format)
 			log.Debug("    ", fieldname, " : ", fieldobj.FieldType, "  //example: ", fieldobj.Example)
 			// assign this field setting become 1 of the property in schema
 			schemaobj.FieldList[fieldobj.FieldName] = fieldobj

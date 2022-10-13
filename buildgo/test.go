@@ -14,6 +14,7 @@ func WriteTest() {
 		//convert parameter in path to value, like /user/{user} => /user/myuid
 		newpath := helper.ConvertPathParasCurlyToColon(path)
 		flattenpath := strings.Replace(path, "/", "_", -1)
+		flattenpath = strings.Replace(flattenpath, ":", "_", -1)
 		flattenpath = strings.Replace(flattenpath, "{", "", -1)
 		flattenpath = strings.Replace(flattenpath, "}", "", -1)
 		flattenpath = strings.Replace(flattenpath, "#", "_", -1)
@@ -25,7 +26,7 @@ func WriteTest() {
 			var writebytes bytes.Buffer
 			srcsettings := map[string]string{}
 			srcsettings["TestName"] = method + "_" + flattenpath
-			srcsettings["RequestServer"] = "http://localhost:8000"
+			srcsettings["RequestServer"] = "http://localhost:9000"
 			srcsettings["RequestMethod"] = method
 			srcsettings["RequestPath"] = newpath
 

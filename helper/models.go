@@ -9,6 +9,7 @@ type Model_ProjectSetting struct {
 	ApiFile        string
 	ListenAddress  string
 	BuildLang      string
+	OverrideHandle bool
 }
 
 // schema infos
@@ -19,6 +20,7 @@ type Model_SchemaSetting struct {
 	Description   string
 	FieldList     map[string]Model_Field
 }
+
 type Model_Field struct {
 	ModelName     string
 	FieldName     string
@@ -29,6 +31,13 @@ type Model_Field struct {
 	ApiFieldName  string
 	Description   string
 	Example       string
+	FieldIsModel  bool
+}
+type Model_Header struct {
+	Name        string
+	Type        string
+	Description string
+	Example     interface{}
 }
 
 // routing infos
@@ -55,6 +64,9 @@ type Model_RequestHandle struct {
 	ResponseSchema Model_SchemaSetting
 	RequestBodies  Model_RequestBody
 	Parameters     map[string]Model_Parameter
+	Headers        []Model_Header
+	HttpStatusCode int
+	ContentType    string
 }
 
 // route's requestbody (collection of info submit by client)

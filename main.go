@@ -17,6 +17,7 @@ var ProjectName = ""
 var ApiFile = ""
 var ListenAddress = ""
 var BuildLang = ""
+var OverrideFile = "false"
 
 func main() {
 	flag.StringVar(&BuildLang, "lang", "go", "Build language (go/php)")
@@ -24,12 +25,19 @@ func main() {
 	flag.StringVar(&ProjectName, "projectname", "openapiserver", "Rest API GO project name")
 	flag.StringVar(&ApiFile, "apifile", "spec.yaml", "openapi v3 yaml file")
 	flag.StringVar(&ListenAddress, "listen", ":8982", "listen to which address, default :8982")
+	flag.StringVar(&OverrideFile, "override", "false", "Override main.go and routehandle.go if exists, default false")
+
 	flag.Parse()
 	helper.Proj.ApiFile = ApiFile
 	helper.Proj.ListenAddress = ListenAddress
 	helper.Proj.BuildLang = BuildLang
 	helper.Proj.GenerateFolder = GenerateFolder
 	helper.Proj.ProjectName = ProjectName
+	if OverrideFile == "true" {
+		helper.Proj.OverrideHandle = true
+	} else {
+		helper.Proj.OverrideHandle = false
+	}
 	log.SetLevel(log.DebugLevel)
 	GenerateCode(ApiFile)
 

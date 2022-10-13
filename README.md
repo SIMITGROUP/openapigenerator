@@ -27,8 +27,9 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 cd openapigenerator
 make
 
-./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"  --lang="go"
+./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"  --lang="go" --overridehandle="true"
 ```
+use `--override="false"` if you wish to regenerate code without modify ```main.go``` and ```routehandle.go```
 
 3. use your rest api
 ```bash
@@ -109,3 +110,23 @@ make
 Todo:
 1. unit test auto run http request using all sample provided in .yaml
 2. add configuration for use sample data/use external module
+
+
+
+
+
+1. change main system, 
+    a. if no session automatically go to login microservices
+    b. callback url all traffic to microservices
+    c. pass environment parameter to microsercices
+2.
+
+
+
+goal indipendent microservices  for keycloak
+1. can redirect
+2. support content type strings
+3. support different http status response
+4. add support for module folder, inside generate dummy methods
+    - dummy module
+5. fix unit test code and prepare samples

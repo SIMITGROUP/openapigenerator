@@ -15,12 +15,13 @@ func WriteSchemas() {
 
 	for schemaname, schemaobj := range helper.AllSchemas {
 		log.Debug("Write Model ", schemaobj.ModelName, ": ", schemaobj.ModelType, " (", schemaname, ")")
+
 		for f, fsetting := range schemaobj.FieldList {
 
 			ftype := fsetting.FieldType
 			format := fsetting.FieldFormat
-			newtype := ConvertDataType(ftype, format)
-			log.Debug("    Prepare field ", f, ": ", newtype, " //", fsetting.ChildItemType)
+			newtype := ConvertDataType(ftype, format, f)
+			log.Debug("    Prepare field ", f, ": ", ftype, ":", newtype, " //", fsetting.ChildItemType)
 			fsetting.FieldType = newtype
 			schemaobj.FieldList[f] = fsetting
 			// x := &schemaobj.FieldList

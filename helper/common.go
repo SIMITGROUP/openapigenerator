@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -24,7 +25,22 @@ func ReadFile(filename string) string {
 	data, _ := os.ReadFile(filename)
 	return string(data)
 }
+func CheckFileExists(folder string, filename string) bool {
+	targetfile := Proj.GenerateFolder
+	if folder == "" {
+		targetfile = targetfile + "/" + filename
+	} else {
+		targetfile = targetfile + "/" + folder + "/" + filename
+	}
 
+	_, err := os.Stat(targetfile)
+	if errors.Is(err, os.ErrNotExist) {
+		return false
+	} else {
+		return true
+	}
+
+}
 func WriteFile(folder string, filename string, content string) {
 	GenerateFolder := Proj.GenerateFolder
 	targetfolder := ""
@@ -110,7 +126,7 @@ func ConvertPathParasCurlyToColon(oripath string) string {
 
 func VerifyKeyname(s string) bool {
 	for _, r := range s {
-		if r == '_' {
+		if r == '_' || r == '-' {
 			return true
 		} else if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
 			return false

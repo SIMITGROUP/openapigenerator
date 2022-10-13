@@ -2,25 +2,20 @@ package openapi
 
 import (
    "github.com/gin-gonic/gin"
-   "net/http"   
+//    "net/http"   
 )
-
-/*
-		/user/:name?firstname=myfirstname&lastname=mylastname
-		name := c.Param("name")
-		firstname := c.DefaultQuery("firstname", "Guest")
-		lastname := c.Query("lastname") // shortcut for c.Request.URL.Query().Get("lastname")
-	*/
 {{range .}}
 func {{ .HandleName}}(c *gin.Context) {    
-    //parameters(if exists) {{range $parayeky,$para:= .Parameters}} 
+    //parameters(if exists)  {{range $parayeky,$para:= .Parameters}} 
     //{{if eq $para.StoreIn "path"}}{{$parayeky}} := c.Param("{{$parayeky}}"){{else if eq $para.StoreIn "query"}}{{$parayeky}} := c.Query("{{$parayeky}}"){{else if eq $para.StoreIn "header"}}{{$parayeky}} := c.Request.Header["{{$parayeky}}"]{{end}}{{end}}
-
-    {{if ne .RequestBodies.RequestSchema.ModelName  ""}}
-    //request bodies
+    {{if ne .RequestBodies.RequestSchema.ModelName  ""}}//request bodies
     requestbodies := {{ .RequestBodies.RequestSchema.ModelName}}{}
-    _ = c.ShouldBindJSON(&requestbodies){{end}} 
-    data:={{.ResponseSchema.ModelName}}{}    
-    c.JSON(http.StatusOK, data.GetExamples() )
-}
-{{end}}
+    _ = c.ShouldBindJSON(&requestbodies){{end}}
+    {{ range $hindex,$header:=.Headers}}c.Header("{{$header.Name}}", "{{$header.Example}}")
+    {{end}}
+    {{if eq .ResponseSchema.ModelType "object"}}
+    data:={{.ResponseSchema.ModelName}}{}
+    c.JSON({{.HttpStatusCode}}, data.GetExamples() ){{else}}
+    var data {{.ResponseSchema.ModelName}}
+    c.String({{.HttpStatusCode}}, data.GetExamples().ToString()){{end}}
+}{{end}}
