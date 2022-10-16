@@ -9,9 +9,9 @@ import (
   "net/http"
   )
 
-func Auth_{{.SchemeName}}(c *gin.Context) {
+func {{.SchemeName}}_Auth(c *gin.Context) {
 	user, password, ok := c.Request.BasicAuth()
-	if ok && verify_{{.SchemeName}}(user, password) {
+	if ok && {{.SchemeName}}_verify(user, password) {
 		log.WithFields(log.Fields{
 			"user": user,
 		}).Info("User authenticated")
@@ -28,6 +28,6 @@ func Auth_{{.SchemeName}}(c *gin.Context) {
 	}
 }
 
-func verify_{{.SchemeName}}(user string, pass string) bool {
+func {{.SchemeName}}_verify(user string, pass string) bool {
 	return true
 }

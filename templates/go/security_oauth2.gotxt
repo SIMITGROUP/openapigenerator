@@ -1,0 +1,180 @@
+package openapi
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+	"time"
+
+	oidc "github.com/coreos/go-oidc"
+	"github.com/dgrijalva/jwt-go"
+	"gitlab.com/avarf/getenvs"
+
+	// oidc "github.com/HailorS/go-oidc"
+	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
+)
+//https://<host-name>/auth/realms/<realm-name>
+var {{.SchemeName}}_configURL = ""
+//http://<my-app-url>/<sso-callback-url>
+var {{.SchemeName}}_redirectURL = ""
+var {{.SchemeName}}_clientID = ""
+var {{.SchemeName}}_clientSecret = ""
+var {{.SchemeName}}_Config oauth2.Config
+var {{.SchemeName}}_state = "{{.SchemeName}}_state"
+var {{.SchemeName}}_ctx = context.Background()
+var {{.SchemeName}}_oidcConfig = &oidc.Config{}
+var {{.SchemeName}}_provider  *oidc.Provider
+type SSOTokenInfo struct {
+	OAuth2Token   *oauth2.Token
+	IDTokenClaims *json.RawMessage // ID Token payload is just JSON.
+}
+
+func {{.SchemeName}}_prepare() {
+
+	{{.SchemeName}}_configURL = getenvs.GetEnvString("{{.SchemeName}}_configURL", "")
+	{{.SchemeName}}_redirectURL = getenvs.GetEnvString("{{.SchemeName}}_redirectURL", "")
+	{{.SchemeName}}_clientID = getenvs.GetEnvString("{{.SchemeName}}_clientID", "")
+	{{.SchemeName}}_clientSecret = getenvs.GetEnvString("{{.SchemeName}}_clientSecret", "")
+	{{.SchemeName}}_oidcConfig.ClientID= {{.SchemeName}}_clientID
+
+	configURL := {{.SchemeName}}_configURL
+	redirectURL := {{.SchemeName}}_redirectURL
+	clientID := {{.SchemeName}}_clientID
+	clientSecret := {{.SchemeName}}_clientSecret
+
+	if configURL == "" {
+		log.Fatal("Undefine environment variable: {{.SchemeName}}_configURL")
+	}
+	if redirectURL == "" {
+		log.Fatal("Undefine environment variable: {{.SchemeName}}_redirectURL")
+	}
+	if clientID == "" {
+		log.Fatal("Undefine environment variable: {{.SchemeName}}_clientID")
+	}
+	if clientSecret == "" {
+		log.Fatal("Undefine environment variable: {{.SchemeName}}_clientSecret")
+	}
+
+	{{.SchemeName}}_provider, _ = oidc.NewProvider({{.SchemeName}}_ctx, configURL)
+
+	{{.SchemeName}}_Config = oauth2.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		RedirectURL:  redirectURL,
+		// Discovery returns the OAuth2 endpoints.
+		Endpoint: {{.SchemeName}}_provider.Endpoint(),
+		// "openid" is a required scope for OpenID Connect flows.
+		Scopes: []string{oidc.ScopeOpenID, "profile", "email"},
+	}
+	// state := "somestate"
+
+	verifier := {{.SchemeName}}_provider.Verifier({{.SchemeName}}_oidcConfig)
+	fmt.Println(verifier)
+}
+func {{.SchemeName}}_GetLoginURL() string {
+	return {{.SchemeName}}_Config.AuthCodeURL({{.SchemeName}}_state)
+}
+
+//redirect to sso login page
+func {{.SchemeName}}_login(c *gin.Context){
+	c.Header("Location", {{.SchemeName}}_GetLoginURL())
+	c.String(307, "")	
+}
+
+//logout, delete cookies, and redirect to login form again
+func {{.SchemeName}}_logout(c *gin.Context)  {
+	logouturl:=c.Request.RequestURI
+	arrstr:=strings.Split({{.SchemeName}}_redirectURL, "/")
+	baseurl:= 	arrstr[0]+"//"+arrstr[2]
+	result := Oauth2_configURL + "/protocol/openid-connect/logout?redirect_uri=" + baseurl
+	c.Header("Location", result)
+	c.SetCookie("access_token", "", -1, "/", "", true, true)
+	c.SetCookie("refresh_token", "", -1, logouturl, "", true, true)
+	c.String(307, "")
+	
+}
+
+func {{.SchemeName}}_Auth(c *gin.Context) {
+	r := c.Request
+	autorization := r.Header.Get("Authorization")
+	authorizestr := strings.Split(autorization, " ")
+	if len(authorizestr) == 2 && strings.ToLower(authorizestr[0]) == "bearer" {
+		tokenString := authorizestr[1]
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			//Make sure that the token method conform to "SigningMethodHMAC"
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			return []byte(os.Getenv("ACCESS_SECRET")), nil
+		})
+		if err != nil {
+			log.Error(err)
+		}
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if ok && claims["iss"] == Oauth2_configURL {
+			c.Next()
+		} else {
+			log.Warn("Invalid token")
+			c.JSON(403, gin.H{
+				"msg": "Invalid token",
+			})
+			c.Abort()
+		}
+	}
+}
+
+func {{.SchemeName}}_callback(c *gin.Context)  {
+	// provider, err := oidc.NewProvider({{.SchemeName}}_ctx, {{.SchemeName}}_configURL)
+	r := c.Request
+	requeststate:=r.URL.Query().Get("state")
+	if requeststate != {{.SchemeName}}_state {
+		// http.Error(w, "state did not match", http.StatusBadRequest)
+		// return ""
+		log.Warn( "state did not match: ",requeststate)
+	}
+
+	token, err := {{.SchemeName}}_Config.Exchange({{.SchemeName}}_ctx, r.URL.Query().Get("code"))
+	if err != nil {
+		log.Warn( "Failed to exchange token: "+err.Error())
+	}
+	rawIDToken, ok := token.Extra("id_token").(string)
+	if !ok {
+		log.Warn( "No id_token field in oauth2 token.")		
+	}
+	idToken, err := {{.SchemeName}}_provider.Verifier({{.SchemeName}}_oidcConfig).Verify({{.SchemeName}}_ctx, rawIDToken)
+	if err != nil {
+		log.Warn( "Failed to verify ID Token: "+err.Error())				
+	}
+
+	resp := SSOTokenInfo{
+		OAuth2Token:   token,
+		IDTokenClaims: new(json.RawMessage),
+	}
+
+	if err := idToken.Claims(&resp.IDTokenClaims); err != nil {
+		log.Warn( err.Error())						
+	}
+	data, err := json.MarshalIndent(resp, "", "    ")
+	if err != nil {
+		log.Warn( err.Error())						
+	}
+	_ = data	
+	// w.Write(data)
+	accesstoken := resp.OAuth2Token.AccessToken
+	refreshtoken := resp.OAuth2Token.RefreshToken
+	tokenexpired := resp.OAuth2Token.Expiry.Unix()
+	startTime := time.Now().Unix()
+	accesstokenexpired := int(tokenexpired - startTime)
+	refreshtokenexpired := 24 * 60 * 60
+	c.Header("Content-Type", "text/plain")
+	c.Header("Location", "/")
+	c.SetCookie("access_token", accesstoken, accesstokenexpired, "/", "", true, true)
+	c.SetCookie("refresh_token", refreshtoken, refreshtokenexpired, "/sso-refreshtoken", "", true, true)
+	c.String(307, "")
+
+	
+}

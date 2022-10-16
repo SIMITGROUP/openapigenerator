@@ -11,7 +11,7 @@ import (
   )  
 
 
-func Auth_{{.SchemeName}}(c *gin.Context){	
+func {{.SchemeName}}_Auth(c *gin.Context){	
 		// {{.Description}}
 		apikeyname := "{{.Keyname}}"
 		keyvalue := c.Request.Header.Get(apikeyname)

@@ -26,16 +26,23 @@ func WriteHandles() bool {
 			// handledatatype = "[]" + helper.GetModelNameFromRef(schemobj.Items.Ref)
 		}
 
-		log.Info("handle: ", handlename, ", ", hsetting.HttpStatusCode, " ", hsetting.ContentType)
+		if helper.In_array(helper.AllFunctionName, handlename) == false {
+			log.Info("handle: ", handlename, ", ", hsetting.HttpStatusCode, " ", hsetting.ContentType)
 
-		// h := helper.Model_RequestHandle{
-		// 	HandleName:     handlename,
-		// ResponseSchema: hsetting.ResponseSchema,
-		// 	Parameters:     hsetting.Parameters,
-		// 	RequestBodies:  hsetting.RequestBodies,
-		// 	HttpStatusCode
-		// }
-		allhandles[handlename] = hsetting
+			// h := helper.Model_RequestHandle{
+			// 	HandleName:     handlename,
+			// ResponseSchema: hsetting.ResponseSchema,
+			// 	Parameters:     hsetting.Parameters,
+			// 	RequestBodies:  hsetting.RequestBodies,
+			// 	HttpStatusCode
+			// }
+			allhandles[handlename] = hsetting
+		} else {
+
+			log.Info("Using build in handle: ", handlename)
+			delete(allhandles, handlename)
+		}
+
 	}
 
 	var routebytes bytes.Buffer
@@ -45,6 +52,6 @@ func WriteHandles() bool {
 	routetemplate := template.New("route")
 	routetemplate, _ = routetemplate.Parse(routesrc)
 	_ = routetemplate.Execute(&routebytes, allhandles)
-	helper.WriteFile("openapi", "routerhandle.go", routebytes.String())
+	helper.WriteFile("openapi", "ZRouterHandle.go", routebytes.String())
 	return true
 }

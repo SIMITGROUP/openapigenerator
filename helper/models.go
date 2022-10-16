@@ -10,6 +10,7 @@ type Model_ProjectSetting struct {
 	ListenAddress  string
 	BuildLang      string
 	OverrideHandle bool
+	InitFunctions  []string
 }
 
 // schema infos
@@ -61,6 +62,8 @@ type Model_RequestSetting struct {
 // routing handles info
 type Model_RequestHandle struct {
 	HandleName     string
+	Summary        string
+	Description    string
 	ResponseSchema Model_SchemaSetting
 	RequestBodies  Model_RequestBody
 	Parameters     map[string]Model_Parameter

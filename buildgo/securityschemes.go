@@ -21,7 +21,7 @@ func WriteSecuritySchemes() {
 
 		var writebytes bytes.Buffer
 		path := getTemplateFile(authsetting)
-		targetfile := "Security_" + authname + ".go"
+		targetfile := "ZSecurity_" + authname + ".go"
 		log.Debug("template source:", path)
 		src := helper.ReadFile(path)
 
@@ -53,12 +53,13 @@ func getTemplateFile(setting openapi3.SecurityScheme) string {
 		keydesc := setting.Description
 		_ = keydesc
 	} else if setting.Type == "http" && schemaname == "bearer" { //JWT
-		log.Fatal("JWT security scheme is not supported yet")
+		// log.Fatal("JWT security scheme is not supported yet")
 		filename = "security_httpjwt"
 	} else if setting.Type == "mutualTLS" {
 		log.Fatal("mutualTLS security scheme is not supported yet")
 	} else if setting.Type == "oauth2" {
-		log.Fatal("oauth2 security scheme is not supported yet")
+		// log.Fatal("oauth2 security scheme is not supported yet")
+		filename = "security_oauth2"
 	} else if setting.Type == "openIdConnect" {
 		log.Fatal("openIdConnect security scheme is not supported yet")
 		filename = "security_openidconnect"

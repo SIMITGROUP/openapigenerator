@@ -13,8 +13,7 @@ func WriteRoutes() {
 	for path, pathsetting := range routesettings {
 		newpath := helper.ConvertPathParasCurlyToColon(path)
 		for method, route := range pathsetting.RequestSettings {
-			desc := strings.Replace(route.Description, "\n", "\n    // ", -1)
-			route.Description = desc
+			route.Description = strings.Replace(route.Description, "\n", "\n    // ", -1)
 			route.Path = newpath
 			pathsetting.RequestSettings[method] = route
 		}
@@ -30,5 +29,5 @@ func WriteRoutes() {
 	routetemplate := template.New("route")
 	routetemplate, _ = routetemplate.Parse(routesrc)
 	_ = routetemplate.Execute(&routebytes, routesettings)
-	helper.WriteFile("openapi", "routeregistry.go", routebytes.String())
+	helper.WriteFile("openapi", "ZRouterRegistry.go", routebytes.String())
 }

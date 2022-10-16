@@ -5,6 +5,8 @@ import (
 //    "net/http"   
 )
 {{range .}}
+// {{ .Summary }}	
+// {{ .Description }}	
 func {{ .HandleName}}(c *gin.Context) {    
     //parameters(if exists)  {{range $parayeky,$para:= .Parameters}} 
     //{{if eq $para.StoreIn "path"}}{{$parayeky}} := c.Param("{{$parayeky}}"){{else if eq $para.StoreIn "query"}}{{$parayeky}} := c.Query("{{$parayeky}}"){{else if eq $para.StoreIn "header"}}{{$parayeky}} := c.Request.Header["{{$parayeky}}"]{{end}}{{end}}

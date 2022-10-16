@@ -4,12 +4,11 @@ info:
   title: 'SIMIT User API'
   description: It is microservices connect to core system, provide authentication service at SSO, access database profiles, and provide others useful user information
 paths:
-  # sso api
-  /sso-verifytoken:
+  /:
     get:
-      summary: check sso token is still valid
-      description: verify token is still valid, if yes return ok, else return fail. actually status shall follow sso server response status
-      operationId: verifyToken
+      summary: info api
+      description: inform name and what version of this api
+      operationId: GetAPIVersion
       responses:
         '200':
           description: success
@@ -17,26 +16,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
+  # oauth2 login flows
+  /login:
+    get:
+      summary: redirect to Login Url
+      description: use build in Oauth2_login
+      operationId: Oauth2_login
+      responses:
+        '200':
+          description: success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PlainText' 
+  /logout:
+    get:
+      summary: logout, 
+      description: use build in Oauth2_logout and redirect to login page, responses below ignored
+      operationId:  Oauth2_logout
+      responses:
+        '200':
+          description: success          
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PlainText'  
   /sso-callback:
     get:
       summary: api to sso server
-      description: connect to keycloak server for request or refresh tokens
-      operationId: ssoHandle
+      description: connect to keycloak server for request or refresh tokens. pass through middleway set access token and refresh token to user
+      operationId: Oauth2_callback
       responses:
-        '307':
-          description: success
-          headers:
-            Content-Type:
-              $ref:  '#/components/headers/ContentType'
-            Location: 
-              $ref: '#/components/headers/RedirectLink'
-            Set-Cookie:
-              $ref: '#/components/headers/SetTokenCookie'
+        '200':
+          description: success, will assign tokens to browser and return to app, responses below ignored
           content:            
             text/plain:
               schema:
-                # type: string
                 $ref: '#/components/schemas/PlainText'    
+
+  # protected resources
+  /user:
+    get:
+      summary: get user infomation
+      description: return user profile in json
+      operationId: GetUserInfo
+      security:
+       - Oauth2: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
 components:
   parameters:
     Authorization:
@@ -58,20 +89,7 @@ components:
   schemas:
     PlainText:
       type: string
-      example: plaintext
-    User:
-      type: object
-      properties:
-        uid:
-          type: string
-          example: xxxx-yyy-zzz
-        name:
-          type: string
-          example: user 1
-        email:
-          type: string
-          format: email
-          example: user1@test.com        
+      example: plaintext            
     Message:
       type: object
       properties:
@@ -84,46 +102,28 @@ components:
         version:
           type: string
           example: 1.0.0
-    Oauth2Token:    
+    User:
       type: object
       properties:
-        access_token:
+        username:
           type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-        token_type:
+          example: "user1"
+        email:
           type: string
-          example: bearer
-        refresh_token:
+          format: email
+          example: user1@example.com
+        fullname:
           type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-        expiry:
-          type: string
-          example: 2022-10-11T23:15:37.093318+08:00
-        user:
-          $ref: '#/components/schemas/User'
-  headers:
-    ContentType:
-      description: define content type
-      schema:
-        type: string
-        format: mime/type
-        example: application/json
-    RedirectLink:
-      description: define redirect link
-      schema:
-        type: string
-        format: url
-        example: http://www.example.com
-    SetTokenCookie:
-      description: Define JWT token via set-cookie
-      schema:
-        type: string
-        example: token=xxxxx.xxxx.xxx
-  securitySchemes:
-    ApiKey:
-      type: apiKey
-      in: header
-      name: X-Api-Key
-security:
-  - ApiKey: []
-
+          example: User 1's Full Name
+  securitySchemes:    
+    Oauth2:
+      description: Use keycloak server
+      type: oauth2      
+      # below information unused at the moment, all others info fetch from environment parameter
+      flows:
+        implicit:   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
+          authorizationUrl: https://api.example.com/oauth2/authorize
+          scopes:
+            email : email
+            openid: openid acc
+            profile: profile

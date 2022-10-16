@@ -7,7 +7,7 @@ func registerRoutes(r *gin.Engine) {
 	{{range .RequestSettings}}	
 	// {{ .Summary }}
     // {{ .Description }}	
-  	r.{{.Method}}("{{.Path}}",{{range $key,$security:= .Securities }} Auth_{{$key }},{{end}}{{.RequestHandle.HandleName}})
+  	r.{{.Method}}("{{.Path}}",{{range $key,$security:= .Securities }}{{$key }}_Auth,{{end}}{{.RequestHandle.HandleName}})
 	{{ end }}
 	{{end}}{{ end }}
 }

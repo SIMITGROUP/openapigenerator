@@ -87,7 +87,7 @@ func GetAuthMethodName(schemename string) string {
 	// 		return "ss"
 	// 	}
 	// }
-	return "Auth_" + schemename
+	return schemename + "_Auth"
 }
 func GetModelName(name string) string {
 	return "Model_" + name
@@ -133,4 +133,14 @@ func VerifyKeyname(s string) bool {
 		}
 	}
 	return true
+}
+
+func In_array(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
 }

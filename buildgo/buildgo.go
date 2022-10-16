@@ -63,6 +63,6 @@ func WriteInfra() {
 	servertemplate := template.New("server")
 	servertemplate, _ = servertemplate.Parse(serversrc)
 	_ = servertemplate.Execute(&serverbytes, helper.Proj)
-	helper.WriteFile("openapi", "server.go", serverbytes.String())
+	helper.WriteFile("openapi", "ZServer.go", serverbytes.String())
 
 }

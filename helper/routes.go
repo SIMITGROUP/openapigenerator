@@ -85,6 +85,8 @@ func GetRequestHandle(methodtype string, path string, op *openapi3.Operation) Mo
 			Headers:        headers,
 			HttpStatusCode: httpstatus,
 			ContentType:    contenttype,
+			Description:    op.Description,
+			Summary:        op.Summary,
 		}
 		AllRequestHandles[op.OperationID] = handle
 		return handle
