@@ -195,22 +195,25 @@ func {{.SchemeName}}_callback(c *gin.Context)  {
 
 	
 }
+func {{.SchemeName}}_getrefreshtoken(refreshToken string) (*oauth2.Token,error) {
+	token := new(oauth2.Token)
+	token.RefreshToken = refreshToken
+	token.Expiry = time.Now()
 
+	// TokenSource will refresh the token if needed (which is likely in this
+
+	tokensource := Oauth2_Config.TokenSource(oauth2.NoContext, token)
+	return tokensource.Token()
+	
+	
+	
+}
 func {{.SchemeName}}_refreshtoken(c *gin.Context){
 	refreshToken, err := c.Cookie("refresh_token")
 	errmsg := ""
 	if err == nil {
-		token := new(oauth2.Token)
-		token.RefreshToken = refreshToken
-		token.Expiry = time.Now()
-
-		// TokenSource will refresh the token if needed (which is likely in this
-
-		tokensource := Oauth2_Config.TokenSource(oauth2.NoContext, token)
-		newtoken, err := tokensource.Token()
-		if err == nil {
-			//_ = newtoken]
-			// c.Header("S", "b")
+		newtoken,tokenerr := {{.SchemeName}}_getrefreshtoken(refreshToken)
+		if tokenerr == nil {
 			accesstoken := newtoken.AccessToken
 			refreshtoken := newtoken.RefreshToken
 			tokenexpired := newtoken.Expiry.Unix()
@@ -226,9 +229,9 @@ func {{.SchemeName}}_refreshtoken(c *gin.Context){
 			})
 
 		} else {
-			errmsg = fmt.Sprintf("create new token error: %v", err)
+			errmsg = fmt.Sprintf("create new token error: %v", tokenerr)
 			log.Warn(errmsg)
-			c.JSON(500, gin.H{
+			c.JSON(400, gin.H{
 				"code": "RFRESH_TOKEN_ERROR",
 				"msg":  errmsg,
 			})
@@ -236,7 +239,7 @@ func {{.SchemeName}}_refreshtoken(c *gin.Context){
 
 	} else {
 		errmsg = fmt.Sprintf("undefine refresh-token in cookie: %v", err)
-		c.JSON(500, gin.H{
+		c.JSON(400, gin.H{
 			"code": "NO_REFRESH_TOKEN",
 			"msg":  errmsg,
 		})
