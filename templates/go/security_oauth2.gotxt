@@ -68,7 +68,10 @@ func {{.SchemeName}}_prepare() {
 		// Discovery returns the OAuth2 endpoints.
 		Endpoint: {{.SchemeName}}_provider.Endpoint(),
 		// "openid" is a required scope for OpenID Connect flows.
-		Scopes: []string{oidc.ScopeOpenID, "profile", "email"},
+		Scopes: []string{			
+			{{range $scopename,$scopesetting := .Scopes}}"{{$scopename}}", //{{$scopesetting}}
+			{{end}}
+		},
 	}
 	// state := "somestate"
 
@@ -116,6 +119,9 @@ func {{.SchemeName}}_Auth(c *gin.Context) {
 		}
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if ok && claims["iss"] == Oauth2_configURL {
+			for _, scopename := range Oauth2_Config.Scopes {
+				c.Set(scopename, claims[scopename])
+			}
 			c.Next()
 		} else {
 			log.Warn("Invalid token")

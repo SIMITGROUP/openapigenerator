@@ -17,7 +17,26 @@ func PrepareSecuritySchemes() {
 			AllFunctionName = append(AllFunctionName, authname+"_prepare")
 
 		}
-		AllSecuritySchemes[authname] = *setting.Value
+		sc := *setting.Value
+		var scopes map[string]string
+		if sc.Flows.Password != nil {
+			scopes = sc.Flows.Password.Scopes
+		} else if sc.Flows.Implicit != nil {
+			scopes = sc.Flows.Implicit.Scopes
+		} else if sc.Flows.ClientCredentials != nil {
+			scopes = sc.Flows.ClientCredentials.Scopes
+		}
+
+		AllSecuritySchemes[authname] = Model_SecuritySchemaSetting{
+			Type:        sc.Type,
+			Description: sc.Description,
+			In:          sc.In,
+			SchemeName:  authname,
+			Name:        sc.Name,
+			Scheme:      sc.Scheme,
+			Scopes:      scopes,
+		}
+
 		log.Info("Prepare Security Scheme: ", authname, ", type: ", schemetype)
 
 	}

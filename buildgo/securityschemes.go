@@ -5,7 +5,6 @@ import (
 	"openapigenerator/helper"
 	"text/template"
 
-	"github.com/getkin/kin-openapi/openapi3"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,9 +14,9 @@ func WriteSecuritySchemes() {
 	log.Debug(helper.AllSecuritySchemes)
 	for authname, authsetting := range helper.AllSecuritySchemes {
 		log.Info("    ", authname)
-		data := map[string]string{}
-		data["SchemeName"] = authname
-		data["Keyname"] = authsetting.Name
+		// data := map[string]string{}
+		// data["SchemeName"] = authname
+		// data["Keyname"] = authsetting.Name
 
 		var writebytes bytes.Buffer
 		path := getTemplateFile(authsetting)
@@ -27,12 +26,12 @@ func WriteSecuritySchemes() {
 
 		routetemplate := template.New("route")
 		routetemplate, _ = routetemplate.Parse(src)
-		_ = routetemplate.Execute(&writebytes, data)
+		_ = routetemplate.Execute(&writebytes, authsetting)
 		helper.WriteFile("openapi", targetfile, writebytes.String())
 	}
 }
 
-func getTemplateFile(setting openapi3.SecurityScheme) string {
+func getTemplateFile(setting helper.Model_SecuritySchemaSetting) string {
 	filename := ""
 	schemaname := helper.LowerCaseFirst(setting.Scheme)
 

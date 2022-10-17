@@ -1,7 +1,5 @@
 package helper
 
-import "github.com/getkin/kin-openapi/openapi3"
-
 // project info
 type Model_ProjectSetting struct {
 	GenerateFolder string
@@ -88,7 +86,17 @@ type Model_Parameter struct {
 	Deprecated      bool
 	AllowEmptyValue bool
 }
-type Model_SecuritySchemaSetting = openapi3.SecurityScheme
+
+// openapi3.SecurityScheme
+type Model_SecuritySchemaSetting = struct {
+	Name        string
+	SchemeName  string
+	Type        string
+	Description string
+	In          string
+	Scheme      string
+	Scopes      map[string]string
+}
 
 // security schemes info, seems use original will
 // type Model_SecuritySchemaSetting struct {
