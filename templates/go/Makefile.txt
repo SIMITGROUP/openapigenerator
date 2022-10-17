@@ -1,7 +1,7 @@
 build:
-	go mod tidy	
+	go get .	
 	go build .
-	@echo "Build successfully, run './openapiserver' command with your own options"
+	@echo "Build successfully"
 unittest:
-	go get -t openapiserver/test
+	go get -t ./test
 	go test ./test/

@@ -18,7 +18,7 @@ import (
 )
 //https://<host-name>/auth/realms/<realm-name>
 var {{.SchemeName}}_configURL = ""
-//http://<my-app-url>/<sso-callback-url>
+//https://<my-app-url>/<sso-callback-url>
 var {{.SchemeName}}_redirectURL = ""
 var {{.SchemeName}}_clientID = ""
 var {{.SchemeName}}_clientSecret = ""
@@ -46,16 +46,16 @@ func {{.SchemeName}}_prepare() {
 	clientSecret := {{.SchemeName}}_clientSecret
 
 	if configURL == "" {
-		log.Fatal("Undefine environment variable: {{.SchemeName}}_configURL")
+		log.Fatal("Undefine environment variable: {{.SchemeName}}_configURL, example: https://<host-name>/auth/realms/<realm-name>")
 	}
 	if redirectURL == "" {
-		log.Fatal("Undefine environment variable: {{.SchemeName}}_redirectURL")
+		log.Fatal("Undefine environment variable: {{.SchemeName}}_redirectURL, example: https://<my-app-url>/<sso-callback-url>")
 	}
 	if clientID == "" {
-		log.Fatal("Undefine environment variable: {{.SchemeName}}_clientID")
+		log.Fatal("Undefine environment variable: {{.SchemeName}}_clientID, example: myclientid")
 	}
 	if clientSecret == "" {
-		log.Fatal("Undefine environment variable: {{.SchemeName}}_clientSecret")
+		log.Fatal("Undefine environment variable: {{.SchemeName}}_clientSecret: HASDJHFEFBEFBEKFJWHWJKEHQKWE")
 	}
 
 	{{.SchemeName}}_provider, _ = oidc.NewProvider({{.SchemeName}}_ctx, configURL)
