@@ -60,10 +60,10 @@ components:
     ApiKey:
       type: apiKey
       in: header
-      name: X_API_KEY
+      name: X-API-KEY
     AdminApiKey:
       type: apiKey
       in: header
-      name: X_ADMIN_API_KEY
+      name: X-ADMIN-API_KEY
 security:
   - ApiKey: []

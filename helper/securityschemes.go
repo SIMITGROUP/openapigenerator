@@ -6,7 +6,10 @@ import (
 
 func PrepareSecuritySchemes() {
 	securityschemas := Doc.Components.SecuritySchemes
+	var scopes map[string]string
 	for authname, setting := range securityschemas {
+		log.Info("Preparing Security Scheme: ", authname)
+		sc := *setting.Value
 		schemetype := LowerCaseFirst(setting.Value.Type)
 		AllFunctionName = append(AllFunctionName, GetAuthMethodName(authname))
 		if schemetype == "oauth2" {
@@ -16,16 +19,13 @@ func PrepareSecuritySchemes() {
 			AllFunctionName = append(AllFunctionName, authname+"_callback")
 			AllFunctionName = append(AllFunctionName, authname+"_prepare")
 			AllFunctionName = append(AllFunctionName, authname+"_refreshtoken")
-
-		}
-		sc := *setting.Value
-		var scopes map[string]string
-		if sc.Flows.Password != nil {
-			scopes = sc.Flows.Password.Scopes
-		} else if sc.Flows.Implicit != nil {
-			scopes = sc.Flows.Implicit.Scopes
-		} else if sc.Flows.ClientCredentials != nil {
-			scopes = sc.Flows.ClientCredentials.Scopes
+			if sc.Flows.Password != nil {
+				scopes = sc.Flows.Password.Scopes
+			} else if sc.Flows.Implicit != nil {
+				scopes = sc.Flows.Implicit.Scopes
+			} else if sc.Flows.ClientCredentials != nil {
+				scopes = sc.Flows.ClientCredentials.Scopes
+			}
 		}
 
 		AllSecuritySchemes[authname] = Model_SecuritySchemaSetting{

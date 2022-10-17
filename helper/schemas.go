@@ -62,6 +62,7 @@ func PrepareSchemas() {
 		}
 		//assign newschema into schema list
 		AllSchemas[schemaname] = schemaobj
+		log.Info("Complete schemas")
 
 	}
 	// 1 all schemas

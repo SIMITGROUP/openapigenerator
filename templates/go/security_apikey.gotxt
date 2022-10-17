@@ -7,14 +7,22 @@ import (
 	"github.com/gin-gonic/gin"
     log "github.com/sirupsen/logrus"
     "net/http"
+	"strings"
     "gitlab.com/avarf/getenvs"
   )  
 
-
+// "header", "query" or "cookie"
 func {{.SchemeName}}_Auth(c *gin.Context){	
 		// {{.Description}}
-		apikeyname := "{{.Keyname}}"
+		apikeyname := "{{.Name}}"
+		{{ if eq .In "cookie"}}
+		keyvalue , _ := c.Request.Cookie(apikeyname)		
+		{{else if eq .In "query"}}
+		keyvalue := c.Request.URL.Query().Get(apikeyname)
+		{{else}}
 		keyvalue := c.Request.Header.Get(apikeyname)
+		{{end}}
+		
 	
 		if verifyKey_{{.SchemeName}}(apikeyname, keyvalue) ==false {
 			log.Warn("Wrong API Key:", apikeyname)
@@ -28,7 +36,10 @@ func {{.SchemeName}}_Auth(c *gin.Context){
 
 func verifyKey_{{.SchemeName}}(keyname string, keyvalue string) bool {
 	emptyvalue:="----"
-	envkeyvalue := getenvs.GetEnvString(keyname, emptyvalue)
+	environmentkeyname := strings.Replace(keyname, "-", "_", -1)
+	envkeyvalue := getenvs.GetEnvString(environmentkeyname, emptyvalue)
+
+	// log.Info("key: ",keyname,", environmentkeyname: ", environmentkeyname, ": ",envkeyvalue)
 
 	if envkeyvalue == emptyvalue {
 		log.Error("Undefine environment variable "+keyname)
