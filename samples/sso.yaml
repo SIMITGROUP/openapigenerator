@@ -17,7 +17,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Message'
   # oauth2 login flows
-  /oauth2/login:
+  /user/login:
     get:
       summary: redirect to Login Url
       description: use build in Oauth2_login
@@ -29,7 +29,7 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/PlainText' 
-  /oauth2/logout:
+  /user/logout:
     get:
       summary: logout, 
       description: use build in Oauth2_logout and redirect to login page, responses below ignored
@@ -41,7 +41,7 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/PlainText'  
-  /oauth2/sso-callback:
+  /user/sso-callback:
     get:
       summary: api to sso server
       description: connect to keycloak server for request or refresh tokens. pass through middleway set access token and refresh token to user
@@ -53,24 +53,25 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/PlainText'    
-  /oauth2/refresh-token:
+  /user/refresh-token:
       get:
         summary: api to sso server
         description: connect to keycloak server for request or refresh tokens. pass through middleway set access token and refresh token to user
         operationId: Oauth2_refreshtoken
         responses:
           '200':
-            description: success, will assign tokens to browser and return to app, responses below ignored
+            description: success, will assign tokens to browser, responses below ignored
             content:            
               text/plain:
                 schema:
                   $ref: '#/components/schemas/PlainText'
-
-  # protected resources
-  /oauth2/user:
+  # protected resources, access own profile only
+  /user/profile:
     get:
       summary: get user infomation
       description: return user profile in json
+      parameters:
+        - $ref: '#/components/parameters/Uid'
       operationId: GetUserInfo
       security:
        - Oauth2: []
@@ -80,16 +81,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+  #   post:
+  #   update:
+  # /user/admin:
+  #   put:
+  # /user/admin/{uid}:
+  #   get:
+  #   post:
+  #   delete:
+
 components:
   parameters:
-    Authorization:
-      name: Authorization
-      in: header
-      required: true
-      schema: 
-        type: string
-        example: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-    uid:
+    Uid:
       name: uid
       description: user id in uuid format
       in: path

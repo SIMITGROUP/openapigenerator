@@ -15,6 +15,7 @@ func {{ .HandleName}}(c *gin.Context) {
     _ = c.ShouldBindJSON(&requestbodies){{end}}
     {{ range $hindex,$header:=.Headers}}c.Header("{{$header.Name}}", "{{$header.Example}}")
     {{end}}
+    c.Header("Content-Type", "{{.ContentType}}")
     {{if eq .ResponseSchema.ModelType "object"}}
     data:={{.ResponseSchema.ModelName}}{}
     c.JSON({{.HttpStatusCode}}, data.GetExamples() ){{else}}

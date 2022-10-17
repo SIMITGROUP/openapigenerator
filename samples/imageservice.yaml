@@ -1,0 +1,78 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'simbiz.cloud/userapi'
+  description: User services
+paths:
+  /:
+    get:
+      summary: welcome
+      description: show api msg
+      operationId: GetWelcomeMsg
+      responses:
+        '200':
+          description: successfully show welcome msg
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    put:
+      summary: create new resource
+      description: create new resource image
+      operationId: createResource
+      responses:
+        '200':
+          description: success create new resource image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /{resourcename}:
+    get:
+      summary: get resource image
+      description: create new resource image      
+      operationId: GetImage
+      parameters:
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: access resource image
+          content:
+            image/png:
+              schema:
+                $ref: '#/components/schemas/Image'
+
+
+components:
+  parameters:
+    Size:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        example: 60
+
+  schemas:
+    Image:
+      type: string
+      format: binary
+    Message:
+      type: object
+      properties:
+        version:
+          type: string
+          example: 1.0.0
+        msg:
+          type: string
+          example: Undefine resource   
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    AdminApiKey:
+      type: apiKey
+      in: header
+      name: X-ADMIN-API_KEY
