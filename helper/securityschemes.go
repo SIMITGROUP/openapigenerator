@@ -15,6 +15,7 @@ func PrepareSecuritySchemes() {
 			AllFunctionName = append(AllFunctionName, authname+"_logout")
 			AllFunctionName = append(AllFunctionName, authname+"_callback")
 			AllFunctionName = append(AllFunctionName, authname+"_prepare")
+			AllFunctionName = append(AllFunctionName, authname+"_refreshtoken")
 
 		}
 		sc := *setting.Value

@@ -10,4 +10,9 @@ func registerRoutes(r *gin.Engine) {
   	r.{{.Method}}("{{.Path}}",{{range $key,$security:= .Securities }}{{$key }}_Auth,{{end}}{{.RequestHandle.HandleName}})
 	{{ end }}
 	{{end}}{{ end }}
+
+
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
+	})
 }

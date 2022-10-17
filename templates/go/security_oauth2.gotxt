@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -103,35 +102,47 @@ func {{.SchemeName}}_logout(c *gin.Context)  {
 
 func {{.SchemeName}}_Auth(c *gin.Context) {
 	r := c.Request
+	errmsg := ""
 	autorization := r.Header.Get("Authorization")
 	authorizestr := strings.Split(autorization, " ")
-	if len(authorizestr) == 2 && strings.ToLower(authorizestr[0]) == "bearer" {
-		tokenString := authorizestr[1]
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			//Make sure that the token method conform to "SigningMethodHMAC"
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
-			return []byte(os.Getenv("ACCESS_SECRET")), nil
+	if autorization == "" {
+		errmsg = "Undefine Authorization header"
+		log.Info(errmsg)
+		c.JSON(403, gin.H{
+			"msg": errmsg,
 		})
-		if err != nil {
-			log.Error(err)
-		}
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if ok && claims["iss"] == Oauth2_configURL {
+		c.Abort()
+
+	} else if len(authorizestr) == 2 && strings.ToLower(authorizestr[0]) == "bearer" {
+		tokenString := authorizestr[1]
+		//temporary parse token without error detect
+		token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			return nil, nil
+		})
+
+		claims, success := token.Claims.(jwt.MapClaims)
+		if success && claims["iss"] == Oauth2_configURL {
 			for _, scopename := range Oauth2_Config.Scopes {
 				c.Set(scopename, claims[scopename])
 			}
 			c.Next()
 		} else {
-			log.Warn("Invalid token")
+			errmsg = "wrong token issuer"
 			c.JSON(403, gin.H{
-				"msg": "Invalid token",
+				"msg": errmsg,
 			})
 			c.Abort()
 		}
+	} else {
+		errmsg = "Invalid token"
+		log.Debug(errmsg)
+		c.JSON(403, gin.H{
+			"msg": errmsg,
+		})
+		c.Abort()
 	}
 }
+
 
 func {{.SchemeName}}_callback(c *gin.Context)  {
 	// provider, err := oidc.NewProvider({{.SchemeName}}_ctx, {{.SchemeName}}_configURL)
@@ -179,8 +190,58 @@ func {{.SchemeName}}_callback(c *gin.Context)  {
 	c.Header("Content-Type", "text/plain")
 	c.Header("Location", "/")
 	c.SetCookie("access_token", accesstoken, accesstokenexpired, "/", "", true, true)
-	c.SetCookie("refresh_token", refreshtoken, refreshtokenexpired, "/sso-refreshtoken", "", true, true)
+	c.SetCookie("refresh_token", refreshtoken, refreshtokenexpired, "/oauth2/sso-refreshtoken", "", true, true)
 	c.String(307, "")
 
 	
+}
+
+func {{.SchemeName}}_refreshtoken(c *gin.Context){
+	refreshToken, err := c.Cookie("refresh_token")
+	errmsg := ""
+	if err == nil {
+		token := new(oauth2.Token)
+		token.RefreshToken = refreshToken
+		token.Expiry = time.Now()
+
+		// TokenSource will refresh the token if needed (which is likely in this
+
+		tokensource := Oauth2_Config.TokenSource(oauth2.NoContext, token)
+		newtoken, err := tokensource.Token()
+		if err == nil {
+			//_ = newtoken]
+			// c.Header("S", "b")
+			accesstoken := newtoken.AccessToken
+			refreshtoken := newtoken.RefreshToken
+			tokenexpired := newtoken.Expiry.Unix()
+			startTime := time.Now().Unix()
+			accesstokenexpired := int(tokenexpired - startTime)
+			refreshtokenexpired := 24 * 60 * 60
+			c.SetCookie("access_token", accesstoken, accesstokenexpired, "/", "", true, true)
+			c.SetCookie("refresh_token", refreshtoken, refreshtokenexpired, "/oauth2/sso-refreshtoken", "", true, true)
+
+			c.JSON(200, gin.H{
+				"code": "OK",
+				"msg":  "",
+			})
+
+		} else {
+			errmsg = fmt.Sprintf("create new token error: %v", err)
+			log.Warn(errmsg)
+			c.JSON(500, gin.H{
+				"code": "RFRESH_TOKEN_ERROR",
+				"msg":  errmsg,
+			})
+		}
+
+	} else {
+		errmsg = fmt.Sprintf("undefine refresh-token in cookie: %v", err)
+		c.JSON(500, gin.H{
+			"code": "NO_REFRESH_TOKEN",
+			"msg":  errmsg,
+		})
+		log.Info(errmsg)
+	}
+	c.Abort()
+
 }

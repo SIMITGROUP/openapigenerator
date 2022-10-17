@@ -17,7 +17,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Message'
   # oauth2 login flows
-  /login:
+  /oauth2/login:
     get:
       summary: redirect to Login Url
       description: use build in Oauth2_login
@@ -29,7 +29,7 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/PlainText' 
-  /logout:
+  /oauth2/logout:
     get:
       summary: logout, 
       description: use build in Oauth2_logout and redirect to login page, responses below ignored
@@ -41,7 +41,7 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/PlainText'  
-  /sso-callback:
+  /oauth2/sso-callback:
     get:
       summary: api to sso server
       description: connect to keycloak server for request or refresh tokens. pass through middleway set access token and refresh token to user
@@ -53,9 +53,21 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/PlainText'    
+  /oauth2/refresh-token:
+      get:
+        summary: api to sso server
+        description: connect to keycloak server for request or refresh tokens. pass through middleway set access token and refresh token to user
+        operationId: Oauth2_refreshtoken
+        responses:
+          '200':
+            description: success, will assign tokens to browser and return to app, responses below ignored
+            content:            
+              text/plain:
+                schema:
+                  $ref: '#/components/schemas/PlainText'
 
   # protected resources
-  /user:
+  /oauth2/user:
     get:
       summary: get user infomation
       description: return user profile in json
