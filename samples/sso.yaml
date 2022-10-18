@@ -21,7 +21,7 @@ paths:
     get:
       summary: redirect to Login Url
       description: use build in Oauth2_login
-      operationId: Oauth2_login
+      operationId: -Oauth2_login
       responses:
         '200':
           description: success
@@ -33,10 +33,10 @@ paths:
     get:
       summary: logout, 
       description: use build in Oauth2_logout and redirect to login page, responses below ignored
-      operationId:  Oauth2_logout
+      operationId:  -Oauth2_logout
       responses:
         '200':
-          description: success          
+          description: success
           content:
             text/plain:
               schema:
@@ -45,7 +45,7 @@ paths:
     get:
       summary: api to sso server
       description: connect to keycloak server for request or refresh tokens. pass through middleway set access token and refresh token to user
-      operationId: Oauth2_callback
+      operationId: -Oauth2_callback
       responses:
         '200':
           description: success, will assign tokens to browser and return to app, responses below ignored
@@ -57,7 +57,7 @@ paths:
       get:
         summary: api to sso server
         description: connect to keycloak server for request or refresh tokens. pass through middleway set access token and refresh token to user
-        operationId: Oauth2_refreshtoken
+        operationId: -Oauth2_refreshtoken
         responses:
           '200':
             description: success, will assign tokens to browser, responses below ignored

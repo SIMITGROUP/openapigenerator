@@ -30,10 +30,12 @@ paths:
   /{resourcename}:
     get:
       summary: get resource image
-      description: create new resource image      
+      description: create new resource image, use GetResizeImageBytes to convert image   
       operationId: GetImage
       parameters:
         - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Resourcename'
+        
       responses:
         '200':
           description: access resource image
@@ -53,7 +55,13 @@ components:
         type: integer
         format: int32
         example: 60
-
+    Resourcename:
+      name: resourcename
+      in: path
+      required: true
+      schema:
+        type: string
+        example: xyzcdeabc
   schemas:
     Image:
       type: string

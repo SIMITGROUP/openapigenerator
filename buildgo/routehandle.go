@@ -25,8 +25,12 @@ func WriteHandles() bool {
 		if hsetting.ResponseSchema.ModelType == "array" {
 			// handledatatype = "[]" + helper.GetModelNameFromRef(schemobj.Items.Ref)
 		}
+		firstcharacter := helper.Left(handlename, 1)
+		if firstcharacter == "-" {
 
-		if helper.In_array(helper.AllFunctionName, handlename) == false {
+			log.Warn("Skip generate ", handlename)
+			delete(allhandles, handlename)
+		} else {
 			log.Info("handle: ", handlename, ", ", hsetting.HttpStatusCode, " ", hsetting.ContentType)
 
 			// h := helper.Model_RequestHandle{
@@ -37,10 +41,6 @@ func WriteHandles() bool {
 			// 	HttpStatusCode
 			// }
 			allhandles[handlename] = hsetting
-		} else {
-
-			log.Info("Using build in handle: ", handlename)
-			delete(allhandles, handlename)
 		}
 
 	}

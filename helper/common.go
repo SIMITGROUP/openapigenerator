@@ -144,3 +144,18 @@ func In_array(s []string, str string) bool {
 
 	return false
 }
+
+func Left(txt string, no int) string {
+	return SubString(txt, 0, no)
+
+}
+func Right(txt string, no int) string {
+	return SubString(txt, no, len(txt))
+
+}
+func SubString(txt string, startno int, endno int) string {
+	runes := []rune(txt)
+	safeSubstring := string(runes[startno:endno])
+
+	return safeSubstring
+}
