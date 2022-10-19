@@ -15,6 +15,8 @@ func WriteRoutes() {
 		for method, route := range pathsetting.RequestSettings {
 			route.Description = strings.Replace(route.Description, "\n", "\n    // ", -1)
 			route.Path = newpath
+
+			route.RequestHandle.HandleName = strings.Replace(route.RequestHandle.HandleName, "-", "", -1)
 			pathsetting.RequestSettings[method] = route
 		}
 

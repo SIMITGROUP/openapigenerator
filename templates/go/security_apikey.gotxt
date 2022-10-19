@@ -1,6 +1,4 @@
-// basic authentication template
-// modify function BasicAuth() to perform real authentication
-// default only authenticate user admin/admin
+// auto generate by generator
 package openapi
 
 import (

@@ -14,11 +14,12 @@ func PrepareSecuritySchemes() {
 		// AllFunctionName = append(AllFunctionName, GetAuthMethodName(authname))
 		if schemetype == "oauth2" {
 			Proj.InitFunctions = append(Proj.InitFunctions, authname+"_prepare")
-			// AllFunctionName = append(AllFunctionName, authname+"_login")
-			// AllFunctionName = append(AllFunctionName, authname+"_logout")
-			// AllFunctionName = append(AllFunctionName, authname+"_callback")
-			// AllFunctionName = append(AllFunctionName, authname+"_prepare")
-			// AllFunctionName = append(AllFunctionName, authname+"_refreshtoken")
+
+			Proj.AllEnvVars[authname+"_configURL"] = ""
+			Proj.AllEnvVars[authname+"_redirectURL"] = ""
+			Proj.AllEnvVars[authname+"_clientID"] = ""
+			Proj.AllEnvVars[authname+"_clientSecret"] = ""
+
 			if sc.Flows.Password != nil {
 				scopes = sc.Flows.Password.Scopes
 			} else if sc.Flows.Implicit != nil {

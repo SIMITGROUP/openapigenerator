@@ -1,3 +1,4 @@
+// auto generate by generator
 package openapi
 
 import (
@@ -8,8 +9,11 @@ import (
 // {{ .Summary }}	
 // {{ .Description }}	
 func {{ .HandleName}}(c *gin.Context) {    
-    //parameters(if exists)  {{range $parayeky,$para:= .Parameters}} 
-    //{{if eq $para.StoreIn "path"}}{{$parayeky}} := c.Param("{{$parayeky}}"){{else if eq $para.StoreIn "query"}}{{$parayeky}} := c.Query("{{$parayeky}}"){{else if eq $para.StoreIn "header"}}{{$parayeky}} := c.Request.Header["{{$parayeky}}"]{{end}}{{end}}
+    {{$paracount := len .Parameters}}
+    {{if gt $paracount 0}}// parameters{{range $parayeky,$para:= .Parameters}} 
+    {{if eq $para.StoreIn "path"}}{{$parayeky}} := c.Param("{{$parayeky}}"){{else if eq $para.StoreIn "query"}}{{$parayeky}} := c.Query("{{$parayeky}}"){{else if eq $para.StoreIn "header"}}{{$parayeky}} := c.Request.Header["{{$parayeky}}"]{{end}}{{end}}
+    {{range $parayeky,$para:= .Parameters}}_, {{end}}_ = {{range $parakey,$para := .Parameters}}{{ $parakey }}, {{end}}1
+    {{end}}
     {{if ne .RequestBodies.RequestSchema.ModelName  ""}}//request bodies
     requestbodies := {{ .RequestBodies.RequestSchema.ModelName}}{}
     _ = c.ShouldBindJSON(&requestbodies){{end}}
@@ -17,8 +21,11 @@ func {{ .HandleName}}(c *gin.Context) {
     {{end}}
     c.Header("Content-Type", "{{.ContentType}}")
     {{if eq .ResponseSchema.ModelType "object"}}
-    data:={{.ResponseSchema.ModelName}}{}
-    c.JSON({{.HttpStatusCode}}, data.GetExamples() ){{else}}
-    var data {{.ResponseSchema.ModelName}}
+    data:={{.ResponseSchema.ModelName}}{}.GetExamples()
+    c.JSON({{.HttpStatusCode}}, data)
+    {{else if eq .ResponseSchema.ModelFormat "binary"}}data := []byte{}
+    c.Status({{.HttpStatusCode}})
+    c.Writer.Write(data)
+    {{else}}var data {{.ResponseSchema.ModelName}}
     c.String({{.HttpStatusCode}}, data.GetExamples().ToString()){{end}}
 }{{end}}

@@ -18,6 +18,7 @@ func PrepareSchemas() {
 		var schemaobj = Model_SchemaSetting{
 			ModelName:     modelname,
 			ModelType:     LowerCaseFirst(schemasetting.Value.Type),
+			ModelFormat:   LowerCaseFirst(schemasetting.Value.Format),
 			InterfaceName: GetInterfaceName(schemaname),
 			Description:   schemasetting.Value.Description,
 			FieldList:     map[string]Model_Field{},

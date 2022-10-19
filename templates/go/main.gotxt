@@ -1,14 +1,29 @@
+// auto generate by generator
 package main
 import (
 	"{{ .ProjectName}}/openapi"
-	"gitlab.com/avarf/getenvs"
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
+
 )
 
 func main() {
 	{{range .InitFunctions}}
 	openapi.{{.}}(){{end}}
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	listen := os.Getenv("API_LISTEN")
+
 	r := openapi.NewServer()
-	listen := getenvs.GetEnvString("API_LISTEN", "{{.ListenAddress}}")
-	
-	r.Run(listen)
+	if listen != "" {
+		r.Run(listen)
+	}else{
+		log.Fatal("Undefine API_LISTEN")
+	}
+
 }

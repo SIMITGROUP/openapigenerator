@@ -1,3 +1,4 @@
+// auto generate by generator
 package openapi
 
 import (
@@ -7,10 +8,10 @@ import (
 )
 
 
-{{if eq .ModelType "object"}}type {{ .ModelName}} struct {
+type {{ .ModelName}} {{if eq .ModelType "object"}}struct{
 	{{ range .FieldList}}{{.FieldName}} {{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}} `json:"{{.ApiFieldName}}"` //{{.Description}}
 	{{end}}
-}{{else}}type {{ .ModelName}} {{.ModelType}}{{end}}
+}{{else if eq .ModelFormat "binary"}}[]byte {{else}}{{.ModelType}}{{end}}
 
 type {{.InterfaceName}} interface{
 	{{ range .FieldList}}

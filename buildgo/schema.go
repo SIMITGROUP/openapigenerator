@@ -24,62 +24,8 @@ func WriteSchemas() {
 			log.Debug("    Prepare field ", f, ": ", ftype, ":", newtype, " //", fsetting.ChildItemType)
 			fsetting.FieldType = newtype
 			schemaobj.FieldList[f] = fsetting
-			// x := &schemaobj.FieldList
 
-			// = schemaobj.FieldList[f].FieldType
-			// schemaobj.FieldList[f].FieldType = newtype
-			// fieldobj.FieldType = newtype
 		}
-		// props := setting.Value.Properties
-		// log.Info("Prepare Schema: ", modelname, "(", schemaname, ")", ": ", setting.Value.Type)
-		// if setting.Value.Type == "object" {
-		// 	allfields := []helper.Model_Field{}
-		// 	for field, fieldsetting := range props {
-		// 		// fmt.Println("Schema:", schemaname, field)
-		// 		examplestr := ""
-		// 		if fieldsetting.Value.Example == nil {
-		// 			if fieldsetting.Value.Type == "object" && fieldsetting.Value.Items.Ref == "" {
-		// 				log.Fatal("Schema " + schemaname + "." + field + " type=object, but not ref to another schema")
-		// 			}
-
-		// 			if fieldsetting.Value.Type != "" && fieldsetting.Value.Type != "object" && fieldsetting.Value.Type != "array" {
-		// 				log.Fatal("Undefine sample data in schema '" + schemaname + "' field '" + field + "'")
-		// 			}
-		// 			// fmt.Println("field ", field, fieldsetting.Value.Items)
-		// 			if fieldsetting.Value.Items.Ref != "" {
-		// 				fmt.Println(field, " == ", fieldsetting.Value.Items.Ref)
-		// 				examplestr = helper.GetModelNameFromRef(fieldsetting.Value.Items.Ref) + "{}"
-		// 				if fieldsetting.Value.Type == "array" {
-		// 					examplestr = "[]" + examplestr
-		// 				}
-
-		// 			}
-
-		// 		} else {
-		// 			examplestr = fmt.Sprintf("%#v", fieldsetting.Value.Example)
-		// 			examplestr = strings.Replace(examplestr, "interface {}", "string", -1)
-		// 		}
-		// 		fieldname := helper.UpperCaseFirst(field)
-		// 		fieldtype := convGoLangType(*fieldsetting.Value)
-		// 		log.Debug("    ", fieldname, ", ", fieldtype)
-		// 		fieldobj := helper.Model_Field{
-		// 			ModelName:    modelname,
-		// 			FieldName:    fieldname,
-		// 			FieldType:    fieldtype,
-		// 			ApiFieldName: field,
-		// 			Description:  fieldsetting.Value.Description,
-		// 			Example:      examplestr,
-		// 		}
-		// 		allfields = append(allfields, fieldobj)
-		// 		// _, _ = field, fieldtype
-		// 	}
-		// 	schemaobj.FieldList = allfields
-		// } else if setting.Value.Type == "array" { //array no need new model
-		// 	continue
-		// } else {
-
-		// }
-		// _, _, _, _ = schemaname, modelname, interfacename, props
 
 		var writebuffer bytes.Buffer
 		filename := "Z" + schemaobj.ModelName + ".go"

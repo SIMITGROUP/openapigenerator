@@ -1,3 +1,4 @@
+// auto generate by generator
 package test
 import (
 	"fmt"

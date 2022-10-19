@@ -33,6 +33,9 @@ func main() {
 	helper.Proj.BuildLang = BuildLang
 	helper.Proj.GenerateFolder = GenerateFolder
 	helper.Proj.ProjectName = ProjectName
+	helper.Proj.AllEnvVars = map[string]string{
+		"API_LISTEN": helper.Proj.ListenAddress,
+	}
 	if OverrideFile == "true" {
 		helper.Proj.OverrideHandle = true
 	} else {

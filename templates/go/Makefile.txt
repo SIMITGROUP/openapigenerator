@@ -1,5 +1,6 @@
+# auto generate by generator
 build:
-	go get .	
+	go mod tidy
 	go build .
 	@echo "Build successfully"
 unittest:

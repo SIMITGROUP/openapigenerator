@@ -147,20 +147,34 @@ func GetRequestBodySetting(methodtype string, path string, op *openapi3.Operatio
 	//op.RequestBody.Ref
 	if op.RequestBody != nil {
 
-		content := op.RequestBody.Value.Content
-		if content != nil && content.Get("application/json").Schema.Ref != "" {
-			ref := content.Get("application/json").Schema.Ref
-			log.Info("        request body schema name: ", ref)
+		content := op.RequestBody.Value
 
-			requestBody.Description = op.RequestBody.Value.Description
-			requestBody.Required = op.RequestBody.Value.Required
-			schemaname := GetTypeNameFromRef(ref)
-
-			requestBody.RequestSchema = AllSchemas[schemaname]
-
-		} else {
-			log.Fatal("        request body undefine $ref")
+		if content == nil {
+			log.Fatal("        request body empty")
 		}
+		if content.Content == nil {
+			log.Fatal("        request body undefine content")
+		}
+		defaultcontenttype := ""
+		for contenttype, contentsetting := range content.Content {
+			log.Debug("          prepare: ", contenttype)
+			contentref := contentsetting.Schema.Ref
+			if contentref == "" {
+				log.Fatal("        undefined response schema $ref")
+			}
+			defaultcontenttype = contenttype
+		}
+		//&& content.Get("application/json").Schema.Ref != ""
+		ref := content.Content.Get(defaultcontenttype).Schema.Ref
+		if ref == "" {
+			log.Info("            request body schema name: ", ref)
+		}
+
+		requestBody.Description = op.RequestBody.Value.Description
+		requestBody.Required = op.RequestBody.Value.Required
+		schemaname := GetTypeNameFromRef(ref)
+
+		requestBody.RequestSchema = AllSchemas[schemaname]
 
 	} // else {
 	// 	log.Fatal("        undefined response schema $ref")

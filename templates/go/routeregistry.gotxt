@@ -1,3 +1,4 @@
+// auto generate by generator
 package openapi
 
 import "github.com/gin-gonic/gin"

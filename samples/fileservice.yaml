@@ -1,0 +1,170 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'simbiz.cloud/userapi'
+  description: User services
+paths:
+  /:
+    get:
+      summary: welcome
+      description: show api msg
+      operationId: GetWelcomeMsg
+      responses:
+        '200':
+          description: successfully show welcome msg
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    
+  /stat/{bucket}:
+    get:
+      summary: Get statistic
+      description: get storage usage state, add this code => data.Total, data.Usage = GetBucketUsage(bucket)
+      operationId: GetBucketStatistic
+      parameters:
+        - $ref: '#/components/parameters/BucketName'
+      responses:
+        '200':
+          description: successfully get list of object
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/BucketStatistic'
+  /list/{bucket}:
+    get:
+      summary: list container/folder/directory/buckets
+      description: get list of items in folders, buckets
+      operationId: GetListOfObjects
+      parameters:
+        - $ref: '#/components/parameters/BucketName'
+      responses:
+        '200':
+          description: successfully get list of object
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /file/{bucket}:
+    get:
+      summary: get resource 
+      description: Get new resource file => data, _ = GetResource(bucket, resourcekey)
+      operationId: GetFile
+      parameters:
+        - $ref: '#/components/parameters/BucketName'
+        - $ref: '#/components/parameters/Resourcekey'
+      responses:
+        '200':
+          description: access resource file
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/File'
+    post:
+      summary: upload resource
+      description: upload a resource file => 
+      operationId: uploadFile
+      parameters:
+        - $ref: '#/components/parameters/BucketName'
+        - $ref: '#/components/parameters/Resourcekey'
+      requestBody:
+        description: upload file content in binary form
+        required: true
+        content:        
+          application/octet-stream:
+            schema:
+              $ref: '#/components/schemas/UploadFile'
+      responses:
+        '200':
+          description: upload resource file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /image/{bucket}:
+    get:
+      summary: get resource image
+      description: create new resource image, auto resize according size => data, _ = GetResource(bucket, resourcekey) \n c.Header("Content-Type", getContentType(data))
+      operationId: GetImage
+      parameters:
+        - $ref: '#/components/parameters/BucketName'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Resourcekey'
+        
+      responses:
+        '200':
+          description: access resource image
+          content:
+            image/png:
+              schema:
+                $ref: '#/components/schemas/Image'
+
+
+components:
+  parameters:
+    BucketName:
+      name: bucket
+      in: path
+      schema:
+        type: string
+        example: bucket1
+    Size:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        example: 60
+    Resourcekey:
+      name: resourcekey
+      in: query
+      required: true
+      schema:
+        type: string
+        example: xyzcdeabc
+  schemas:
+    UploadFile:
+      type: string
+      format: binary
+
+    BucketStatistic:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+          example: 0
+        usage:
+          type: integer
+          format: int64
+          example: 0
+        apivesion:
+          type: string
+          example: 1.0.0
+    Image:
+      type: string
+      format: binary
+      description: image
+    File:
+      type: string
+      format: binary
+      description: file
+    Message:
+      type: object
+      properties:
+        version:
+          type: string
+          example: 1.0.0
+        msg:
+          type: string
+          example: Undefine resource   
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    AdminApiKey:
+      type: apiKey
+      in: header
+      name: X-ADMIN-API_KEY

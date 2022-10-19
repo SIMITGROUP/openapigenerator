@@ -9,12 +9,14 @@ type Model_ProjectSetting struct {
 	BuildLang      string
 	OverrideHandle bool
 	InitFunctions  []string
+	AllEnvVars     map[string]string
 }
 
 // schema infos
 type Model_SchemaSetting struct {
 	ModelName     string //schema1 => Model_schema1
 	ModelType     string //object,array
+	ModelFormat   string //format if type = string, example date, binary
 	InterfaceName string //Interface_schema1
 	Description   string
 	FieldList     map[string]Model_Field

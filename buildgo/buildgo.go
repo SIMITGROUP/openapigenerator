@@ -22,7 +22,6 @@ func Generate(doc *openapi3.T) {
 
 func WriteInfra() {
 	overridefile := helper.Proj.OverrideHandle
-
 	//prepare main
 	//if file exists, but no override flag
 	if helper.CheckFileExists("", "main.go") && overridefile == false {
@@ -64,5 +63,14 @@ func WriteInfra() {
 	servertemplate, _ = servertemplate.Parse(serversrc)
 	_ = servertemplate.Execute(&serverbytes, helper.Proj)
 	helper.WriteFile("openapi", "ZServer.go", serverbytes.String())
+
+	//prepare .env
+	var envvarbytes bytes.Buffer
+	envvarfilepath := "./templates/go/dot.env"
+	dotenvsrc := helper.ReadFile(envvarfilepath)
+	envvartemplate := template.New("envvar")
+	envvartemplate, _ = envvartemplate.Parse(dotenvsrc)
+	_ = envvartemplate.Execute(&envvarbytes, helper.Proj.AllEnvVars)
+	helper.WriteFile("", ".env", envvarbytes.String())
 
 }
