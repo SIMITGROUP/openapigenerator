@@ -105,6 +105,7 @@ components:
     BucketName:
       name: bucket
       in: path
+      required: true
       schema:
         type: string
         example: bucket1
