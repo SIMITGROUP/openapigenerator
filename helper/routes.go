@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -216,15 +217,18 @@ func GetParameters(methodtype string, path string, op *openapi3.Operation) map[s
 		if VerifyKeyname(pname) == false {
 			log.Fatal("Invalid parameter ", pname, ", it should only consist character a-z without special character and spacing")
 		}
-		log.Info("            ", pname, ": ", ptype,
-			", IN: ", pstorein,
-			", Required: ", prequired)
 
+		examplestr := fmt.Sprintf("%v", psetting.Value.Schema.Value.Example)
+
+		log.Warn("            ", pname, ": ", ptype,
+			", IN: ", pstorein,
+			", Required: ", prequired, ", example: ", examplestr)
 		paras[psetting.Value.Name] = Model_Parameter{
 			StoreIn:         psetting.Value.In,
 			Required:        psetting.Value.Required,
 			Deprecated:      psetting.Value.Deprecated,
 			AllowEmptyValue: psetting.Value.AllowEmptyValue,
+			Example:         examplestr,
 		}
 		// } else {
 		// psetting.Value

@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Test{{.TestName}}(t *testing.T){
+func {{.TestName}}(t *testing.T){
 	requestURL := fmt.Sprintf("%v%v", "{{.RequestServer}}","{{.RequestPath}}")
 	req, err := http.NewRequest("{{.RequestMethod}}", requestURL, nil)
 	req.Header.Set("Accept", "application/json")

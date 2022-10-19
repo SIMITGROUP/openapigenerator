@@ -87,6 +87,7 @@ type Model_Parameter struct {
 	Required        bool
 	Deprecated      bool
 	AllowEmptyValue bool
+	Example         string
 }
 
 // openapi3.SecurityScheme
