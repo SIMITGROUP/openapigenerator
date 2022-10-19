@@ -3,6 +3,9 @@ info:
   version: '1.0.0'
   title: 'simbiz.cloud/userapi'
   description: User services
+servers:
+  - url: http://localhost:9000
+    description: development server
 paths:
   /:
     get:

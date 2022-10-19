@@ -3,6 +3,9 @@ info:
   version: '1.0.0'
   title: 'SIMIT User API'
   description: It is microservices connect to core system, provide authentication service at SSO, access database profiles, and provide others useful user information
+servers:
+  - url: http://localhost:9000
+    description: development server
 paths:
   /:
     get:

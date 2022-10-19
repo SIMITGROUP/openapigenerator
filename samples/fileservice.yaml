@@ -3,20 +3,10 @@ info:
   version: '1.0.0'
   title: 'simbiz.cloud/userapi'
   description: User services
-paths:
-  /:
-    get:
-      summary: welcome
-      description: show api msg
-      operationId: GetWelcomeMsg
-      responses:
-        '200':
-          description: successfully show welcome msg
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-    
+servers:
+  - url: http://localhost:9000
+    description: development server
+paths:    
   /stat/{bucket}:
     get:
       summary: Get statistic
@@ -169,3 +159,5 @@ components:
       type: apiKey
       in: header
       name: X-ADMIN-API_KEY
+security:
+  - ApiKey: []
