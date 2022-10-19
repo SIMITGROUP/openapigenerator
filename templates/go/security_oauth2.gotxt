@@ -7,11 +7,10 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
+	"os"
 	oidc "github.com/coreos/go-oidc"
 	"github.com/dgrijalva/jwt-go"
-	"gitlab.com/avarf/getenvs"
-
+	"github.com/joho/godotenv"
 	// oidc "github.com/HailorS/go-oidc"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -34,11 +33,15 @@ type SSOTokenInfo struct {
 }
 
 func {{.SchemeName}}_prepare() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
-	{{.SchemeName}}_configURL = getenvs.GetEnvString("{{.SchemeName}}_configURL", "")
-	{{.SchemeName}}_redirectURL = getenvs.GetEnvString("{{.SchemeName}}_redirectURL", "")
-	{{.SchemeName}}_clientID = getenvs.GetEnvString("{{.SchemeName}}_clientID", "")
-	{{.SchemeName}}_clientSecret = getenvs.GetEnvString("{{.SchemeName}}_clientSecret", "")
+	{{.SchemeName}}_configURL = os.Getenv("{{.SchemeName}}_configURL")
+	{{.SchemeName}}_redirectURL = os.Getenv("{{.SchemeName}}_redirectURL")
+	{{.SchemeName}}_clientID = os.Getenv("{{.SchemeName}}_clientID")
+	{{.SchemeName}}_clientSecret = os.Getenv("{{.SchemeName}}_clientSecret")
 	{{.SchemeName}}_oidcConfig.ClientID= {{.SchemeName}}_clientID
 
 	configURL := {{.SchemeName}}_configURL

@@ -71,6 +71,6 @@ func WriteInfra() {
 	envvartemplate := template.New("envvar")
 	envvartemplate, _ = envvartemplate.Parse(dotenvsrc)
 	_ = envvartemplate.Execute(&envvarbytes, helper.Proj.AllEnvVars)
-	helper.WriteFile("", ".env", envvarbytes.String())
+	helper.WriteFile("", ".env.default", envvarbytes.String())
 
 }

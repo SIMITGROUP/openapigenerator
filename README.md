@@ -32,6 +32,9 @@ make
 use `--override="false"` if you wish to regenerate code without modify ```main.go``` and ```routehandle.go```
 
 3. use your rest api
+    3.1 copy openapiserverfolder/.env.default to .env
+    3.2 fill in suitable info into .env
+    3.3 run below command
 ```bash
 cd ../openapiserverfolder
 make
