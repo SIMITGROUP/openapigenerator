@@ -29,6 +29,7 @@ func GenerateTestFuncName(method string, path string) (funcname string) {
 	for _, partstr := range patharr {
 		partstr = strings.Replace(partstr, "{", "", -1)
 		partstr = strings.Replace(partstr, "}", "", -1)
+		partstr = strings.Replace(partstr, "-", "", -1)
 		partstr = strings.Replace(partstr, ":", "", -1)
 		pathstr = pathstr + helper.UpperCaseFirst(partstr)
 	}
@@ -68,7 +69,7 @@ func WriteTest() {
 			srcsettings["RequestServer"] = getTestServer()
 			srcsettings["RequestMethod"] = method
 			srcsettings["RequestPath"] = newpath
-
+			srcsettings["ContentType"] = reqsetting.RequestHandle.ContentType
 			testfilename := functionname + "_test.go"
 			srcpath := "./templates/go/test.gotxt"
 			src := helper.ReadFile(srcpath)
