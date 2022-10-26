@@ -27,7 +27,7 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 cd openapigenerator
 make
 
-./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"  --lang="go" --overridehandle="true"
+./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"  --lang="go" --override="true"
 ```
 use `--override="false"` if you wish to regenerate code without modify ```main.go``` and ```routehandle.go```
 
