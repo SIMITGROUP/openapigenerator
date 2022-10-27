@@ -15,7 +15,7 @@ type {{ .ModelName}} {{if eq .ModelType "object"}}struct{
 
 type {{.InterfaceName}} interface{
 	{{ range .FieldList}}
-	Get{{.FieldName}}()
+	Get{{.FieldName}}() {{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}}
 	Set{{.FieldName}}({{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}}){{end}}
 	Validate() error
 	GetExamples() {{.ModelName}}
@@ -26,7 +26,7 @@ type {{.InterfaceName}} interface{
 func (obj {{.ModelName}}) Get{{.FieldName}}() {{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}}{
 	return obj.{{.FieldName}}
 }
-func (obj {{.ModelName}}) Set{{.FieldName}}(val {{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}}){
+func (obj *{{.ModelName}}) Set{{.FieldName}}(val {{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}}){
 	obj.{{.FieldName}}= val
 }{{end}}
 
