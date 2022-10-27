@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"flag"
 
 	log "github.com/sirupsen/logrus"
@@ -19,6 +20,9 @@ var ListenAddress = ""
 var BuildLang = ""
 var OverrideFile = "false"
 
+//go:embed templates/*
+var embedfs embed.FS
+
 func main() {
 	flag.StringVar(&BuildLang, "lang", "go", "Build language (go/php)")
 	flag.StringVar(&GenerateFolder, "targetfolder", "../openapiserverfolder", "Generate Folder to which folder")
@@ -26,8 +30,9 @@ func main() {
 	flag.StringVar(&ApiFile, "apifile", "spec.yaml", "openapi v3 yaml file")
 	flag.StringVar(&ListenAddress, "listen", ":8982", "listen to which address, default :8982")
 	flag.StringVar(&OverrideFile, "override", "false", "Override main.go and routehandle.go if exists, default false")
-
 	flag.Parse()
+
+	helper.SetEmbedFiles(embedfs)
 	helper.Proj.ApiFile = ApiFile
 	helper.Proj.ListenAddress = ListenAddress
 	helper.Proj.BuildLang = BuildLang
@@ -41,6 +46,7 @@ func main() {
 	} else {
 		helper.Proj.OverrideHandle = false
 	}
+
 	log.SetLevel(log.DebugLevel)
 	GenerateCode(ApiFile)
 

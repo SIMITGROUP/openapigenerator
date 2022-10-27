@@ -27,7 +27,7 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 cd openapigenerator
 make
 
-./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"  --lang="go" --overridehandle="true"
+./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"  --lang="go"  --override="true"
 ```
 use `--override="false"` if you wish to regenerate code without modify ```main.go``` and ```routehandle.go```
 
@@ -133,3 +133,46 @@ goal indipendent microservices  for keycloak
 4. add support for module folder, inside generate dummy methods
     - dummy module
 5. fix unit test code and prepare samples
+
+
+
+
+todo:
+test
+    1. unit test prepare data type mapping response
+    2. unit test status mapping
+    3. unit test prepare request samples
+    4. unit test base on server setting, or base on cli option
+    
+functions
+    easy        
+        8. refresh token how to know refresh link => define refresh url
+    medium
+        4. application choose yaml's accept mime type
+        6. verification of jwt token need more improvement
+        6. touch up securityscheme setting not complete use
+        8. support examples
+    hard
+        5. make override option base on analyse file content instead hard code
+        5. components support reponses, examples, requestBodies, callbacks
+        7. try generator client 
+    
+    
+    DONE:    
+        7. user service break oauth into 1 level deeper
+        8. use embed to embed resource file
+    
+    
+
+development
+1. pick suitable db driver and query builder
+2. prepare db scheme
+3. prepare structure of resources
+4. add tools
+    string process
+    db process
+    cache process
+    
+
+
+8. 

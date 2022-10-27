@@ -59,6 +59,11 @@ type Model_RequestSetting struct {
 	// Parameters 	datatype	// route registry seems not required
 }
 
+type Model_Responses struct {
+	ContentType    string
+	ResponseSchema Model_SchemaSetting
+}
+
 // routing handles info
 type Model_RequestHandle struct {
 	HandleName     string

@@ -48,17 +48,6 @@ func getTestServer() string {
 func WriteTest() {
 	routesettings := helper.AllRoutes
 	for path, pathsetting := range routesettings {
-		//convert parameter in path to value, like /user/{user} => /user/myuid
-		// newpath := helper.ConvertPathParasCurlyToColon(path)
-		// flattenpath := strings.Replace(path, "/", "_", -1)
-		// flattenpath = strings.Replace(flattenpath, ":", "_", -1)
-		// flattenpath = strings.Replace(flattenpath, "{", "", -1)
-		// flattenpath = strings.Replace(flattenpath, "}", "", -1)
-		// flattenpath = strings.Replace(flattenpath, "#", "_", -1)
-		// flattenpath = strings.Replace(flattenpath, ".", "_", -1)
-		// flattenpath = strings.Replace(flattenpath, "-", "_", -1)
-		//create test, 1 request method 1 file
-
 		for method, reqsetting := range pathsetting.RequestSettings {
 			newpath := GenerateSamplePath(path, reqsetting.RequestHandle.Parameters)
 			var writebytes bytes.Buffer

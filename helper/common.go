@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"embed"
 	"errors"
 	"fmt"
 	"os"
@@ -12,6 +13,11 @@ import (
 	"golang.org/x/text/language"
 )
 
+var EmbedFiles embed.FS
+
+func SetEmbedFiles(file embed.FS) {
+	EmbedFiles = file
+}
 func UpperCaseFirst(name string) string {
 	newname := cases.Title(language.Und).String(name)
 	return newname
@@ -20,11 +26,20 @@ func LowerCaseFirst(name string) string {
 	newname := cases.Lower(language.Und).String(name)
 	return newname
 }
-
 func ReadFile(filename string) string {
-	data, _ := os.ReadFile(filename)
+
+	// data, err := Box.FindString("|")
+	// Box.ResolutionDir = filename
+
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// data, _ := os.ReadFile(filename)
+	data, _ := EmbedFiles.ReadFile(filename)
+
 	return string(data)
 }
+
 func CheckFileExists(folder string, filename string) bool {
 	targetfile := Proj.GenerateFolder
 	if folder == "" {

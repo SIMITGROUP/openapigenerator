@@ -22,6 +22,7 @@ func Generate(doc *openapi3.T) {
 
 func WriteInfra() {
 	overridefile := helper.Proj.OverrideHandle
+
 	//prepare main
 	//if file exists, but no override flag
 	if helper.CheckFileExists("", "main.go") && overridefile == false {
