@@ -14,12 +14,12 @@ type {{.ModelName}} struct {
 	token string
 }
 type {{.InterfaceName}} interface {
-	 {{.MethodName}}() gin.HandlerFunc 
+	{{.MethodName}}() gin.HandlerFunc 
 }
 func (obj {{.ModelName}}) {{.MethodName}}() gin.HandlerFunc {
 	return {{.HandleName}}	
 }
-var  {{.Name}}  {{.InterfaceName}}  ={{.ModelName}}{}
+var {{.Name}} {{.InterfaceName}} = {{.ModelName}}{}
 
 
 {{if eq .SecurityScheme "basic"}}

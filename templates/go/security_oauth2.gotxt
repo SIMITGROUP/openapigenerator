@@ -5,33 +5,48 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
-	"os"
+
 	oidc "github.com/coreos/go-oidc"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
+
 	// oidc "github.com/HailorS/go-oidc"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )
-//https://<host-name>/auth/realms/<realm-name>
+
+// From .env
+//
+// https://<host-name>/auth/realms/<realm-name>
 var {{.SchemeName}}_configURL = ""
-//https://<my-app-url>/<sso-callback-url>
+
+// From .env
+//
+// https://<my-app-url>/<sso-callback-url>
 var {{.SchemeName}}_redirectURL = ""
+
+// From .env
 var {{.SchemeName}}_clientID = ""
+
+// From .env
 var {{.SchemeName}}_clientSecret = ""
+
 var {{.SchemeName}}_Config oauth2.Config
 var {{.SchemeName}}_state = "{{.SchemeName}}_state"
 var {{.SchemeName}}_ctx = context.Background()
 var {{.SchemeName}}_oidcConfig = &oidc.Config{}
-var {{.SchemeName}}_provider  *oidc.Provider
+var {{.SchemeName}}_provider *oidc.Provider
+
 type SSOTokenInfo struct {
 	OAuth2Token   *oauth2.Token
 	IDTokenClaims *json.RawMessage // ID Token payload is just JSON.
 }
 
+// Initialize oauth2
 func {{.SchemeName}}_prepare() {
 	err := godotenv.Load()
 	if err != nil {
@@ -42,7 +57,7 @@ func {{.SchemeName}}_prepare() {
 	{{.SchemeName}}_redirectURL = os.Getenv("{{.SchemeName}}_redirectURL")
 	{{.SchemeName}}_clientID = os.Getenv("{{.SchemeName}}_clientID")
 	{{.SchemeName}}_clientSecret = os.Getenv("{{.SchemeName}}_clientSecret")
-	{{.SchemeName}}_oidcConfig.ClientID= {{.SchemeName}}_clientID
+	{{.SchemeName}}_oidcConfig.ClientID = {{.SchemeName}}_clientID
 
 	configURL := {{.SchemeName}}_configURL
 	redirectURL := {{.SchemeName}}_redirectURL
@@ -81,27 +96,27 @@ func {{.SchemeName}}_prepare() {
 	verifier := {{.SchemeName}}_provider.Verifier({{.SchemeName}}_oidcConfig)
 	fmt.Println(verifier)
 }
+
 func {{.SchemeName}}_GetLoginURL() string {
 	return {{.SchemeName}}_Config.AuthCodeURL({{.SchemeName}}_state)
 }
 
-//redirect to sso login page
-func {{.SchemeName}}_login(c *gin.Context){
-	c.Header("Location", {{.SchemeName}}_GetLoginURL())
-	c.String(307, "")	
+// redirect to sso login page
+func {{.SchemeName}}_login(c *gin.Context) {
+	c.Redirect(307, {{.SchemeName}}_GetLoginURL())
 }
 
-//logout, delete cookies, and redirect to login form again
-func {{.SchemeName}}_logout(c *gin.Context)  {
-	logouturl:=c.Request.RequestURI
-	arrstr:=strings.Split({{.SchemeName}}_redirectURL, "/")
-	baseurl:= 	arrstr[0]+"//"+arrstr[2]
-	result := Oauth2_configURL + "/protocol/openid-connect/logout?redirect_uri=" + baseurl
-	c.Header("Location", result)
+// logout, delete cookies, and redirect to login form again
+func {{.SchemeName}}_logout(c *gin.Context) {
+	logouturl := c.Request.RequestURI
+	arrstr := strings.Split({{.SchemeName}}_redirectURL, "/")
+	baseurl := arrstr[0] + "//" + arrstr[2]
+	result := {{.SchemeName}}_configURL + "/protocol/openid-connect/logout?redirect_uri=" + baseurl
+
 	c.SetCookie("access_token", "", -1, "/", "", true, true)
 	c.SetCookie("refresh_token", "", -1, logouturl, "", true, true)
-	c.String(307, "")
-	
+
+	c.Redirect(307, result)
 }
 
 func {{.SchemeName}}_Auth(c *gin.Context) {
@@ -125,8 +140,8 @@ func {{.SchemeName}}_Auth(c *gin.Context) {
 		})
 
 		claims, success := token.Claims.(jwt.MapClaims)
-		if success && claims["iss"] == Oauth2_configURL {
-			for _, scopename := range Oauth2_Config.Scopes {
+		if success && claims["iss"] == {{.SchemeName}}_configURL {
+			for _, scopename := range {{.SchemeName}}_Config.Scopes {
 				c.Set(scopename, claims[scopename])
 			}
 			c.Next()
@@ -147,28 +162,27 @@ func {{.SchemeName}}_Auth(c *gin.Context) {
 	}
 }
 
-
-func {{.SchemeName}}_callback(c *gin.Context)  {
+func {{.SchemeName}}_callback(c *gin.Context) {
 	// provider, err := oidc.NewProvider({{.SchemeName}}_ctx, {{.SchemeName}}_configURL)
 	r := c.Request
-	requeststate:=r.URL.Query().Get("state")
+	requeststate := r.URL.Query().Get("state")
 	if requeststate != {{.SchemeName}}_state {
 		// http.Error(w, "state did not match", http.StatusBadRequest)
 		// return ""
-		log.Warn( "state did not match: ",requeststate)
+		log.Warn("state did not match: ", requeststate)
 	}
 
 	token, err := {{.SchemeName}}_Config.Exchange({{.SchemeName}}_ctx, r.URL.Query().Get("code"))
 	if err != nil {
-		log.Warn( "Failed to exchange token: "+err.Error())
+		log.Warn("Failed to exchange token: " + err.Error())
 	}
 	rawIDToken, ok := token.Extra("id_token").(string)
 	if !ok {
-		log.Warn( "No id_token field in oauth2 token.")		
+		log.Warn("No id_token field in oauth2 token.")
 	}
 	idToken, err := {{.SchemeName}}_provider.Verifier({{.SchemeName}}_oidcConfig).Verify({{.SchemeName}}_ctx, rawIDToken)
 	if err != nil {
-		log.Warn( "Failed to verify ID Token: "+err.Error())				
+		log.Warn("Failed to verify ID Token: " + err.Error())
 	}
 
 	resp := SSOTokenInfo{
@@ -177,13 +191,13 @@ func {{.SchemeName}}_callback(c *gin.Context)  {
 	}
 
 	if err := idToken.Claims(&resp.IDTokenClaims); err != nil {
-		log.Warn( err.Error())						
+		log.Warn(err.Error())
 	}
 	data, err := json.MarshalIndent(resp, "", "    ")
 	if err != nil {
-		log.Warn( err.Error())						
+		log.Warn(err.Error())
 	}
-	_ = data	
+	_ = data
 	// w.Write(data)
 	accesstoken := resp.OAuth2Token.AccessToken
 	refreshtoken := resp.OAuth2Token.RefreshToken
@@ -192,31 +206,29 @@ func {{.SchemeName}}_callback(c *gin.Context)  {
 	accesstokenexpired := int(tokenexpired - startTime)
 	refreshtokenexpired := 24 * 60 * 60
 	c.Header("Content-Type", "text/plain")
-	c.Header("Location", "/")
 	c.SetCookie("access_token", accesstoken, accesstokenexpired, "/", "", true, true)
 	c.SetCookie("refresh_token", refreshtoken, refreshtokenexpired, "/oauth2/sso-refreshtoken", "", true, true)
-	c.String(307, "")
 
-	
+	c.Redirect(307, "/")
 }
-func {{.SchemeName}}_getrefreshtoken(refreshToken string) (*oauth2.Token,error) {
+
+func {{.SchemeName}}_getrefreshtoken(refreshToken string) (*oauth2.Token, error) {
 	token := new(oauth2.Token)
 	token.RefreshToken = refreshToken
 	token.Expiry = time.Now()
 
 	// TokenSource will refresh the token if needed (which is likely in this
 
-	tokensource := Oauth2_Config.TokenSource(oauth2.NoContext, token)
+	tokensource := {{.SchemeName}}_Config.TokenSource(oauth2.NoContext, token)
 	return tokensource.Token()
-	
-	
-	
+
 }
-func {{.SchemeName}}_refreshtoken(c *gin.Context){
+
+func {{.SchemeName}}_refreshtoken(c *gin.Context) {
 	refreshToken, err := c.Cookie("refresh_token")
 	errmsg := ""
 	if err == nil {
-		newtoken,tokenerr := {{.SchemeName}}_getrefreshtoken(refreshToken)
+		newtoken, tokenerr := {{.SchemeName}}_getrefreshtoken(refreshToken)
 		if tokenerr == nil {
 			accesstoken := newtoken.AccessToken
 			refreshtoken := newtoken.RefreshToken
