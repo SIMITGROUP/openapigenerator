@@ -75,6 +75,11 @@ make
     Callbacks
     Headers
     Links
+5. Schema extends another Schema
+6. Array of Object Schema
+7. Different example but same schema (Example is put at response / requestBody)
+8. Header name Xxx-Xxx-Xxx variable convert to xxx_Xxx_Xxx in code.
+9. enum
 
 # Rules while using this project
 1. Not support  ***oneOf, anyOf, allOf, not ***
