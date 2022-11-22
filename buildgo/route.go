@@ -26,7 +26,7 @@ func WriteRoutes() {
 	// routesettings["sss"].Path
 	// routesettings["sss"].RequestSettings
 	var routebytes bytes.Buffer
-	routepath := "./templates/go/routeregistry.gotxt"
+	routepath := "templates/go/routeregistry.gotxt"
 	routesrc := helper.ReadFile(routepath)
 	routetemplate := template.New("route")
 	routetemplate, _ = routetemplate.Parse(routesrc)

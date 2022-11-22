@@ -35,8 +35,12 @@ func ReadFile(filename string) string {
 	// 	log.Fatal(err)
 	// }
 	// data, _ := os.ReadFile(filename)
+	// entries, err := EmbedFiles.ReadDir("templates/go")
+	// fmt.Println(entries, err)
 	data, _ := EmbedFiles.ReadFile(filename)
 
+	// fmt.Println("filename: ", filename)
+	// fmt.Println("    content", string(data))
 	return string(data)
 }
 

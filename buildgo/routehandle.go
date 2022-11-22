@@ -47,7 +47,7 @@ func WriteHandles() bool {
 
 	var routebytes bytes.Buffer
 
-	routepath := "./templates/go/routehandle.gotxt"
+	routepath := "templates/go/routehandle.gotxt"
 	routesrc := helper.ReadFile(routepath)
 	routetemplate := template.New("route")
 	routetemplate, _ = routetemplate.Parse(routesrc)

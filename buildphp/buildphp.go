@@ -22,7 +22,7 @@ func Generate(doc *openapi3.T) {
 func WriteInfra() {
 	// prepare main
 	var mainbytes bytes.Buffer
-	mainfilepath := "./templates/php/index.phptxt"
+	mainfilepath := "templates/php/index.phptxt"
 	mainsrc := helper.ReadFile(mainfilepath)
 	maintemplate := template.New("main")
 	maintemplate, _ = maintemplate.Parse(mainsrc)
@@ -33,7 +33,7 @@ func WriteInfra() {
 
 	// prepare coposer
 	var composerbytes bytes.Buffer
-	composerfilepath := "./templates/php/composer.json"
+	composerfilepath := "templates/php/composer.json"
 	composersrc := helper.ReadFile(composerfilepath)
 	composertemplate := template.New("composer")
 	composertemplate, _ = composertemplate.Parse(composersrc)
@@ -42,7 +42,7 @@ func WriteInfra() {
 
 	// // prepare Makefile
 	// var makebytes bytes.Buffer
-	// makefilepath := "./templates/go/Makefile.txt"
+	// makefilepath := "templates/go/Makefile.txt"
 	// makesrc := helper.ReadFile(makefilepath)
 	// maketemplate := template.New("makefile")
 	// maketemplate, _ = maketemplate.Parse(makesrc)
@@ -52,7 +52,7 @@ func WriteInfra() {
 	// //prepare openapi/server.go
 
 	// var serverbytes bytes.Buffer
-	// serverfilepath := "./templates/go/server.gotxt"
+	// serverfilepath := "templates/go/server.gotxt"
 	// serversrc := helper.ReadFile(serverfilepath)
 	// servertemplate := template.New("server")
 	// servertemplate, _ = servertemplate.Parse(serversrc)

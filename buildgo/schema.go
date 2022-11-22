@@ -29,7 +29,7 @@ func WriteSchemas() {
 
 		var writebuffer bytes.Buffer
 		filename := "Z" + schemaobj.ModelName + ".go"
-		schemapath := "./templates/go/schema.gotxt"
+		schemapath := "templates/go/schema.gotxt"
 		schemasrc := helper.ReadFile(schemapath)
 		schematemplate := template.New("schema")
 		schematemplate, _ = schematemplate.Parse(schemasrc)

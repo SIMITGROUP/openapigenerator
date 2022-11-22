@@ -60,7 +60,7 @@ func WriteTest() {
 			srcsettings["RequestPath"] = newpath
 			srcsettings["ContentType"] = reqsetting.RequestHandle.ContentType
 			testfilename := functionname + "_test.go"
-			srcpath := "./templates/go/test.gotxt"
+			srcpath := "templates/go/test.gotxt"
 			src := helper.ReadFile(srcpath)
 			srctemplate := template.New("test")
 			srctemplate, _ = srctemplate.Parse(src)

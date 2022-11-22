@@ -29,7 +29,7 @@ func WriteInfra() {
 		log.Warn("main.go exists, skip")
 	} else {
 		var mainbytes bytes.Buffer
-		mainfilepath := "./templates/go/main.gotxt"
+		mainfilepath := "templates/go/main.gotxt"
 		mainsrc := helper.ReadFile(mainfilepath)
 		maintemplate := template.New("main")
 		maintemplate, _ = maintemplate.Parse(mainsrc)
@@ -39,7 +39,7 @@ func WriteInfra() {
 
 	//prepare go.mod
 	var gomodbytes bytes.Buffer
-	gomodfilepath := "./templates/go/go.modtxt"
+	gomodfilepath := "templates/go/go.modtxt"
 	gosrc := helper.ReadFile(gomodfilepath)
 	gotemplate := template.New("gomod")
 	gotemplate, _ = gotemplate.Parse(gosrc)
@@ -48,7 +48,7 @@ func WriteInfra() {
 
 	//prepare Makefile
 	var makebytes bytes.Buffer
-	makefilepath := "./templates/go/Makefile.txt"
+	makefilepath := "templates/go/Makefile.txt"
 	makesrc := helper.ReadFile(makefilepath)
 	maketemplate := template.New("makefile")
 	maketemplate, _ = maketemplate.Parse(makesrc)
@@ -58,7 +58,7 @@ func WriteInfra() {
 	//prepare openapi/server.go
 
 	var serverbytes bytes.Buffer
-	serverfilepath := "./templates/go/server.gotxt"
+	serverfilepath := "templates/go/server.gotxt"
 	serversrc := helper.ReadFile(serverfilepath)
 	servertemplate := template.New("server")
 	servertemplate, _ = servertemplate.Parse(serversrc)
@@ -67,7 +67,7 @@ func WriteInfra() {
 
 	//prepare .env
 	var envvarbytes bytes.Buffer
-	envvarfilepath := "./templates/go/dot.env"
+	envvarfilepath := "templates/go/dot.env"
 	dotenvsrc := helper.ReadFile(envvarfilepath)
 	envvartemplate := template.New("envvar")
 	envvartemplate, _ = envvartemplate.Parse(dotenvsrc)

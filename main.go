@@ -20,7 +20,7 @@ var ListenAddress = ""
 var BuildLang = ""
 var OverrideFile = "false"
 
-//go:embed templates/*
+//go:embed templates
 var embedfs embed.FS
 
 func main() {
