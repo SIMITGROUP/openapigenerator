@@ -1,6 +1,8 @@
 package buildgo
 
-import "openapigenerator/helper"
+import (
+	"openapigenerator/helper"
+)
 
 func ConvertDataType(datatype string, dataformat string, fieldname string) string {
 	dtype := ""
@@ -23,7 +25,13 @@ func ConvertDataType(datatype string, dataformat string, fieldname string) strin
 	} else if datatype == "string" {
 		/*kiv  seems string "byte","binary","date","date-time","password" not so important,
 		ignore format the the moment*/
-		dtype = "string"
+		if dataformat == "json" {
+			// logrus.Error(fieldname, " Json Found")
+			dtype = "any"
+		} else {
+			dtype = "string"
+		}
+
 	} else if datatype == "array" {
 		dtype = "array"
 	} else if datatype == "object" {

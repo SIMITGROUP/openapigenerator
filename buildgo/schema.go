@@ -53,6 +53,11 @@ func convGoLangType(s openapi3.Schema) string {
 		}
 
 	} else if s.Type == "string" {
+
+		if s.Format == "json" {
+			log.Error("s.Format==json")
+			fieldtype = "any"
+		}
 		//do nothing for string
 	} else if s.Type == "array" {
 		if s.Items.Value.Type != "" && s.Items.Value.Type != "object" {

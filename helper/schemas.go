@@ -41,7 +41,9 @@ func PrepareSchemas() {
 			fieldobj.FieldType = fieldsettings.Value.Type
 			if fieldobj.FieldType == "object" {
 				fieldobj.FieldIsModel = true
-				if fieldsettings.Value.Properties == nil {
+				if fieldsettings.Ref != "" {
+					log.Fatal("Schema ", schemaname, " has field ", fieldname, ":object using ref which is not supported yet: ", fieldsettings.Ref)
+				} else if fieldsettings.Value.Properties == nil {
 					log.Fatal("Schema ", schemaname, " has field ", fieldname, ":object but undefine properties")
 				}
 			} else if fieldobj.FieldType == "array" {
@@ -61,6 +63,10 @@ func PrepareSchemas() {
 			// assign this field setting become 1 of the property in schema
 			schemaobj.FieldList[fieldobj.FieldName] = fieldobj
 		}
+		if schemasetting.Value.AdditionalProperties != nil {
+			log.Warn("*** ADDITIONAL PROPERTIES: ", schemaname, ": ", schemasetting.Value.AdditionalProperties.Value.Type)
+		}
+
 		//assign newschema into schema list
 		AllSchemas[schemaname] = schemaobj
 		log.Info("Complete schemas")
