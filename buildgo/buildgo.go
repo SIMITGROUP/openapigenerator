@@ -22,6 +22,8 @@ func Generate(doc *openapi3.T) {
 
 func WriteInfra() {
 	overridefile := helper.Proj.OverrideHandle
+	helper.CopyFile(helper.Proj.ApiFile, helper.Proj.GenerateFolder+"/api/api.yaml")
+	//copy api file into /api/api.yaml
 
 	//prepare main
 	//if file exists, but no override flag

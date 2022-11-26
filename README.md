@@ -150,7 +150,8 @@ test
     4. unit test base on server setting, or base on cli option
     
 functions
-    easy        
+    easy      
+        3. docker file
         8. refresh token how to know refresh link => define refresh url
     medium
         4. application choose yaml's accept mime type
@@ -163,7 +164,9 @@ functions
         7. try generator client 
     
     
-    DONE:    
+    DONE:   
+        1. copy api file into /api/api.yaml 
+        2. build in swagger-ui, with parameter on-off
         7. user service break oauth into 1 level deeper
         8. use embed to embed resource file
     

@@ -5,6 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 var SecuritySchemelist map[string]bool
+var WithSwagger = false
+
 func NewServer() *gin.Engine {
 	r := gin.Default()
 	//JWT is not supported at this moment

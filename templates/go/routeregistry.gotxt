@@ -1,7 +1,11 @@
 // auto generate by generator
 package openapi
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+)
 
 func registerRoutes(r *gin.Engine) {
 	{{ with . }}{{range .}}
@@ -11,7 +15,14 @@ func registerRoutes(r *gin.Engine) {
   	r.{{.Method}}("{{.Path}}",{{range $key,$security:= .Securities }}{{$key }}_Auth,{{end}}{{.RequestHandle.HandleName}})
 	{{ end }}
 	{{end}}{{ end }}
-
+	
+	r.GET("/event/api", func(c *gin.Context) {
+		c.FileAttachment("./api/api.yaml", "api.yaml")
+	})
+	//swagger ui for api documentation
+	if WithSwagger == true {
+		r.GET("/event/swagger-ui/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, ginSwagger.URL("/event/api")))
+	}
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})

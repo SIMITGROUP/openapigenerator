@@ -18,7 +18,13 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	listen := os.Getenv("API_LISTEN")
-
+	swaggerui := os.Getenv("SWAGGERUI")
+	if swaggerui == "" {
+		openapi.WithSwagger = false
+	} else {
+		openapi.WithSwagger = true
+	}
+	
 	r := openapi.NewServer()
 	if listen != "" {
 		r.Run(listen)

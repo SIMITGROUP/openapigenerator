@@ -4,7 +4,9 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -62,18 +64,18 @@ func CheckFileExists(folder string, filename string) bool {
 }
 func WriteFile(folder string, filename string, content string) {
 	GenerateFolder := Proj.GenerateFolder
-	targetfolder := ""
+	// targetfolder := ""
 	targetfile := ""
 
 	if folder != "" {
-		targetfolder = GenerateFolder + "/" + folder
+		// targetfolder = GenerateFolder + "/" + folder
 		targetfile = GenerateFolder + "/" + folder + "/" + filename
 	} else {
-		targetfolder = GenerateFolder
+		// targetfolder = GenerateFolder
 		targetfile = GenerateFolder + "/" + filename
 	}
-
-	_ = os.MkdirAll(targetfolder, 0777)
+	PrepareFolder(targetfile)
+	// _ = os.MkdirAll(targetfolder, 0777)
 	// fmt.Println("targetfile:", GenerateFolder, targetfile, "===", targetfolder, err)
 	err := os.WriteFile(targetfile, []byte(content), 0644)
 	if err == nil {
@@ -85,6 +87,31 @@ func WriteFile(folder string, filename string, content string) {
 
 	}
 
+}
+func PrepareFolder(targetfile string) error {
+	dir := filepath.Dir(targetfile)
+	err := os.MkdirAll(dir, 0777)
+	if err != nil {
+		log.Fatal("Can't write :", err.Error())
+	}
+	return err
+}
+
+func CopyFile(sourceFile string, destinationFile string) error {
+
+	input, err := ioutil.ReadFile(sourceFile)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	PrepareFolder(destinationFile)
+	err = ioutil.WriteFile(destinationFile, input, 0644)
+	if err != nil {
+		log.Error("Error creating", destinationFile)
+		log.Fatal(err)
+		return err
+	}
+	return nil
 }
 
 func RemoveDuplicate[T string | int](sliceList []T) []T {

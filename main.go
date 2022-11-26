@@ -40,6 +40,7 @@ func main() {
 	helper.Proj.ProjectName = ProjectName
 	helper.Proj.AllEnvVars = map[string]string{
 		"API_LISTEN": helper.Proj.ListenAddress,
+		"SWAGGERUI":  "true",
 	}
 	if OverrideFile == "true" {
 		helper.Proj.OverrideHandle = true
