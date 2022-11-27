@@ -12,7 +12,7 @@ import (
 func PrepareSchemas() {
 	for schemaname, schemasetting := range Doc.Components.Schemas {
 		log.Info("Prepare Schema: ", schemaname)
-
+		requiredfields := schemasetting.Value.Required
 		modelname := GetModelName(schemaname)
 		//initiate new schema
 		var schemaobj = Model_SchemaSetting{
@@ -28,7 +28,6 @@ func PrepareSchemas() {
 			var fieldobj = Model_Field{}
 			fieldobj.FieldIsModel = false
 			fieldobj.ApiFieldName = fieldname
-
 			fieldobj.FieldName = UpperCaseFirst(fieldname)
 			fieldobj.Description = fieldsettings.Value.Description
 			fieldobj.Example = getExamples(fieldsettings)
@@ -59,6 +58,12 @@ func PrepareSchemas() {
 
 			fieldobj.ApiFieldType = LowerCaseFirst(fieldsettings.Value.Type)
 			fieldobj.FieldFormat = LowerCaseFirst(fieldsettings.Value.Format)
+
+			for _, requiredfieldname := range requiredfields {
+				if fieldobj.ApiFieldName == requiredfieldname {
+					fieldobj.Required = true
+				}
+			}
 			log.Debug("    ", fieldname, " : ", fieldobj.FieldType, "  //example: ", fieldobj.Example)
 			// assign this field setting become 1 of the property in schema
 			schemaobj.FieldList[fieldobj.FieldName] = fieldobj

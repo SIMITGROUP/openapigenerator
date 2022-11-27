@@ -153,6 +153,7 @@ functions
     easy      
         3. docker file
         8. refresh token how to know refresh link => define refresh url
+        
     medium
         4. application choose yaml's accept mime type
         6. verification of jwt token need more improvement
@@ -163,7 +164,8 @@ functions
         5. components support reponses, examples, requestBodies, callbacks
         7. try generator client 
     
-    
+    misc:
+        auto define port base on yaml file, dont know viable or not
     DONE:   
         1. copy api file into /api/api.yaml 
         2. build in swagger-ui, with parameter on-off

@@ -9,7 +9,7 @@ import (
 
 
 type {{ .ModelName}} {{if eq .ModelType "object"}}struct{
-	{{ range .FieldList}}{{.FieldName}} {{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}} `json:"{{.ApiFieldName}}"` //{{.Description}}
+	{{ range .FieldList}}{{.FieldName}} {{if eq .FieldType  "array"}}[]{{.ChildItemType}}{{else}}{{.FieldType}}{{end}} `json:"{{.ApiFieldName}}" binding:"{{ if eq .Required true}}required{{else}}{{end}}"` //{{.Description}}
 	{{end}}
 }{{else if eq .ModelFormat "binary"}}[]byte {{else}}{{.ModelType}}{{end}}
 

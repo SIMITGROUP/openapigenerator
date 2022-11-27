@@ -30,6 +30,7 @@ type Model_Field struct {
 	ApiFieldType  string
 	FieldFormat   string
 	ApiFieldName  string
+	Required      bool
 	Description   string
 	Example       string
 	FieldIsModel  bool
