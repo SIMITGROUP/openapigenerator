@@ -5,7 +5,7 @@ type Model_ProjectSetting struct {
 	GenerateFolder string
 	ProjectName    string
 	ApiFile        string
-	ListenAddress  string
+	ListenPort     string
 	BuildLang      string
 	OverrideHandle bool
 	InitFunctions  []string

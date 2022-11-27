@@ -4,11 +4,13 @@ import (
 	"{{ .ProjectName}}/openapi"
 	"log"
 	"os"
-
+	"embed"
 	"github.com/joho/godotenv"
 
 )
 
+//go:embed api
+var embedfs embed.FS
 func main() {
 	{{range .InitFunctions}}
 	openapi.{{.}}(){{end}}
@@ -24,7 +26,7 @@ func main() {
 	} else {
 		openapi.WithSwagger = true
 	}
-	
+	openapi.SetEmbedFiles(embedfs)
 	r := openapi.NewServer()
 	if listen != "" {
 		r.Run(listen)

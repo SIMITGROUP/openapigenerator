@@ -27,7 +27,7 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 cd openapigenerator
 make
 
-./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --listen=":9000"  --lang="go"  --override="true"
+./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --port="9000"  --lang="go"  --override="true"
 ```
 use `--override="false"` if you wish to regenerate code without modify ```main.go``` and ```routehandle.go```
 
@@ -46,6 +46,18 @@ make
 5. Put in your real code at below file and repeat (3.)
     a.  ***openapiserverfolder/openapi/routerhandle.go***
     b.  ***openapiserverfolder/openapi/Model_xxx.go***
+
+
+# Run Docker
+1. generate project as above step
+2. in generated project folder run below command:
+```
+make dockerremove  #remove existing container and image if exists
+make docker  #build docker image
+make dockerrun    #run docker, under devnetwork
+make dockershell # access docker shell 
+```
+3. check Makefile to know detail command
 
 
 # Features
@@ -90,6 +102,8 @@ make
             - require content type ***application/json***
             - $ref link to suitable schema
     b. ***operationID*** is require to auto generate handle
+
+
 
 # Limitation
 1. api refer to Schema type "array" , only able to show blank array
@@ -151,7 +165,7 @@ test
     
 functions
     easy      
-        3. docker file
+        
         8. refresh token how to know refresh link => define refresh url
         
     medium
@@ -167,6 +181,8 @@ functions
     misc:
         auto define port base on yaml file, dont know viable or not
     DONE:   
+        to be confirm
+            3. docker file
         1. copy api file into /api/api.yaml 
         2. build in swagger-ui, with parameter on-off
         7. user service break oauth into 1 level deeper

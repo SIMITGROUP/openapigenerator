@@ -48,6 +48,7 @@ func WriteInfra() {
 	_ = gotemplate.Execute(&gomodbytes, helper.Proj)
 	helper.WriteFile("", "go.mod", gomodbytes.String())
 
+	// helper.Proj.ProjectName
 	//prepare Makefile
 	var makebytes bytes.Buffer
 	makefilepath := "templates/go/Makefile.txt"
@@ -75,5 +76,14 @@ func WriteInfra() {
 	envvartemplate, _ = envvartemplate.Parse(dotenvsrc)
 	_ = envvartemplate.Execute(&envvarbytes, helper.Proj.AllEnvVars)
 	helper.WriteFile("", ".env.default", envvarbytes.String())
+
+	//prepare .env
+	var dockerbytes bytes.Buffer
+	dockerfilepath := "templates/go/dockerfile.txt"
+	dockersrc := helper.ReadFile(dockerfilepath)
+	dockerfiletemplate := template.New("dockerfile")
+	dockerfiletemplate, _ = dockerfiletemplate.Parse(dockersrc)
+	_ = dockerfiletemplate.Execute(&dockerbytes, helper.Proj)
+	helper.WriteFile("", "Dockerfile", dockerbytes.String())
 
 }

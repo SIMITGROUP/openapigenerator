@@ -39,10 +39,10 @@ func GenerateTestFuncName(method string, path string) (funcname string) {
 }
 func getTestServer() string {
 	applink := "http://localhost"
-	arr := strings.Split(helper.Proj.ListenAddress, ":")
-	if len(arr) == 2 {
-		applink = applink + ":" + arr[1]
-	}
+	// arr := strings.Split(helper.Proj.ListenAddress, ":")
+	// if len(arr) == 2 {
+	applink = applink + ":" + helper.Proj.ListenPort
+	// }
 	return applink
 }
 func WriteTest() {

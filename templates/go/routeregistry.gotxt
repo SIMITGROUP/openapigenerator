@@ -2,10 +2,17 @@
 package openapi
 
 import (
+	"embed"
+	"net/http"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
+var EmbedFiles embed.FS
+
+func SetEmbedFiles(file embed.FS) {
+	EmbedFiles = file
+}
 
 func registerRoutes(r *gin.Engine) {
 	{{ with . }}{{range .}}
@@ -17,7 +24,10 @@ func registerRoutes(r *gin.Engine) {
 	{{end}}{{ end }}
 	
 	r.GET("/event/api", func(c *gin.Context) {
-		c.FileAttachment("./api/api.yaml", "api.yaml")
+		byteFile, _ := EmbedFiles.ReadFile("api/api.yaml")		
+		c.Header("Content-Disposition", "attachment; filename=api.yaml")
+		c.Data(http.StatusOK, "application/octet-stream", byteFile)
+		// c.FileAttachment("./api/api.yaml", "api.yaml")
 	})
 	//swagger ui for api documentation
 	if WithSwagger == true {

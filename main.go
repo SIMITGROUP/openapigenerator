@@ -16,7 +16,7 @@ import (
 var GenerateFolder = ""
 var ProjectName = ""
 var ApiFile = ""
-var ListenAddress = ""
+var ListenPort = ""
 var BuildLang = ""
 var OverrideFile = "false"
 
@@ -28,18 +28,18 @@ func main() {
 	flag.StringVar(&GenerateFolder, "targetfolder", "../openapiserverfolder", "Generate Folder to which folder")
 	flag.StringVar(&ProjectName, "projectname", "openapiserver", "Rest API GO project name")
 	flag.StringVar(&ApiFile, "apifile", "spec.yaml", "openapi v3 yaml file")
-	flag.StringVar(&ListenAddress, "listen", ":8982", "listen to which address, default :8982")
+	flag.StringVar(&ListenPort, "port", ":9000", "listen to which port, default: 9000")
 	flag.StringVar(&OverrideFile, "override", "false", "Override main.go and routehandle.go if exists, default false")
 	flag.Parse()
 
 	helper.SetEmbedFiles(embedfs)
 	helper.Proj.ApiFile = ApiFile
-	helper.Proj.ListenAddress = ListenAddress
+	helper.Proj.ListenPort = ListenPort
 	helper.Proj.BuildLang = BuildLang
 	helper.Proj.GenerateFolder = GenerateFolder
 	helper.Proj.ProjectName = ProjectName
 	helper.Proj.AllEnvVars = map[string]string{
-		"API_LISTEN": helper.Proj.ListenAddress,
+		"API_LISTEN": ":" + helper.Proj.ListenPort,
 		"SWAGGERUI":  "true",
 	}
 	if OverrideFile == "true" {

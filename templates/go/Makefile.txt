@@ -3,6 +3,17 @@ build:
 	go mod tidy
 	go build .
 	@echo "Build successfully"
+docker:
+	go mod tidy
+	GOOS=linux GOARCH=amd64 go build -o resources/{{.ProjectName}} .	
+	docker build -t {{.ProjectName}}-img -f Dockerfile .
+dockerremove:
+	docker rm {{.ProjectName}}
+	docker rmi {{.ProjectName}}-img
+dockerrun:	
+	docker run -p {{.ListenPort}}:{{.ListenPort}} --name {{.ProjectName}} -e X_Api_Key=123 --net devnetwork {{.ProjectName}}-img
+dockershell:
+	docker run -it -p {{.ListenPort}}:{{.ListenPort}} --name eventapi -e X_Api_Key=123  --entrypoint=/bin/sh --net devnetwork {{.ProjectName}}-img
 unittest:
 	go get -t ./test
 	go test -v ./test/*test.go
