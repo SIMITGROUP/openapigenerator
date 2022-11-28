@@ -5,7 +5,7 @@ build:
 	@echo "Build successfully"
 docker:
 	go mod tidy
-	GOOS=linux GOARCH=amd64 go build -o resources/{{.ProjectName}} .	
+	GOOS=linux GOARCH=amd64 go build -o dist/{{.ProjectName}} .	
 	docker build -t {{.ProjectName}}-img -f Dockerfile .
 dockerremove:
 	docker rm {{.ProjectName}}

@@ -41,6 +41,7 @@ func main() {
 	helper.Proj.AllEnvVars = map[string]string{
 		"API_LISTEN": ":" + helper.Proj.ListenPort,
 		"SWAGGERUI":  "true",
+		"GIN_MODE":   "debug", // or release
 	}
 	if OverrideFile == "true" {
 		helper.Proj.OverrideHandle = true
