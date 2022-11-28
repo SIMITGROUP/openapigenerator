@@ -79,7 +79,7 @@ func WriteInfra() {
 
 	//prepare .env
 	var dockerbytes bytes.Buffer
-	dockerfilepath := "templates/go/dockerfile.txt"
+	dockerfilepath := "templates/go/preparedockerfile.txt"
 	dockersrc := helper.ReadFile(dockerfilepath)
 	dockerfiletemplate := template.New("dockerfile")
 	dockerfiletemplate, _ = dockerfiletemplate.Parse(dockersrc)
