@@ -1,4 +1,5 @@
-FROM golang:alpine
+FROM alpine
+# FROM golang:alpine
 WORKDIR /app
 COPY dist/{{.ProjectName}} /app
 COPY .env.default /app/.env
