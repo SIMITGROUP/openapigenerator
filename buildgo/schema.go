@@ -56,7 +56,7 @@ func convGoLangType(s openapi3.Schema) string {
 
 		if s.Format == "json" {
 			log.Error("s.Format==json")
-			fieldtype = "any"
+			fieldtype = "bson.M"
 		}
 		//do nothing for string
 	} else if s.Type == "array" {

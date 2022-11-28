@@ -27,7 +27,7 @@ func ConvertDataType(datatype string, dataformat string, fieldname string) strin
 		ignore format the the moment*/
 		if dataformat == "json" {
 			// logrus.Error(fieldname, " Json Found")
-			dtype = "any"
+			dtype = "bson.M"
 		} else {
 			dtype = "string"
 		}
