@@ -15,15 +15,15 @@ func SetEmbedFiles(file embed.FS) {
 }
 
 func registerRoutes(r *gin.Engine) {
-	{{ with . }}{{range .}}
+	{{ with .routesettings }}{{range .}}
 	{{range .RequestSettings}}	
 	// {{ .Summary }}
     // {{ .Description }}	
   	r.{{.Method}}("{{.Path}}",{{range $key,$security:= .Securities }}{{$key }}_Auth,{{end}}{{.RequestHandle.HandleName}})
 	{{ end }}
 	{{end}}{{ end }}
-	
-	r.GET("/event/api", func(c *gin.Context) {
+	{{ with .projectsetting}}
+	r.GET("/{{.ProjectName}}/api", func(c *gin.Context) {
 		byteFile, _ := EmbedFiles.ReadFile("api/api.yaml")		
 		c.Header("Content-Disposition", "attachment; filename=api.yaml")
 		c.Data(http.StatusOK, "application/octet-stream", byteFile)
@@ -31,9 +31,9 @@ func registerRoutes(r *gin.Engine) {
 	})
 	//swagger ui for api documentation
 	if WithSwagger == true {
-		r.GET("/event/swagger-ui/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, ginSwagger.URL("/event/api")))
+		r.GET("/{{.ProjectName}}/swagger-ui/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, ginSwagger.URL("/{{.ProjectName}}/api")))
 	}
-
+	{{end}}
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
 	})
