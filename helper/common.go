@@ -205,3 +205,7 @@ func SubString(txt string, startno int, endno int) string {
 
 	return safeSubstring
 }
+
+func ConvertApiKeyToEnvVar(keyname string) string {
+	return strings.Replace(keyname, "-", "_", -1)
+}

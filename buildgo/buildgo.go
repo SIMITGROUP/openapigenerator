@@ -16,6 +16,7 @@ func Generate(doc *openapi3.T) {
 	WriteRoutes()
 	WriteSecuritySchemes()
 	WriteHandles()
+	WriteEnvVars()
 	WriteTest()
 
 }
@@ -69,15 +70,6 @@ func WriteInfra() {
 	helper.WriteFile("openapi", "ZServer.go", serverbytes.String())
 
 	//prepare .env
-	var envvarbytes bytes.Buffer
-	envvarfilepath := "templates/go/dot.env"
-	dotenvsrc := helper.ReadFile(envvarfilepath)
-	envvartemplate := template.New("envvar")
-	envvartemplate, _ = envvartemplate.Parse(dotenvsrc)
-	_ = envvartemplate.Execute(&envvarbytes, helper.Proj.AllEnvVars)
-	helper.WriteFile("", ".env.default", envvarbytes.String())
-
-	//prepare .env
 	var dockerbytes bytes.Buffer
 	dockerfilepath := "templates/go/preparedockerfile.txt"
 	dockersrc := helper.ReadFile(dockerfilepath)
@@ -86,4 +78,15 @@ func WriteInfra() {
 	_ = dockerfiletemplate.Execute(&dockerbytes, helper.Proj)
 	helper.WriteFile("", "Dockerfile", dockerbytes.String())
 
+}
+
+func WriteEnvVars() {
+	//prepare .env
+	var envvarbytes bytes.Buffer
+	envvarfilepath := "templates/go/dot.env"
+	dotenvsrc := helper.ReadFile(envvarfilepath)
+	envvartemplate := template.New("envvar")
+	envvartemplate, _ = envvartemplate.Parse(dotenvsrc)
+	_ = envvartemplate.Execute(&envvarbytes, helper.Proj.AllEnvVars)
+	helper.WriteFile("", ".env.default", envvarbytes.String())
 }

@@ -71,6 +71,7 @@ type Model_RequestHandle struct {
 	Summary        string
 	Description    string
 	ResponseSchema Model_SchemaSetting
+	ResponseType   string
 	RequestBodies  Model_RequestBody
 	Parameters     map[string]Model_Parameter
 	Headers        []Model_Header

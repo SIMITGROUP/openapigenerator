@@ -20,7 +20,11 @@ func {{ .HandleName}}(c *gin.Context) {
     {{ range $hindex,$header:=.Headers}}c.Header("{{$header.Name}}", "{{$header.Example}}")
     {{end}}
     c.Header("Content-Type", "{{.ContentType}}")
-    {{if eq .ResponseSchema.ModelType "object"}}
+    {{if eq .ResponseType "array"}}
+    sample:={{.ResponseSchema.ModelName}}{}.GetExamples()
+    data:=[]{{.ResponseSchema.ModelName}}{sample}
+    c.JSON({{.HttpStatusCode}}, data)
+    {{else if eq .ResponseSchema.ModelType "object"}}
     data:={{.ResponseSchema.ModelName}}{}.GetExamples()
     c.JSON({{.HttpStatusCode}}, data)
     {{else if eq .ResponseSchema.ModelFormat "binary"}}data := []byte{}

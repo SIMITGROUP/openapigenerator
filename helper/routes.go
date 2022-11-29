@@ -73,7 +73,7 @@ func GetRequestHandle(methodtype string, path string, op *openapi3.Operation) Mo
 	} else {
 
 		//get this handle return data (object)
-		httpstatus, contenttype, responseschema, headers := GetResponseSchema(methodtype, path, op)
+		httpstatus, contenttype, responseschema, responsetype, headers := GetResponseSchema(methodtype, path, op)
 		//get this handle request body (object)
 		requestbody := GetRequestBodySetting(methodtype, path, op)
 		//get this handle parameters (array)
@@ -81,6 +81,7 @@ func GetRequestHandle(methodtype string, path string, op *openapi3.Operation) Mo
 		handle := Model_RequestHandle{
 			HandleName:     op.OperationID,
 			ResponseSchema: responseschema,
+			ResponseType:   responsetype,
 			Parameters:     paras,
 			RequestBodies:  requestbody,
 			Headers:        headers,
@@ -93,8 +94,9 @@ func GetRequestHandle(methodtype string, path string, op *openapi3.Operation) Mo
 		return handle
 	}
 }
-func GetResponseSchema(methodtype string, path string, op *openapi3.Operation) (int, string, Model_SchemaSetting, []Model_Header) {
+func GetResponseSchema(methodtype string, path string, op *openapi3.Operation) (int, string, Model_SchemaSetting, string, []Model_Header) {
 	//default
+	responsetype := "string"
 	selectedstatus := 0
 	selectedcontenttype := ""
 	headers := []Model_Header{}
@@ -123,7 +125,11 @@ func GetResponseSchema(methodtype string, path string, op *openapi3.Operation) (
 			_ = contentobj
 			break
 		}
+		if Left(httpstatuscode, 1) == "2" {
+			break
+		}
 	}
+
 	if selectedstatus == 0 {
 		log.Fatal("        undefine http responses, example: '2xx','3xx','4xx','5xx'")
 	}
@@ -135,11 +141,15 @@ func GetResponseSchema(methodtype string, path string, op *openapi3.Operation) (
 		log.Info("        response schema name: ", contentSchema.Ref)
 		schemaname := GetTypeNameFromRef(contentSchema.Ref)
 		schema = AllSchemas[schemaname]
+	} else if contentSchema.Value.Type == "array" && contentSchema.Value.Items.Ref != "" {
+		schemaname := GetTypeNameFromRef(contentSchema.Value.Items.Ref)
+		schema = AllSchemas[schemaname]
+		responsetype = "array"
 	} else {
 		log.Fatal("        undefined response schema $ref")
 	}
 
-	return selectedstatus, selectedcontenttype, schema, headers
+	return selectedstatus, selectedcontenttype, schema, responsetype, headers
 }
 func GetRequestBodySetting(methodtype string, path string, op *openapi3.Operation) Model_RequestBody {
 	log.Info("        request body: ", op.RequestBody)

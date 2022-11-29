@@ -73,7 +73,6 @@ func GenerateCode(ApiFile string) {
 			allvars := map[string]string{}
 			json.Unmarshal(jsonbyte, &allvars)
 			for key, val := range allvars {
-				log.Error(key, ":", val)
 				helper.Proj.AllEnvVars[key] = val
 			}
 		} else {

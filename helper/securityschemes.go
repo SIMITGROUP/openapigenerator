@@ -27,6 +27,9 @@ func PrepareSecuritySchemes() {
 			} else if sc.Flows.ClientCredentials != nil {
 				scopes = sc.Flows.ClientCredentials.Scopes
 			}
+		} else if schemetype == "apikey" {
+			envkeyname := ConvertApiKeyToEnvVar(setting.Value.Name)
+			Proj.AllEnvVars[envkeyname] = ""
 		}
 
 		AllSecuritySchemes[authname] = Model_SecuritySchemaSetting{

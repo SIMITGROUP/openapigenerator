@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"openapigenerator/helper"
+	"strconv"
 	"strings"
 	"text/template"
 )
@@ -51,15 +52,18 @@ func WriteTest() {
 		for method, reqsetting := range pathsetting.RequestSettings {
 			newpath := GenerateSamplePath(path, reqsetting.RequestHandle.Parameters)
 			var writebytes bytes.Buffer
-			srcsettings := map[string]string{}
+			srcsettings := map[string]any{}
 			functionname := GenerateTestFuncName(method, path)
 
-			srcsettings["TestName"] = "Test" + functionname
+			srcsettings["FuncName"] = functionname
 			srcsettings["RequestServer"] = getTestServer()
 			srcsettings["RequestMethod"] = method
 			srcsettings["RequestPath"] = newpath
 			srcsettings["ContentType"] = reqsetting.RequestHandle.ContentType
-			testfilename := functionname + "_test.go"
+			srcsettings["StatusCode"] = strconv.FormatInt(int64(reqsetting.RequestHandle.HttpStatusCode), 10)
+			srcsettings["Envvars"] = helper.Proj.AllEnvVars
+
+			testfilename := "Z" + functionname + "_test.go"
 			srcpath := "templates/go/test.gotxt"
 			src := helper.ReadFile(srcpath)
 			srctemplate := template.New("test")
