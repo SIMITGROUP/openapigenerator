@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // prepare unit test request path according path's parameter
@@ -70,10 +68,10 @@ func WriteTest() {
 
 				modelname := reqsetting.RequestHandle.RequestBodies.RequestSchema.ModelName
 				var schemaobj helper.Model_SchemaSetting
-				log.Error("functionname:", functionname, "  ,modelname:", modelname)
+				// log.Error("functionname:", functionname, "  ,modelname:", modelname)
 				for schemaname, schm := range helper.AllSchemas {
 					if schm.ModelName == modelname {
-						log.Error(" .     schema name:", schemaname)
+						// log.Error(" .     schema name:", schemaname)
 						schemaobj = helper.AllSchemas[schemaname]
 						break
 					}
@@ -88,7 +86,7 @@ func WriteTest() {
 				}
 				examplesstr = strings.TrimSuffix(examplesstr, ",\n")
 				examplesstr = examplesstr + "}`"
-				log.Error("examplesstr:", examplesstr)
+				// log.Error("examplesstr:", examplesstr)
 				srcsettings["Examplestr"] = examplesstr
 			} else {
 				srcsettings["Examplestr"] = ""
