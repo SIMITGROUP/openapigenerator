@@ -81,7 +81,7 @@ func WriteTest() {
 
 				examplesstr := "`{\n"
 				for f, fsetting := range schemaobj.FieldList {
-					tmp := fmt.Sprintf("\"%s\": %s,\n", f, fsetting.Example)
+					tmp := fmt.Sprintf("		\"%s\": %s,\n", f, fsetting.Example)
 					tmp = strings.Replace(tmp, "map[string]interface {}", "", -1)
 					examplesstr = examplesstr + tmp
 
