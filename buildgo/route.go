@@ -5,8 +5,6 @@ import (
 	"openapigenerator/helper"
 	"strings"
 	"text/template"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 // register routes
@@ -28,16 +26,16 @@ func WriteRoutes() {
 	// routesettings["sss"].Path
 	// routesettings["sss"].RequestSettings
 
-	parameters := bson.M{
-		"routesettings":  routesettings,
-		"projectsetting": helper.Proj,
-	}
+	// parameters := bson.M{
+	// 	"routesettings":  routesettings,
+	// 	"projectsetting": helper.Proj,
+	// }
 	var routebytes bytes.Buffer
 	routepath := "templates/go/routeregistry.gotxt"
 	routesrc := helper.ReadFile(routepath)
 	routetemplate := template.New("route")
 	routetemplate, _ = routetemplate.Parse(routesrc)
-	// _ = routetemplate.Execute(&routebytes, routesettings)
-	_ = routetemplate.Execute(&routebytes, parameters)
+	_ = routetemplate.Execute(&routebytes, routesettings)
+	// _ = routetemplate.Execute(&routebytes, parameters)
 	helper.WriteFile("openapi", "ZRouterRegistry.go", routebytes.String())
 }
