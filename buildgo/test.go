@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // prepare unit test request path according path's parameter
@@ -62,6 +64,35 @@ func WriteTest() {
 			srcsettings["ContentType"] = reqsetting.RequestHandle.ContentType
 			srcsettings["StatusCode"] = strconv.FormatInt(int64(reqsetting.RequestHandle.HttpStatusCode), 10)
 			srcsettings["Envvars"] = helper.Proj.AllEnvVars
+			//if requestbody is required, prepare sample requestbody
+			if reqsetting.RequestHandle.RequestBodies.RequestSchema.ModelType != "" {
+				srcsettings["WithRequestBody"] = true
+
+				modelname := reqsetting.RequestHandle.RequestBodies.RequestSchema.ModelName
+				var schemaobj helper.Model_SchemaSetting
+				log.Error("functionname:", functionname, "  ,modelname:", modelname)
+				for schemaname, schm := range helper.AllSchemas {
+					if schm.ModelName == modelname {
+						log.Error(" .     schema name:", schemaname)
+						schemaobj = helper.AllSchemas[schemaname]
+						break
+					}
+				}
+
+				examplesstr := "`{\n"
+				for f, fsetting := range schemaobj.FieldList {
+					tmp := fmt.Sprintf("\"%s\": %s,\n", f, fsetting.Example)
+					tmp = strings.Replace(tmp, "map[string]interface {}", "", -1)
+					examplesstr = examplesstr + tmp
+
+				}
+				examplesstr = strings.TrimSuffix(examplesstr, ",\n")
+				examplesstr = examplesstr + "}`"
+				log.Error("examplesstr:", examplesstr)
+				srcsettings["Examplestr"] = examplesstr
+			} else {
+				srcsettings["Examplestr"] = ""
+			}
 
 			testfilename := "Z" + functionname + "_test.go"
 			srcpath := "templates/go/test.gotxt"

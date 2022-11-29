@@ -8,7 +8,7 @@ import (
 
 func Test{{.FuncName}}(t *testing.T) {
 	requestURL := fmt.Sprintf("%v%v", "{{.RequestServer}}","{{.RequestPath}}")
-	req, err := http.NewRequest("{{.RequestMethod}}", requestURL, nil)
+	req, err := http.NewRequest("{{.RequestMethod}}", requestURL, {{if eq .WithRequestBody true}}{{.FuncName}}_RequestBody(){{else}}nil{{end}})
 	if err != nil {
 		t.Error(err)
 	} else {
@@ -60,4 +60,11 @@ func {{.FuncName}}(t *testing.T, req *http.Request)  {
 
 }
 
+{{if eq .WithRequestBody true}}
+func {{.FuncName}}_RequestBody()*strings.Reader{
+	data := {{.Examplestr}}
+	return strings.NewReader(data)
+}
+{{end}}
 */
+

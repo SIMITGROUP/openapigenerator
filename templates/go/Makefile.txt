@@ -14,6 +14,7 @@ dockerrun:
 	docker run -p {{.ListenPort}}:{{.ListenPort}} --name {{.ProjectName}} -e X_Api_Key=123 --net devnetwork {{.ProjectName}}-img
 dockershell:
 	docker run -it -p {{.ListenPort}}:{{.ListenPort}} --name eventapi -e X_Api_Key=123  --entrypoint=/bin/sh --net devnetwork {{.ProjectName}}-img
-unittest:
+apitest:
 	go get -t ./test
-	go test -v ./test/*test.go
+	grc go test -v ./test/*.go
+		
