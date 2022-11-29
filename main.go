@@ -2,7 +2,9 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
 	"flag"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
 
@@ -43,6 +45,7 @@ func main() {
 		"SWAGGERUI":  "true",
 		"GIN_MODE":   "debug", // or release
 	}
+
 	if OverrideFile == "true" {
 		helper.Proj.OverrideHandle = true
 	} else {
@@ -58,6 +61,24 @@ func GenerateCode(ApiFile string) {
 	doc, err := openapi3.NewLoader().LoadFromFile(ApiFile)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	extenvalues := doc.ExtensionProps.Extensions
+
+	// bson.M(extenvalues)
+	for extendname, extendvalue := range extenvalues {
+		if extendname == "x-env-vars" {
+			value := fmt.Sprintf("%s", extendvalue)
+			jsonbyte := []byte(value)
+			allvars := map[string]string{}
+			json.Unmarshal(jsonbyte, &allvars)
+			for key, val := range allvars {
+				log.Error(key, ":", val)
+				helper.Proj.AllEnvVars[key] = val
+			}
+		} else {
+			log.Warn("Unsupported extension value: ", extendvalue)
+		}
 	}
 	helper.PrepareObjects(doc)
 	/*
