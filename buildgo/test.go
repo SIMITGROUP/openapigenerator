@@ -62,6 +62,8 @@ func WriteTest() {
 			srcsettings["ContentType"] = reqsetting.RequestHandle.ContentType
 			srcsettings["StatusCode"] = strconv.FormatInt(int64(reqsetting.RequestHandle.HttpStatusCode), 10)
 			srcsettings["Envvars"] = helper.Proj.AllEnvVars
+			srcsettings["Securities"] = reqsetting.Securities
+			// reqsetting.Securities["SSS"].
 			//if requestbody is required, prepare sample requestbody
 			if reqsetting.RequestHandle.RequestBodies.RequestSchema.ModelType != "" {
 				srcsettings["WithRequestBody"] = true

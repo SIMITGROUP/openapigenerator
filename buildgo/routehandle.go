@@ -10,13 +10,13 @@ import (
 
 // use every registered route's operationID to create handle function
 func WriteHandles() bool {
-	overridefile := helper.Proj.OverrideHandle
+	// overridefile := helper.Proj.OverrideHandle
 
-	//if file exists, but no override flag
-	if helper.CheckFileExists("openapi", "routerhandle.go") && overridefile == false {
-		log.Warn("routerhandle.go exists, skip")
-		return false
-	}
+	// //if file exists, but no override flag
+	// if helper.CheckFileExists("openapi", "routerhandle.go") && overridefile == false {
+	// 	log.Warn("routerhandle.go exists, skip")
+	// 	return false
+	// }
 
 	allhandles := map[string]helper.Model_RequestHandle{}
 	for handlename, hsetting := range helper.AllRequestHandles {

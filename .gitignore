@@ -22,3 +22,4 @@ go.work
 
 # Ignore make output app
 openapigenerator
+dist/*

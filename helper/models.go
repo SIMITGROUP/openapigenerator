@@ -100,6 +100,7 @@ type Model_Parameter struct {
 // openapi3.SecurityScheme
 type Model_SecuritySchemaSetting = struct {
 	Name        string
+	EnvVarName  string
 	SchemeName  string
 	Type        string
 	Description string

@@ -41,8 +41,10 @@ func {{.FuncName}}(t *testing.T)  {
 		} else {
 			req, err = http.NewRequest("{{.RequestMethod}}", requestURL, requestdata)
 		}
-
-		// req.Header.Add("X-Api-Key", X_Api_Key)
+		{{range $apikeyname,$keysetting := .Securities}}
+			req.Header.Add("{{$keysetting.Name}}", {{$keysetting.EnvVarName}})
+		{{end}}
+		
 
 		if err != nil {
 			t.Error(err)

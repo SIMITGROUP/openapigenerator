@@ -1,20 +1,40 @@
-# Introduction
-### This project still under rapid development, it working but not yet production ready.
+# Openapi Generator
+An openapiv3 generator which can generate micro-services for GO Language
 
-The goal of this project is to allow developer setup microservices in shortest time, design with low code concept. 
+## Content
+<hr/>
 
+- [Gin Web Framework](#gin-web-framework)
+  - [Contents](#contents)
+  - [Introduction](#introduction)
+  - [Quick Start](#quickstart)
+
+
+
+## Introduction
 We know openapi is cool, usually we use swagger or postman for api testing, documentation and design. However, design, develop, testing and documentation is redundant work and spend us lot of time.
 
-To create good rest api, here is the step:
-1. Design openapi v3 with swaggerhub, postman or etc openapi GUI design tools, get your spec.yaml (use v3.0 only, v3.1 not yet)
-2. Follow steps written at ***How to use*** to generate your microservices program
-3. If your .yaml design well, the server will function as expected. Then you can edit your ***openapiserver/openapi/handles.go*** to make your microservices use real data.
+This generator able to generate micro-services with below capability:
+1. working gin mock server, you can modified it to become real microservice
+2. unit test for all restapi
+3. build in swagger-ui to allow you test api easily
+4. easily generate docker image
+5. build in support security scheme
 
 
- design api standard (spec.yaml), before development. The spec.yaml you did can turn into fully function microservices with step-by-step below. After code generated, just change the function defined in ***openapi/handle.go***, simple and easy.
+## Quickstart
+1. Download openapigenerator
+2. prepare openapi-v3 spec file, (tested in .yaml only)
+3. Execute below command:
+```bash
+./openapigenerator --apifile="openapiv3.yaml"  --targetfolder="~/myproject" --projectname="project1" --port="9000"  --lang="go"
+```
+4. Use vscode to open `~/myproject`
 
 
-# How to use
+
+
+## Setup
 1. clone this project to your home director
 ```bash
 cd ~
@@ -26,38 +46,39 @@ git clone https://github.com/SIMITGROUP/openapigenerator.git
 ```bash
 cd openapigenerator
 make
-
-./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../openapiserverfolder" --projectname="openapiserver" --port="9000"  --lang="go"  --override="true"
+./openapigenerator --apifile="samples/spec.yaml"  --targetfolder="../myproject" --projectname="project1" --port="9000"  --lang="go"
 ```
-use `--override="false"` if you wish to regenerate code without modify ```main.go``` and ```routehandle.go```
 
 3. use your rest api
-    3.1 copy openapiserverfolder/.env.default to .env
+    3.1 copy myproject/.env.default to .env
     3.2 fill in suitable info into .env
     3.3 run below command
 ```bash
-cd ../openapiserverfolder
+cd ../myproject
 make
-./openapiserver
+./project1
 ```
 
 4. Try your rest api http://localhost:9000, to access your mock rest api server. It will run return sample data defined in .yaml file.
 
-5. Put in your real code at below file and repeat (3.)
-    a.  ***openapiserverfolder/openapi/routerhandle.go***
-    b.  ***openapiserverfolder/openapi/Model_xxx.go***
+5. Browse to http://localhost:9000/doc/swagger-ui/index.html to access swagger-ui
 
-
-# Run Docker
-1. generate project as above step
-2. in generated project folder run below command:
+6. You can perform automatic unit test by open another terminal, run following command:
+```bash
+make apitest
 ```
-make dockerremove  #remove existing container and image if exists
-make docker  #build docker image
-make dockerrun    #run docker, under devnetwork
+
+## Run in Docker
+Project come with few command help you run microservice in docker environment. Check `Makefile` to know more detail
+
+1. create docker container in devnetwork.
+```
+cd myproject
+make dockerremove ; make docker;  make dockerrun #run docker, under devnetwork
 make dockershell # access docker shell 
 ```
-3. check Makefile to know detail command
+2 You may edit `Makefile` if you wish to pass create docker container with more useful setting
+
 
 
 # Features

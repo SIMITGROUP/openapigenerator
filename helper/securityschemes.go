@@ -38,6 +38,7 @@ func PrepareSecuritySchemes() {
 			In:          sc.In,
 			SchemeName:  authname,
 			Name:        sc.Name,
+			EnvVarName:  ConvertApiKeyToEnvVar(sc.Name),
 			Scheme:      sc.Scheme,
 			Scopes:      scopes,
 		}

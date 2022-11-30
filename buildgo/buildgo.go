@@ -22,23 +22,23 @@ func Generate(doc *openapi3.T) {
 }
 
 func WriteInfra() {
-	overridefile := helper.Proj.OverrideHandle
+	// overridefile := helper.Proj.OverrideHandle
 	helper.CopyFile(helper.Proj.ApiFile, helper.Proj.GenerateFolder+"/api/api.yaml")
 	//copy api file into /api/api.yaml
 
 	//prepare main
 	//if file exists, but no override flag
-	if helper.CheckFileExists("", "main.go") && overridefile == false {
-		log.Warn("main.go exists, skip")
-	} else {
-		var mainbytes bytes.Buffer
-		mainfilepath := "templates/go/main.gotxt"
-		mainsrc := helper.ReadFile(mainfilepath)
-		maintemplate := template.New("main")
-		maintemplate, _ = maintemplate.Parse(mainsrc)
-		_ = maintemplate.Execute(&mainbytes, helper.Proj)
-		helper.WriteFile("", "main.go", mainbytes.String())
-	}
+	// if helper.CheckFileExists("", "main.go") && overridefile == false {
+	// 	log.Warn("main.go exists, skip")
+	// } else {
+	var mainbytes bytes.Buffer
+	mainfilepath := "templates/go/main.gotxt"
+	mainsrc := helper.ReadFile(mainfilepath)
+	maintemplate := template.New("main")
+	maintemplate, _ = maintemplate.Parse(mainsrc)
+	_ = maintemplate.Execute(&mainbytes, helper.Proj)
+	helper.WriteFile("", "main.go", mainbytes.String())
+	// }
 
 	//prepare go.mod
 	var gomodbytes bytes.Buffer
