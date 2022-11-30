@@ -1,21 +1,13 @@
 // auto generate by generator
 package test
-import (
-	"fmt"
+import (	
 	"testing"
-	"net/http"	
 )
 
 func Test{{.FuncName}}(t *testing.T) {
-	requestURL := fmt.Sprintf("%v%v", "{{.RequestServer}}","{{.RequestPath}}")
-	req, err := http.NewRequest("{{.RequestMethod}}", requestURL, {{if eq .WithRequestBody true}}{{.FuncName}}_RequestBody(){{else}}nil{{end}})
-	if err != nil {
-		t.Error(err)
-	} else {
-		req.Header.Set("Accept", "{{.ContentType}}")	
-		{{.FuncName}}(t,req)
-		
-	}
+	{{.FuncName}}(t)
+
+	
 }
 
 // copy and modify below content and put into new file {{.FuncName}}.go (in this test folder)
@@ -26,45 +18,73 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"strings"
 
 	"github.com/bmizerany/assert"
 	"github.com/joho/godotenv"
 )
 
-func {{.FuncName}}(t *testing.T, req *http.Request)  {
+func {{.FuncName}}(t *testing.T)  {
 	_ = godotenv.Load()
 	{{range $envname,$envval:= .Envvars}}{{$envname}}:=os.Getenv("{{$envname}}")
 	{{end}}
 	{{range $envname,$envval:= .Envvars}}_,{{end}}_ = {{range $envname,$envval:= .Envvars}}{{$envname}},{{end}} 1
 	maxstring := 50
 	client := &http.Client{}
-	resp, err := client.Do(req)
+	for _,requestdata := range {{.FuncName}}_RequestBody(){
 
-	if err != nil {
-		t.Error(err)		
-	} else {
-		b, err := io.ReadAll(resp.Body)
-		responsebody := string(b)
-		if len(responsebody) > maxstring {
-			responsebody = responsebody[:maxstring] + "..." // trim too long body
+		requestURL := fmt.Sprintf("%v%v", "{{.RequestServer}}","{{.RequestPath}}")
+		var req *http.Request
+		var err error
+		if requestdata == nil {
+			req, err = http.NewRequest("{{.RequestMethod}}", requestURL, nil)
+		} else {
+			req, err = http.NewRequest("{{.RequestMethod}}", requestURL, requestdata)
 		}
-		if resp.StatusCode != {{.StatusCode}} {
-			t.Error(responsebody)
-		}
+
+		// req.Header.Add("X-Api-Key", X_Api_Key)
+
 		if err != nil {
-			t.Error("ERR2", err)
+			t.Error(err)
+		} else {
+			req.Header.Set("Accept", "{{.ContentType}}")					
 		}
-		assert.Equal(t, resp.StatusCode, {{.StatusCode}})
-		
+
+
+		resp, err := client.Do(req)
+
+		if err != nil {
+			t.Error(err)		
+		} else {
+			b, err := io.ReadAll(resp.Body)
+			responsebody := string(b)
+			if len(responsebody) > maxstring {
+				responsebody = responsebody[:maxstring] + "..." // trim too long body
+			}
+			if resp.StatusCode != {{.StatusCode}} {
+				t.Error(responsebody)
+			}
+			if err != nil {
+				t.Error("ERR2", err)
+			}
+			assert.Equal(t, resp.StatusCode, {{.StatusCode}})
+			
+		}
 	}
-
 }
 
-{{if eq .WithRequestBody true}}
-func {{.FuncName}}_RequestBody()*strings.Reader{
+func {{.FuncName}}_RequestBody()[]*strings.Reader{
+	result := []*strings.Reader{}
+	{{ if eq .WithRequestBody true}}
 	data := {{.Examplestr}}
-	return strings.NewReader(data)
+	result = append(result,strings.NewReader(data))
+	{{else}}
+	result = append(result,nil)
+	{{end}}
+	
+	
+	return result
 }
-{{end}}
+
 */
 
