@@ -33,7 +33,7 @@ An openapiv3 generator which can generate micro-services for GO Language
         - [Execute Unit Test](#execute-unit-test)   
     - [Secure Microservice](#secure-microservice) 
         - [Secure with ApiKey](#secure-with-apikey) 
-
+- [Todo](#todo)
 
 
 ## Introduction
@@ -434,3 +434,15 @@ paths:
 ```bash
 http get localhost:<portno>/api1 X-Api-Key:<you-key-code>
 ```
+
+# Todo
+1. Add `x-generator-setting` to direct set project name, port number and etc suitable configuration
+2. rename this project to prevent crash name with official openapi-generator
+3. support more component type
+4. client generators for different kind of languages
+5. add some common template for
+   * crud for different kind of database
+   * messaging template for sms, email, push notifications
+6. openapi 3.1
+7. more securityschemes
+8. data validation
