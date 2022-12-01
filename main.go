@@ -2,9 +2,7 @@ package main
 
 import (
 	"embed"
-	"encoding/json"
 	"flag"
-	"fmt"
 
 	log "github.com/sirupsen/logrus"
 
@@ -68,13 +66,10 @@ func GenerateCode(ApiFile string) {
 	// bson.M(extenvalues)
 	for extendname, extendvalue := range extenvalues {
 		if extendname == "x-env-vars" {
-			value := fmt.Sprintf("%s", extendvalue)
-			jsonbyte := []byte(value)
-			allvars := map[string]string{}
-			json.Unmarshal(jsonbyte, &allvars)
-			for key, val := range allvars {
-				helper.Proj.AllEnvVars[key] = val
-			}
+			helper.DefineEnvVarExists(extendname)
+
+		} else if extendname == "x-operationId-exists" {
+			helper.DefineRouteHandleExists(extendvalue)
 		} else {
 			log.Warn("Unsupported extension value: ", extendvalue)
 		}

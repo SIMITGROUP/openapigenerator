@@ -11,10 +11,18 @@ dockerremove:
 	docker rm {{.ProjectName}}
 	docker rmi {{.ProjectName}}-img
 dockerrun:	
-	docker run -p {{.ListenPort}}:{{.ListenPort}} --name {{.ProjectName}} -e X_Api_Key=123 --net devnetwork {{.ProjectName}}-img
+	docker run -p {{.ListenPort}}:{{.ListenPort}} --name {{.ProjectName}} -e GIN_MODE=release --net devnetwork {{.ProjectName}}-img
 dockershell:
-	docker run -it -p {{.ListenPort}}:{{.ListenPort}} --name eventapi -e X_Api_Key=123  --entrypoint=/bin/sh --net devnetwork {{.ProjectName}}-img
+	docker run -it -p {{.ListenPort}}:{{.ListenPort}} --name eventapi -e GIN_MODE=release  --entrypoint=/bin/sh --net devnetwork {{.ProjectName}}-img
 apitest:
 	go get -t ./test
 	grc go test -v ./test/*.go
-		
+windows:
+	go get .
+	GOOS=windows GOARCH=amd64 go build -o dist/openapigenerator-win.exe .
+linux:
+	go get .
+	GOOS=linux GOARCH=amd64 go build -o dist/openapigenerator-linux.bin .
+mac:
+	go get .
+	GOOS=darwin GOARCH=amd64 go build -o dist/openapigenerator-mac.bin .

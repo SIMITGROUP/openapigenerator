@@ -2,7 +2,7 @@ FROM alpine
 # FROM golang:alpine
 WORKDIR /app
 COPY dist/{{.ProjectName}} /app
-COPY .env.default /app/.env
+COPY .env.docker /app/.env
 EXPOSE {{.ListenPort}}
 USER nobody:nobody
 ENTRYPOINT ["./{{.ProjectName}}"]

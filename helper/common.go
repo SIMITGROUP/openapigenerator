@@ -2,6 +2,7 @@ package helper
 
 import (
 	"embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -208,4 +209,23 @@ func SubString(txt string, startno int, endno int) string {
 
 func ConvertApiKeyToEnvVar(keyname string) string {
 	return strings.Replace(keyname, "-", "_", -1)
+}
+
+func DefineRouteHandleExists(extendvalue any) {
+	value := fmt.Sprintf("%s", extendvalue)
+	jsonbyte := []byte(value)
+	allvars := map[string]bool{}
+	json.Unmarshal(jsonbyte, &allvars)
+	for key, val := range allvars {
+		Proj.AllExistsHandles[key] = val
+	}
+}
+func DefineEnvVarExists(extendvalue any) {
+	value := fmt.Sprintf("%s", extendvalue)
+	jsonbyte := []byte(value)
+	allvars := map[string]string{}
+	json.Unmarshal(jsonbyte, &allvars)
+	for key, val := range allvars {
+		Proj.AllEnvVars[key] = val
+	}
 }

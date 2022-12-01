@@ -2,14 +2,15 @@ package helper
 
 // project info
 type Model_ProjectSetting struct {
-	GenerateFolder string
-	ProjectName    string
-	ApiFile        string
-	ListenPort     string
-	BuildLang      string
-	OverrideHandle bool
-	InitFunctions  []string
-	AllEnvVars     map[string]string
+	GenerateFolder   string
+	ProjectName      string
+	ApiFile          string
+	ListenPort       string
+	BuildLang        string
+	OverrideHandle   bool
+	InitFunctions    []string
+	AllEnvVars       map[string]string
+	AllExistsHandles map[string]bool
 }
 
 // schema infos

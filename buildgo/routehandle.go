@@ -32,15 +32,12 @@ func WriteHandles() bool {
 			delete(allhandles, handlename)
 		} else {
 			log.Info("handle: ", handlename, ", ", hsetting.HttpStatusCode, " ", hsetting.ContentType)
+			existvalue, exists := helper.Proj.AllExistsHandles[handlename]
+			//no generate route handle, if api document exclude it
+			if exists == false || existvalue == false {
+				allhandles[handlename] = hsetting
+			}
 
-			// h := helper.Model_RequestHandle{
-			// 	HandleName:     handlename,
-			// ResponseSchema: hsetting.ResponseSchema,
-			// 	Parameters:     hsetting.Parameters,
-			// 	RequestBodies:  hsetting.RequestBodies,
-			// 	HttpStatusCode
-			// }
-			allhandles[handlename] = hsetting
 		}
 
 	}
