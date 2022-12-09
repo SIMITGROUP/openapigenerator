@@ -386,6 +386,8 @@ If you wish to build binary for specific OS and distribute manually. Folow step
 make windows #build for windows
 make linux #build for linux
 make mac #build for mac
+make mac-arm #build for mac m1 type processor
+
 ```
 2. Distrubute file in `dist/`, along with suitable `.env` file
 

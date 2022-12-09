@@ -26,3 +26,6 @@ linux:
 mac:
 	go get .
 	GOOS=darwin GOARCH=amd64 go build -o dist/{{.ProjectName}}-mac.bin .
+mac-arm:
+	go get .
+	GOOS=darwin GOARCH=arm64 go build -o dist/{{.ProjectName}}-mac.bin .
