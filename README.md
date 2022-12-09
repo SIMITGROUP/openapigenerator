@@ -1,8 +1,6 @@
 # Openapi Generator
 An openapiv3 generator which can generate micro-services for GO Language
 
-*** this project good enough for prototyping, and the documentation is ongoing ***
-
 ## Content
 - [Openapi Generator](#openapi-generator)
   - [Contents](#contents)
@@ -482,7 +480,5 @@ http get localhost:<portno>/api1 X-Api-Key:<you-key-code>
    * messaging template for sms, email, push notifications
 6. openapi 3.1
 7. more securityschemes
-8. data validation
+8. more complete data validation
 
-
-1. fix no .env.docker
