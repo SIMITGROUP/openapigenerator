@@ -12,6 +12,8 @@ An openapiv3 generator which can generate micro-services for GO Language
 - [Openapi Document](#openapi-document)
     - [Requirements](#requirements)
     - [Define Environment Variables](#define-environment-variables)
+    - [Define Error Schema](#define-error-schema)
+    - [Require 2XX and 4XX In Every Response ](#require-2XX-and-4XX-in-every-response)    
     - [Not Supported Features](#not-supported-features)
 - [Develop In Generated Project](#develop-in-generated-project)     
     - [Project Overview](#project-overview) 
@@ -113,6 +115,39 @@ x-env-vars:
   MONGO_USER: 
   MONGO_PASS: 
 ```
+# Define Error Schema
+You can define special schema "Error", which shall include 2 field: `err_code` and `err_msg` as below example.
+ http request for `post`,`put` which you may submit requestbody.
+```yaml
+    Error:
+      type: object      
+      properties:
+        err_code:
+          type: string
+          example: "ER-MG-001"
+        err_msg:
+          description: A human readable error message
+          type: string
+          example: "Mongodb not connected"
+        version:
+          type: string
+          example: v1
+```
+How it work:
+1. This schema can define as error 4xx response for http request with requestbody (post, put, patch)
+2. when the actual request body not compatible with schema defination, the `err_msg` will display error like below:
+```json
+{
+  "err_code": "ERR_INPUT_VALIDATION",
+  "err_msg": "Key: 'Model_Book.Bookid' Error:Field validation for 'Bookid' failed on the 'required' tag",
+  "version": "v1"
+}
+```
+
+# Require 2XX and 4XX In Every Response
+For good practise, every http request shall define at least 1 response for 2xx and 4xx. There is hardcoded behaviour which will identity 2xx as  success response, and 4xx is failed response.
+
+
 
 # Develop In Generated Project
 After code generated, we can start over development by change the generated code. You shall prepare below dev environment:
@@ -446,3 +481,6 @@ http get localhost:<portno>/api1 X-Api-Key:<you-key-code>
 6. openapi 3.1
 7. more securityschemes
 8. data validation
+
+
+1. fix no .env.docker

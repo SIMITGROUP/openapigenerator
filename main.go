@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"flag"
+	"path"
 
 	log "github.com/sirupsen/logrus"
 
@@ -37,7 +38,9 @@ func main() {
 	helper.Proj.ListenPort = ListenPort
 	helper.Proj.BuildLang = BuildLang
 	helper.Proj.GenerateFolder = GenerateFolder
-	helper.Proj.ProjectName = ProjectName
+	helper.Proj.ProjectFullName = ProjectName
+	helper.Proj.ProjectName = path.Base(ProjectName)
+	helper.Proj.AllExistsHandles = map[string]bool{}
 	helper.Proj.AllEnvVars = map[string]string{
 		"API_LISTEN": ":" + helper.Proj.ListenPort,
 		"SWAGGERUI":  "true",
@@ -66,7 +69,7 @@ func GenerateCode(ApiFile string) {
 	// bson.M(extenvalues)
 	for extendname, extendvalue := range extenvalues {
 		if extendname == "x-env-vars" {
-			helper.DefineEnvVarExists(extendname)
+			helper.DefineEnvVarExists(extendvalue)
 
 		} else if extendname == "x-operationId-exists" {
 			helper.DefineRouteHandleExists(extendvalue)

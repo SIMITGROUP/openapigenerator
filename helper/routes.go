@@ -72,27 +72,160 @@ func GetRequestHandle(methodtype string, path string, op *openapi3.Operation) Mo
 		return requestobj
 	} else {
 
-		//get this handle return data (object)
-		httpstatus, contenttype, responseschema, responsetype, headers := GetResponseSchema(methodtype, path, op)
 		//get this handle request body (object)
 		requestbody := GetRequestBodySetting(methodtype, path, op)
 		//get this handle parameters (array)
 		paras := GetParameters(methodtype, path, op)
-		handle := Model_RequestHandle{
-			HandleName:     op.OperationID,
-			ResponseSchema: responseschema,
-			ResponseType:   responsetype,
-			Parameters:     paras,
-			RequestBodies:  requestbody,
-			Headers:        headers,
-			HttpStatusCode: httpstatus,
-			ContentType:    contenttype,
-			Description:    op.Description,
-			Summary:        op.Summary,
-		}
+
+		//get this handle return data (object)
+		// httpstatus, contenttype, responseschema, responsetype, headers := GetResponseSchema(methodtype, path, op)
+		handle := GetHandleSchema(methodtype, path, op, paras, requestbody)
+		// handle := Model_RequestHandle{
+		// 	HandleName:     op.OperationID,
+		// 	ResponseSchema: responseschema,
+		// 	ResponseType:   responsetype,
+		// 	Parameters:     paras,
+		// 	RequestBodies:  requestbody,
+		// 	Headers:        headers,
+		// 	HttpStatusCode: httpstatus,
+		// 	ContentType:    contenttype,
+		// 	Description:    op.Description,
+		// 	Summary:        op.Summary,
+		// }
 		AllRequestHandles[op.OperationID] = handle
 		return handle
 	}
+}
+
+func GetHandleSchema(methodtype string, path string, op *openapi3.Operation, paras map[string]Model_Parameter, requestbody Model_RequestBody) Model_RequestHandle {
+
+	//default value
+
+	//ok return
+	httpstatus := 200
+	responsetype := "object"
+	responseschema := Model_SchemaSetting{}
+	headers := []Model_Header{}
+	selectedcontenttype := "application/json"
+
+	success_done := false
+	//failed return
+	errhttpstatus := 400
+	errresponsetype := ""
+	errresponseschema := Model_SchemaSetting{}
+	errheaders := []Model_Header{}
+	errcontenttype := "application/json"
+	error_done := false
+	for httpstatuscode, statusconfig := range op.Responses {
+		log.Info("        status : ", httpstatuscode)
+		statusnumber, _ := strconv.Atoi(httpstatuscode)
+
+		//prepare success schema
+		singledigitcode := Left(httpstatuscode, 1)
+		if singledigitcode == "2" && success_done == false {
+			success_done = true
+			httpstatus = statusnumber
+			for headername, headersetting := range statusconfig.Value.Headers {
+				header := Model_Header{
+					Name:        headername,
+					Description: headersetting.Value.Description,
+					Type:        headersetting.Value.Schema.Value.Type,
+					Example:     headersetting.Value.Schema.Value.Example,
+				}
+				headers = append(headers, header)
+			}
+			for contenttype, _ := range statusconfig.Value.Content {
+				log.Info("            content type : ", contenttype)
+				selectedcontenttype = contenttype
+				break
+			}
+
+			responseschema, responsetype = GetSchemaInfoFromStatusCode(op, httpstatus, selectedcontenttype)
+
+		} else if singledigitcode == "4" && error_done == false {
+			error_done = true
+			errhttpstatus = statusnumber
+			for headername, headersetting := range statusconfig.Value.Headers {
+				header := Model_Header{
+					Name:        headername,
+					Description: headersetting.Value.Description,
+					Type:        headersetting.Value.Schema.Value.Type,
+					Example:     headersetting.Value.Schema.Value.Example,
+				}
+				errheaders = append(errheaders, header)
+			}
+			for contenttype, _ := range statusconfig.Value.Content {
+				log.Info("            content type : ", contenttype)
+				errcontenttype = contenttype
+				break
+			}
+			errresponseschema, errresponsetype = GetSchemaInfoFromStatusCode(op, errhttpstatus, errcontenttype)
+		}
+	}
+
+	if selectedcontenttype == "" {
+		log.Fatal("        undefine resonse content type, example application/json, text/html,text/plain\nrefer https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types")
+	}
+	// contentSchema := op.Responses.Get(selectedstatus).Value.Content.Get(selectedcontenttype).Schema
+	// if contentSchema.Ref != "" {
+	// 	log.Info("        response schema name: ", contentSchema.Ref)
+	// 	schemaname := GetTypeNameFromRef(contentSchema.Ref)
+	// 	schema = AllSchemas[schemaname]
+	// } else if contentSchema.Value.Type == "array" && contentSchema.Value.Items.Ref != "" {
+	// 	schemaname := GetTypeNameFromRef(contentSchema.Value.Items.Ref)
+	// 	schema = AllSchemas[schemaname]
+	// 	responsetype = "array"
+	// } else {
+	// 	log.Fatal("        undefined response schema $ref")
+	// }
+
+	if success_done == false {
+		log.Fatal("        Undefine http status 2xx")
+	}
+	if error_done == false {
+		log.Fatal("        Undefine http status 4xx")
+	}
+
+	handle := Model_RequestHandle{
+		HandleName: op.OperationID,
+
+		Description:   op.Description,
+		Summary:       op.Summary,
+		Parameters:    paras,
+		RequestBodies: requestbody,
+
+		Headers:        headers,
+		HttpStatusCode: httpstatus,
+		ResponseType:   responsetype,
+		ResponseSchema: responseschema,
+		ContentType:    selectedcontenttype,
+
+		ErrHeaders:        errheaders,
+		ErrHttpStatusCode: errhttpstatus,
+		ErrResponseType:   errresponsetype,
+		ErrResponseSchema: errresponseschema,
+		ErrContentType:    errcontenttype,
+	}
+	return handle
+}
+
+func GetSchemaInfoFromStatusCode(op *openapi3.Operation, statuscode int, contenttype string) (Model_SchemaSetting, string) {
+	var schema Model_SchemaSetting
+	responsetype := "object"
+	contentSchema := op.Responses.Get(statuscode).Value.Content.Get(contenttype).Schema
+	if contentSchema.Ref != "" {
+		log.Info("        response schema name: ", contentSchema.Ref)
+		schemaname := GetTypeNameFromRef(contentSchema.Ref)
+		schema = AllSchemas[schemaname]
+
+	} else if contentSchema.Value.Type == "array" && contentSchema.Value.Items.Ref != "" {
+		schemaname := GetTypeNameFromRef(contentSchema.Value.Items.Ref)
+		schema = AllSchemas[schemaname]
+		responsetype = "array"
+	} else {
+		log.Fatal("        undefined response schema $ref")
+	}
+	return schema, responsetype
 }
 func GetResponseSchema(methodtype string, path string, op *openapi3.Operation) (int, string, Model_SchemaSetting, string, []Model_Header) {
 	//default

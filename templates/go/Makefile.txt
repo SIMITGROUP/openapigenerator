@@ -19,10 +19,10 @@ apitest:
 	grc go test -v ./test/*.go
 windows:
 	go get .
-	GOOS=windows GOARCH=amd64 go build -o dist/openapigenerator-win.exe .
+	GOOS=windows GOARCH=amd64 go build -o dist/{{.ProjectName}}-win.exe .
 linux:
 	go get .
-	GOOS=linux GOARCH=amd64 go build -o dist/openapigenerator-linux.bin .
+	GOOS=linux GOARCH=amd64 go build -o dist/{{.ProjectName}}-linux.bin .
 mac:
 	go get .
-	GOOS=darwin GOARCH=amd64 go build -o dist/openapigenerator-mac.bin .
+	GOOS=darwin GOARCH=amd64 go build -o dist/{{.ProjectName}}-mac.bin .

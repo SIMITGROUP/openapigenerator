@@ -4,6 +4,7 @@ package helper
 type Model_ProjectSetting struct {
 	GenerateFolder   string
 	ProjectName      string
+	ProjectFullName  string
 	ApiFile          string
 	ListenPort       string
 	BuildLang        string
@@ -68,16 +69,25 @@ type Model_Responses struct {
 
 // routing handles info
 type Model_RequestHandle struct {
-	HandleName     string
-	Summary        string
-	Description    string
-	ResponseSchema Model_SchemaSetting
-	ResponseType   string
-	RequestBodies  Model_RequestBody
-	Parameters     map[string]Model_Parameter
-	Headers        []Model_Header
+	HandleName  string
+	Summary     string
+	Description string
+
+	//ok return
 	HttpStatusCode int
+	ResponseType   string
+	ResponseSchema Model_SchemaSetting
+	Headers        []Model_Header
 	ContentType    string
+	//failed return
+	ErrHttpStatusCode int
+	ErrResponseType   string
+	ErrResponseSchema Model_SchemaSetting
+	ErrHeaders        []Model_Header
+	ErrContentType    string
+	//inputs
+	RequestBodies Model_RequestBody
+	Parameters    map[string]Model_Parameter
 }
 
 // route's requestbody (collection of info submit by client)

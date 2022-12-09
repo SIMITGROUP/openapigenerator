@@ -89,4 +89,5 @@ func WriteEnvVars() {
 	envvartemplate, _ = envvartemplate.Parse(dotenvsrc)
 	_ = envvartemplate.Execute(&envvarbytes, helper.Proj.AllEnvVars)
 	helper.WriteFile("", ".env.default", envvarbytes.String())
+	helper.WriteFile("", ".env.docker", envvarbytes.String())
 }

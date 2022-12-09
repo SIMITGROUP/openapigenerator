@@ -12,6 +12,11 @@ import (
 func PrepareSchemas() {
 	for schemaname, schemasetting := range Doc.Components.Schemas {
 		log.Info("Prepare Schema: ", schemaname)
+
+		//Schema name "Error" require special field error_code, error_msg, need validation
+		if schemaname == "Error" {
+			ValidateIfErrorSchema(schemasetting)
+		}
 		requiredfields := schemasetting.Value.Required
 		modelname := GetModelName(schemaname)
 		//initiate new schema
@@ -136,4 +141,25 @@ func getExamples(op *openapi3.SchemaRef) string {
 
 	}
 	return val
+}
+
+func ValidateIfErrorSchema(schemasetting *openapi3.SchemaRef) {
+	has_error_code := false
+	has_error_msg := false
+
+	for fieldname, _ := range schemasetting.Value.Properties {
+		if fieldname == "err_code" {
+			has_error_code = true
+		}
+		if fieldname == "err_msg" {
+			has_error_msg = true
+		}
+	}
+
+	if has_error_code == false {
+		log.Fatal("Schema 'Error' is special schema require property err_code")
+	}
+	if has_error_msg == false {
+		log.Fatal("Schema 'Error' is special schema require property err_msg")
+	}
 }

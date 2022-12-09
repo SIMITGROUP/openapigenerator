@@ -14,12 +14,18 @@ func {{ .HandleName}}(c *gin.Context) {
     {{if eq $para.StoreIn "path"}}{{$parayeky}} := c.Param("{{$parayeky}}"){{else if eq $para.StoreIn "query"}}{{$parayeky}} := c.Query("{{$parayeky}}"){{else if eq $para.StoreIn "header"}}{{$parayeky}} := c.Request.Header["{{$parayeky}}"]{{end}}{{end}}
     {{range $parayeky,$para:= .Parameters}}_, {{end}}_ = {{range $parakey,$para := .Parameters}}{{ $parakey }}, {{end}}1
     {{end}}
-    {{if ne .RequestBodies.RequestSchema.ModelName  ""}}//request bodies
+    c.Header("Content-Type", "{{.ContentType}}")
+
+    {{if ne .RequestBodies.RequestSchema.ModelName  ""}}//start process request bodies    
     requestbodies := {{ .RequestBodies.RequestSchema.ModelName}}{}
-    _ = c.ShouldBindJSON(&requestbodies){{end}}
+    err := c.ShouldBindJSON(&requestbodies)
+    if err == nil {
+    {{end}}    
     {{ range $hindex,$header:=.Headers}}c.Header("{{$header.Name}}", "{{$header.Example}}")
     {{end}}
-    c.Header("Content-Type", "{{.ContentType}}")
+    
+
+    
     {{if eq .ResponseType "array"}}
     sample:={{.ResponseSchema.ModelName}}{}.GetExamples()
     data:=[]{{.ResponseSchema.ModelName}}{sample}
@@ -32,4 +38,24 @@ func {{ .HandleName}}(c *gin.Context) {
     c.Writer.Write(data)
     {{else}}var data {{.ResponseSchema.ModelName}}
     c.String({{.HttpStatusCode}}, data.GetExamples().ToString()){{end}}
+
+
+    {{if ne .RequestBodies.RequestSchema.ModelName  ""}}
+    }else{ //end process request bodies
+        {{if eq .ErrResponseType "array"}}
+        sample:={{.ErrResponseSchema.ModelName}}{}.GetExamples()
+        data:=[]{{.ErrResponseSchema.ModelName}}{sample}
+        c.JSON({{.ErrHttpStatusCode}}, data)
+        {{else if eq .ErrResponseSchema.ModelType "object"}}
+        data:={{.ErrResponseSchema.ModelName}}{}.GetExamples()
+        {{if eq .ErrResponseSchema.ModelName "Model_Error"}}data.Err_code="ERR_INPUT_VALIDATION"
+        data.Err_msg=err.Error(){{end}}
+        c.JSON({{.ErrHttpStatusCode}}, data)
+        {{else if eq .ErrResponseSchema.ModelFormat "binary"}}data := []byte{}
+        c.Status({{.ErrHttpStatusCode}})
+        c.Writer.Write(data)
+        {{else}}var data {{.ErrResponseSchema.ModelName}}
+        c.String({{.ErrHttpStatusCode}}, err.Error()){{end}}
+    }
+    {{end}}
 }{{end}}

@@ -215,17 +215,33 @@ func DefineRouteHandleExists(extendvalue any) {
 	value := fmt.Sprintf("%s", extendvalue)
 	jsonbyte := []byte(value)
 	allvars := map[string]bool{}
-	json.Unmarshal(jsonbyte, &allvars)
-	for key, val := range allvars {
-		Proj.AllExistsHandles[key] = val
+
+	err := json.Unmarshal(jsonbyte, &allvars)
+	if err == nil {
+		log.Info("Route")
+		for key, val := range allvars {
+			log.Info("    ", key, fmt.Sprintf("%T", val), val)
+			Proj.AllExistsHandles[key] = val
+		}
+	} else {
+		log.Error("Error setting x-operationId-exists: ", value)
 	}
+
 }
 func DefineEnvVarExists(extendvalue any) {
 	value := fmt.Sprintf("%s", extendvalue)
 	jsonbyte := []byte(value)
 	allvars := map[string]string{}
-	json.Unmarshal(jsonbyte, &allvars)
-	for key, val := range allvars {
-		Proj.AllEnvVars[key] = val
+	err := json.Unmarshal(jsonbyte, &allvars)
+
+	if err == nil {
+		log.Info("Define x-env-vars if exists: ")
+		for key, val := range allvars {
+			log.Info("    envvar: " + key)
+			Proj.AllEnvVars[key] = val
+		}
+	} else {
+		log.Error("Error setting x-env-vars: ", value)
 	}
+
 }
